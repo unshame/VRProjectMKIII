@@ -10,7 +10,7 @@ public class TriggerSpawn : MonoBehaviour {
 
     void OnTriggerStay(Collider other)
     {
-		if (Factory.Prefab.name == other.gameObject.name && other.tag != "ReadyForDestroy")
+		if (Factory.Prefab.transform.GetChild(0).name == other.gameObject.name && other.tag != "ReadyForDestroy")
         {
             IsEmpty = false;
             TimePast = 0;
@@ -19,7 +19,7 @@ public class TriggerSpawn : MonoBehaviour {
 
     void OnTriggerExit(Collider other){
 		GameObject ExitedObject = other.gameObject;
-		if (Factory.Prefab.name == ExitedObject.name && other.tag != "ReadyForDestroy") {
+		if (Factory.Prefab.transform.GetChild(0).name == ExitedObject.name && other.tag != "ReadyForDestroy") {
             if (other.gameObject.tag == "SpItem") other.gameObject.tag = "ChildSpItem";
 			IsEmpty = true;
             TimePast = 0;

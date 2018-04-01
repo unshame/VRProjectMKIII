@@ -13,7 +13,7 @@ public class ObjectManager : MonoBehaviour {
 		Items = GameObject.FindGameObjectsWithTag ("ChildSpItem");
         foreach(GameObject Item in Items)
         {
-			if(false && Vector3.Distance(Item.transform.position, Camera.main.transform.position) > 100f)
+			if(Vector3.Distance(Item.transform.position, Camera.main.transform.position) > 100f)
 			{
 			    Item.tag ="ReadyForDestroy";
                 Destroy(Item, 4f);

@@ -36,7 +36,7 @@ public class Spawner : MonoBehaviour {
 		GameObject StaticPrefab;
 		StaticPrefab = Instantiate (Item, Point.position, Point.rotation);
 		StaticPrefab.name = Prefab.name;
-		StaticPrefab.gameObject.tag = "SpItem";
+		StaticPrefab.transform.GetChild(0).tag = "SpItem";
 	}
     // Спавн Триггер области
 	public void SpawnTriggerArea(Transform Point, TriggerSpawn Area){
