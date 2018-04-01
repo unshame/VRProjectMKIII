@@ -183,7 +183,7 @@ MonoBehaviour:
   attachmentFlags: 12
   attachmentPoint: 
   catchSpeedThreshold: 0
-  restoreOriginalParent: 1
+  restoreOriginalParent: 0
   attachEaseIn: 0
   snapAttachEaseInCurve:
     serializedVersion: 2
