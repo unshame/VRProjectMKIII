@@ -152,8 +152,8 @@ public class BuildStation : MonoBehaviour {
     public Material brushMaterial;
     protected Block brushBlock = null;
 
-    protected List<List<List<Block>>> blocks = new List<List<List<Block>>>();
-    protected List<GameObject> blocksList = new List<GameObject>();
+    public List<List<List<Block>>> blocks = new List<List<List<Block>>>();
+    public List<GameObject> blocksList = new List<GameObject>();
 
     void Start() {
         blockSize = transform.localScale.x / size;
