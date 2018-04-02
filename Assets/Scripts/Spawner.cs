@@ -1,49 +1,66 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 
+[RequireComponent(typeof(BoxCollider))]
 public class Spawner : MonoBehaviour {
-	public Transform Spawnpoint; // Координаты спавна
-	public GameObject Prefab; // Модель
-	public TriggerSpawn TriggerArea; // область триггера спавна
-	public enum SType {RigidSpawner,StaticSpawner,RigidWithoutTrigger};
-	public SType SpawnerType;
-	public void Start(){
-        SpawnObject(Spawnpoint, Prefab);
-        if (SpawnerType.ToString() != "RigidWithoutTrigger") {
-			SpawnTriggerArea (Spawnpoint, TriggerArea);
-		}
-	}
-    public void SpawnObject(Transform Point, GameObject Item) {
-        if (SpawnerType.ToString() == "StaticSpawner") {
-            SpawnStaticObject(Spawnpoint, Prefab);
+    public GameObject Prefab;
+    public float SpawnDelay;
+    public bool IsEmpty = true;
+
+    private float TimePast = 0f;
+
+    List<GameObject> ObjectsInside = new List<GameObject>();
+
+    bool IsCorrectType(GameObject other) {
+        var identity = Prefab.gameObject.GetComponentInChildren<ObjectIdentity>();
+        var otherIdentity = other.GetComponent<ObjectIdentity>();
+        return identity && otherIdentity && identity.TypeName == otherIdentity.TypeName;
+    }
+
+    public void Start() {
+        GetComponent<BoxCollider>().isTrigger = true;
+        SpawnObject(Prefab);
+    }
+
+    void Update() {
+
+        if(ObjectsInside.Count != 0) {
+            TimePast = 0;
+            IsEmpty = false;
+            return;
         }
-        else {
-            SpawnRigidObject(Spawnpoint, Prefab);
+
+        TimePast += Time.deltaTime;
+        IsEmpty = true;
+
+        if (TimePast > SpawnDelay) {
+            SpawnObject(Prefab);
+            TimePast = 0;
+            IsEmpty = false;
         }
     }
-	// Функция спавна объекта
-	// *Point - точка респавна
-	// *Item - Объект
-	public void SpawnRigidObject(Transform Point, GameObject Item){
-		GameObject RigidPrefab;
-		RigidPrefab = Instantiate (Item, Point.position, Point.rotation);
-		RigidPrefab.gameObject.AddComponent <Rigidbody>();
-		RigidPrefab.name = Prefab.name;
-		RigidPrefab.gameObject.tag = "SpItem";
-	}
-	public void SpawnStaticObject(Transform Point, GameObject Item){
-		GameObject StaticPrefab;
-		StaticPrefab = Instantiate (Item, Point.position, Point.rotation);
-		StaticPrefab.name = Prefab.name;
-		StaticPrefab.transform.GetChild(0).tag = "SpItem";
-	}
-    // Спавн Триггер области
-	public void SpawnTriggerArea(Transform Point, TriggerSpawn Area){
-		TriggerSpawn One;
-		One = Instantiate (Area, Point.position, Point.rotation) as TriggerSpawn;
-		One.IncludeSpawner (this);
-		One.SetName (Area.name + " " + Prefab.name);
-		One.gameObject.tag = "TriggerArea";
-	}
+
+    public void SpawnObject(GameObject Item) {
+        Instantiate(Item, transform.position, transform.rotation);
+    }
+
+    void OnTriggerStay(Collider other) {
+        GameObject otherObject = other.gameObject;
+        if (IsCorrectType(otherObject)) {
+            if (!ObjectsInside.Contains(otherObject)) {
+                ObjectsInside.Add(otherObject);
+            }
+        }
+    }
+
+    void OnTriggerExit(Collider other) {
+        GameObject otherObject = other.gameObject;
+        if (IsCorrectType(otherObject)) {
+            if (ObjectsInside.Contains(otherObject)) {
+                ObjectsInside.Remove(otherObject);
+            }
+        }
+    }
 }
