@@ -20,6 +20,8 @@ public class DisplayStation : BuildStation {
 
     public override void AddBlock(Coord blockCoord, GameObject otherBlock, Vector3 offset, List<Block> affectedBlocks) {
         var blockCopy = Instantiate(otherBlock);
+        var otherCollider = otherBlock.GetComponent<BoxCollider>();
+        offset = new Vector3(otherCollider.size.x, otherCollider.size.y, otherCollider.size.z) * blockSize / 2;
         base.AddBlock(blockCoord, blockCopy, offset, affectedBlocks);
     }
 

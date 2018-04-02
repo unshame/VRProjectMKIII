@@ -12,7 +12,7 @@ public class WorkplaceRotator : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-        transform.transform.rotation *= transform.localRotation;
+        transform.rotation *= transform.localRotation;
         transform.localRotation = Quaternion.identity;
     }
 }
