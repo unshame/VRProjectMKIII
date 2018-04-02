@@ -43,6 +43,7 @@ GameObject:
   - component: {fileID: 65160613618765288}
   - component: {fileID: 23079864134828760}
   - component: {fileID: 114702030217641312}
+  - component: {fileID: 114759602543349308}
   m_Layer: 8
   m_Name: BuildSphere
   m_TagString: Untagged
@@ -224,6 +225,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isActive: 0
+--- !u!114 &114759602543349308
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1848137899061614}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fbdfacbd9a542a48b7e4b26260aad82, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TypeName: Sphere
 --- !u!114 &114765118000583356
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -20,7 +20,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4096534340916710}
   - component: {fileID: 65267412479862996}
-  - component: {fileID: 114843022943221022}
   - component: {fileID: 23506758183691158}
   - component: {fileID: 33682885250226788}
   - component: {fileID: 114828536606480950}
@@ -107,15 +106,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   onlyIgnoreHand: {fileID: 0}
---- !u!114 &114843022943221022
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1047736690351894}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 780eaf64b46a59b44828f13871d294d0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SpawnDelay: 0.5
