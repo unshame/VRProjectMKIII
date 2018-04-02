@@ -347,7 +347,7 @@ namespace Valve.VR.InteractionSystem {
         //-------------------------------------------------
         private void UpdateGameObject() {
             if (rotateGameObject) {
-                transform.parent.parent.localRotation = start * Quaternion.AngleAxis(outAngle, localPlaneNormal);
+                transform.parent.localRotation = start * Quaternion.AngleAxis(outAngle, localPlaneNormal);
             }
         }
 
