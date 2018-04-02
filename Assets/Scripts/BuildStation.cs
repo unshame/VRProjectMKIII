@@ -10,6 +10,11 @@ public class Block {
     private List<Block> affectedBlocks;
     private Vector3 offset;
 
+    public Block affectingBlock {
+        get;
+        private set;
+    }
+
     public bool isEmpty {
         get {
             return !block && !isFilled;
@@ -22,9 +27,15 @@ public class Block {
         }
     }
 
-    public GameObject gameObject {
+    public GameObject gameObjectOrigin {
         get {
             return block;
+        }
+    }
+
+    public GameObject gameObject {
+        get {
+            return affectingBlock == null ? block : affectingBlock.gameObjectOrigin;
         }
     }
 
@@ -33,6 +44,7 @@ public class Block {
     }
 
     public Block(Vector3 position, Quaternion rotation, Transform parent) {
+        affectingBlock = null;
         anchor = new GameObject();
         anchor.transform.position = position;
         anchor.transform.rotation = rotation;
@@ -40,13 +52,21 @@ public class Block {
     }
 
     public void fill() {
+        if (this.block) {
+            empty();
+        }
         isFilled = true;
+    }
+
+    public void fill(Block affectingBlock) {
+        fill();
+        this.affectingBlock = affectingBlock;
     }
 
     public void fill(GameObject block, bool collide, Vector3 offset, Quaternion rotation, List<Block> affectedBlocks = null) {
 
         if (this.block) {
-            hide();
+            empty();
         }
 
         this.block = block;
@@ -64,22 +84,21 @@ public class Block {
         this.affectedBlocks = affectedBlocks;
 
         foreach (Block affectedBlock in affectedBlocks) {
-            affectedBlock.fill();
+            affectedBlock.fill(this);
         }
     }
 
     public void empty() {
         block = null;
         isFilled = false;
+        affectingBlock = null;
         emptyAffected();
     }
 
     public void empty(GameObject block) {
 
         if (this.block == block) {
-            this.block = null;
-            isFilled = false;
-            emptyAffected();
+            empty();
         }
     }
 
@@ -154,6 +173,8 @@ public class BuildStation : MonoBehaviour {
 
     public List<List<List<Block>>> blocks = new List<List<List<Block>>>();
     public List<GameObject> blocksList = new List<GameObject>();
+
+    public bool editable = true;
 
     void Start() {
         blockSize = transform.localScale.x / size;
@@ -295,6 +316,10 @@ public class BuildStation : MonoBehaviour {
     }
 
     protected virtual void OnTriggerStay(Collider other) {
+        if (!editable) {
+            HideBrush();
+            return;
+        }
         var otherBlock = other.gameObject;
         Vector3 offset;
         List<Block> closestAffectedBlocks;

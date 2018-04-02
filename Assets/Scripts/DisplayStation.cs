@@ -11,8 +11,8 @@ public class DisplayStation : BuildStation {
 
     public void RemoveBlock(Coord blockCoord) {
         var block = GetBlock(blockCoord);
-        if (block != null && block.gameObject != null) {
-            var gameObject = block.gameObject;
+        if (block != null && block.gameObjectOrigin != null) {
+            var gameObject = block.gameObjectOrigin;
             block.empty();
             Destroy(gameObject);
         }
