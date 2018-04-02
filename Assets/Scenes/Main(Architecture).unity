@@ -4417,6 +4417,11 @@ Prefab:
       propertyPath: displayStation
       value: 
       objectReference: {fileID: 1788651253}
+    - target: {fileID: 114268956457568762, guid: ad233b753743c494e82333d1422f97c9,
+        type: 2}
+      propertyPath: size
+      value: 8
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: ad233b753743c494e82333d1422f97c9, type: 2}
   m_IsPrefabParent: 0
@@ -16475,6 +16480,10 @@ MonoBehaviour:
   size: 8
   brush: {fileID: 1931013664773174, guid: bc6571aa36fd64f4c8c51cc8d7e8d131, type: 2}
   brushMaterial: {fileID: 2100000, guid: afe91e5206725c04ba3dbc5746155d1b, type: 2}
+  blocksList: []
+  editable: 1
+  maxBlockDistance: 4
+  ShouldShowBrush: 0
 --- !u!23 &1788651254
 MeshRenderer:
   m_ObjectHideFlags: 0

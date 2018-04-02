@@ -347,6 +347,8 @@ namespace Valve.VR.InteractionSystem {
         //-------------------------------------------------
         private void UpdateGameObject() {
             if (rotateGameObject) {
+                // ИЗМЕНЕННЫЙ КОД
+                // Вращаем parent, вместо текущего объекта
                 transform.parent.localRotation = start * Quaternion.AngleAxis(outAngle, localPlaneNormal);
             }
         }

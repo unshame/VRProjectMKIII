@@ -1,158 +1,8 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Valve.VR.InteractionSystem;
 
-public class Block {
-    private GameObject block = null;
-    private GameObject anchor;
-    private bool isFilled = false;
-    private List<Block> affectedBlocks;
-    private Vector3 offset;
-
-    public Block affectingBlock {
-        get;
-        private set;
-    }
-
-    public bool isEmpty {
-        get {
-            return !block && !isFilled;
-        }
-    }
-
-    public Vector3 position {
-        get {
-            return anchor.transform.position;
-        }
-    }
-
-    public GameObject gameObjectOrigin {
-        get {
-            return block;
-        }
-    }
-
-    public GameObject gameObject {
-        get {
-            return affectingBlock == null ? block : affectingBlock.gameObjectOrigin;
-        }
-    }
-
-    public bool sameAs(GameObject block) {
-        return this.block != null && this.block == block;
-    }
-
-    public Block(Vector3 position, Quaternion rotation, Transform parent) {
-        affectingBlock = null;
-        anchor = new GameObject();
-        anchor.transform.position = position;
-        anchor.transform.rotation = rotation;
-        anchor.transform.parent = parent;
-    }
-
-    public void fill() {
-        if (this.block) {
-            empty();
-        }
-        isFilled = true;
-    }
-
-    public void fill(Block affectingBlock) {
-        fill();
-        this.affectingBlock = affectingBlock;
-    }
-
-    public void fill(GameObject block, bool collide, Vector3 offset, Quaternion rotation, List<Block> affectedBlocks = null) {
-
-        if (this.block) {
-            empty();
-        }
-
-        this.block = block;
-
-        if(affectedBlocks == null) {
-            affectedBlocks = new List<Block>();
-        }
-
-        this.offset = offset;
-        show(collide);
-        resetPosition(rotation);
-
-        isFilled = true;
-
-        this.affectedBlocks = affectedBlocks;
-
-        foreach (Block affectedBlock in affectedBlocks) {
-            affectedBlock.fill(this);
-        }
-    }
-
-    public void empty() {
-        block = null;
-        isFilled = false;
-        affectingBlock = null;
-        emptyAffected();
-    }
-
-    public void empty(GameObject block) {
-
-        if (this.block == block) {
-            empty();
-        }
-    }
-
-    private void emptyAffected() {
-        if (affectedBlocks == null) return;
-
-        foreach (Block affectedBlock in affectedBlocks) {
-            affectedBlock.empty();
-        }
-
-        affectedBlocks = null;
-    }
-
-    public void hide() {
-        if (!block) return;
-
-        var rigidbody = block.transform.parent ? block.transform.parent.GetComponent<Rigidbody>() : block.GetComponent<Rigidbody>();
-        if (!rigidbody) {
-            rigidbody = block.GetComponent<Rigidbody>();
-        }
-        if (rigidbody) {
-            rigidbody.isKinematic = true;
-        }
-        block.GetComponent<Renderer>().enabled = false;
-        block.GetComponent<Collider>().enabled = false;
-    }
-
-    public void show(bool collide = false) {
-        if (!block) return;
-
-        var rigidbody = block.transform.parent ? block.transform.parent.GetComponent<Rigidbody>() : block.GetComponent<Rigidbody>();
-        if (!rigidbody) {
-            rigidbody = block.GetComponent<Rigidbody>();
-        }
-        if (rigidbody) {
-            rigidbody.isKinematic = true;
-        }
-        block.GetComponent<Renderer>().enabled = true;
-        block.GetComponent<Collider>().enabled = collide;
-    }
-
-    public void resetPosition(Quaternion rotation) {
-        if (!block) return;
-        var blockTransform = block.transform.parent;
-        if (!blockTransform || !blockTransform.gameObject.GetComponent<Throwable>()) {
-            blockTransform = block.transform;
-        }
-        if (blockTransform) {
-            blockTransform.position = anchor.transform.position + rotation * offset;
-            blockTransform.rotation = anchor.transform.rotation;
-        }
-    }
-}
-
+// Координаты блока в 3D массиве
 public class Coord {
     public int x, y, z;
     public Coord(int x, int y, int z) {
@@ -162,21 +12,40 @@ public class Coord {
     }
 }
 
+// Редактор здания
 public class BuildStation : MonoBehaviour {
 
+    // Кол-во клеток по одной стороне
     public int size = 10;
+    
+    // Размер блока (рассчитывается из size)
     protected float blockSize;
 
+    // Префаб, а после инициализации - инстанция кисти-блока (полупрозрачный блок)
     public GameObject brush;
+
+    // Материал кисти
     public Material brushMaterial;
+
+    // Блок, в котором находится кисть
     protected Block brushBlock = null;
 
+    // 3D массив блоков
+    [HideInInspector]
     public List<List<List<Block>>> blocks = new List<List<List<Block>>>();
+
+    // Массив всех GameObject'ов в редакторе
+    [HideInInspector]
     public List<GameObject> blocksList = new List<GameObject>();
 
+    // Можно ли изменять контент редактора в игре
     public bool editable = true;
 
-    void Start() {
+    // Максимальная удаленность валидного блока от объекта, который планируется туда поставить (дистанция в блоках)
+    public int maxBlockDistance = 4;
+
+    // Инициализирует кисть, создает блоки
+    protected virtual void Start() {
         blockSize = transform.localScale.x / size;
 
         brush = Instantiate(brush, transform.parent);
@@ -213,16 +82,18 @@ public class BuildStation : MonoBehaviour {
         }
     }
 
-    void Update() {
+    // Восстанавливает позиции всех GameObject, т.к. SteamVR их решает двигать
+    protected virtual void Update() {
         for (int x = 0; x < size; x++) {
             for (int y = 0; y < size; y++) {
                 for (int z = 0; z < size; z++) {
-                    blocks[x][y][z].resetPosition(transform.rotation);
+                    blocks[x][y][z].setPosition(transform.rotation);
                 }
             }
         }
     }
 
+    // Прячет кисть
     public virtual void HideBrush() {
 
         if (brushBlock != null) {
@@ -232,6 +103,7 @@ public class BuildStation : MonoBehaviour {
         }
     }
 
+    // Показывает кисть в указанном блоке
     public virtual void ShowBrush(Coord blockCoord, Mesh mesh, Vector3 offset) {
         var block = GetBlock(blockCoord);
         block.fill(brush, false, offset, transform.rotation);
@@ -240,10 +112,12 @@ public class BuildStation : MonoBehaviour {
         brush.transform.localScale = new Vector3(blockSize, blockSize, blockSize);
     }
 
+    // Возвращает блок по координатам
     public Block GetBlock(int x, int y, int z) {
         return GetBlock(new Coord(x, y, z));
     }
 
+    // Возвращает блок по координатам
     public Block GetBlock(Coord coord) {
 
         if(coord.x >= size || coord.y >= size || coord.z >= size) {
@@ -253,6 +127,7 @@ public class BuildStation : MonoBehaviour {
         return blocks[coord.x][coord.y][coord.z];
     }
 
+    // Возвращает координаты блока
     public Coord GetBlockCoord(Block block) {
         for (int x = 0; x < size; x++) {
             for (int y = 0; y < size; y++) {
@@ -267,6 +142,7 @@ public class BuildStation : MonoBehaviour {
         return null;
     }
 
+    // Возвращает координаты блока с указанным GameObject'ом
     public Coord GetBlockCoord(GameObject block) {
         for (int x = 0; x < size; x++) {
             for (int y = 0; y < size; y++) {
@@ -281,6 +157,7 @@ public class BuildStation : MonoBehaviour {
         return null;
     }
 
+    // Убирает указанный GameObject из редактора
     public virtual void RemoveBlock(GameObject otherBlock) {
 
         for (int x = 0; x < size; x++) {
@@ -303,6 +180,7 @@ public class BuildStation : MonoBehaviour {
         }
     }
 
+    // Добавляет GameObject по указанным координатам
     public virtual void AddBlock(Coord blockCoord, GameObject otherBlock, Vector3 offset, List<Block> affectedBlocks) {
         var block = GetBlock(blockCoord);
         otherBlock.transform.localScale = new Vector3(blockSize, blockSize, blockSize);
@@ -315,31 +193,45 @@ public class BuildStation : MonoBehaviour {
         block.fill(otherBlock, true, offset, transform.rotation, affectedBlocks);
     }
 
+    // Каждый тик, когда что-то находится в редакторе
+    // Обрабатывает добавление объектов в редактор
     protected virtual void OnTriggerStay(Collider other) {
+
+        // Не редактируем
         if (!editable) {
             HideBrush();
             return;
         }
+
         var otherBlock = other.gameObject;
         Vector3 offset;
         List<Block> closestAffectedBlocks;
         bool otherIsActive;
+
+        // Проверяем валидность объекта и находим ближайший блок, в который можно его поставить
         var closestBlockCoord = GetClosestBlockCoord(otherBlock, out offset, out closestAffectedBlocks, out otherIsActive);
 
+        // Блок найден
         if (closestBlockCoord != null) {
+
+            // Если он в руке игрока, показываем кисть
             if (otherIsActive) {
                 ShowBrush(closestBlockCoord, otherBlock.GetComponent<MeshFilter>().mesh, offset);
             }
             else {
+                // Иначе ставим объект
                 AddBlock(closestBlockCoord, otherBlock, offset, closestAffectedBlocks);
             }
         }
     }
 
+    // Когда что-то покидает редактор
+    // Прячет кисть
     protected virtual void OnTriggerExit(Collider other) {
         HideBrush();
     }
 
+    // Вовзращает координаты ближайшего блока, а также оффсет, блоки, на которые будет наложен GameObject и находится ли он в руке игрока
     protected Coord GetClosestBlockCoord(GameObject otherBlock, out Vector3 offset, out List<Block> closestAffectedBlocks, out bool isActive) {
         offset = new Vector3();
         closestAffectedBlocks = null;
@@ -347,43 +239,53 @@ public class BuildStation : MonoBehaviour {
 
         var interactible = otherBlock.GetComponent<Interactible>();
 
+        // Это не объект для редактора
         if (!interactible) {
             return null;
         }
 
         isActive = interactible.isActive;
         if (blocksList.Contains(otherBlock)) {
+
             if (isActive) {
+
+                // Игрок взял объект, который ранее был поставлен в редактор
                 RemoveBlock(otherBlock);
             }
             else {
+
+                // Этот объект уже поставлен в редактор и его никто не трогает
                 return null;
             }
         }
 
+        // Мы уже знаем, что это объект для редактора, так что можно убрать кисть из старой позиции
         HideBrush();
 
         var minDist = Mathf.Infinity;
         Coord closestBlockCoord = null;
 
-
+        // Рассчитываем оффсет объекта
         var otherCollider = otherBlock.GetComponent<BoxCollider>();
         offset = new Vector3(otherCollider.size.x, otherCollider.size.y, otherCollider.size.z) * blockSize / 2;
         var otherPosition = otherBlock.transform.position - transform.rotation * offset;
 
+        // Находим ближайший незаполенный блок
         for (int x = 0; x < size; x++) {
             for (int y = 0; y < size; y++) {
                 for (int z = 0; z < size; z++) {
                     var blockCoord = new Coord(x, y, z);
                     List<Block> affectedBlocks;
 
+                    // Проверяем валидность блока
                     var block = GetValidBlock(blockCoord, otherBlock.GetComponent<BoxCollider>().size, out affectedBlocks);
                     if (block == null) {
                         continue;
                     }
 
+                    // Проверяем дальность блока
                     var dist = Vector3.Distance(otherPosition, block.position);
-                    if (dist < blockSize * 4 && dist < minDist) {
+                    if (dist < blockSize * maxBlockDistance && dist < minDist) {
                         closestBlockCoord = new Coord(x, y, z);
                         minDist = dist;
                         closestAffectedBlocks = affectedBlocks;
@@ -391,17 +293,21 @@ public class BuildStation : MonoBehaviour {
                 }
             }
         }
+
         return closestBlockCoord;
     }
 
+    // Возвращает ближайший валидный блок и блоки, на которые будет наложен GameObject
     Block GetValidBlock(Coord blockCoord, Vector3 otherBlockSize, out List<Block> affectedBlocks) {
         var block = GetBlock(blockCoord);
         var isValid = false;
-
+        
+        // Блок на нижнем этаже можно заполнить всегда
         if (blockCoord.y == 0) {
             isValid = true;
         }
         else {
+            // Проверяем, не будет ли блок висеть в воздухе
             var connectedBlocks = GetConnectedBlocks(blockCoord.x, blockCoord.y, blockCoord.z);
             foreach (Block connectedBlock in connectedBlocks) {
                 if (!connectedBlock.isEmpty && !connectedBlock.sameAs(brush)) {
@@ -412,9 +318,10 @@ public class BuildStation : MonoBehaviour {
 
         affectedBlocks = new List<Block>();
 
+        // Проверяем, не пересечется ли объект с другими заполненными блоками и сразу собираем все блоки пересеченные блоки в массив
         if (isValid) {
             for (int i = 1; i <= 3; i++) {
-                isValid = AppendAffectedBlocks(affectedBlocks, blockCoord, otherBlockSize, i);
+                isValid = CheckAndAppendAffectedBlocks(affectedBlocks, blockCoord, otherBlockSize, i);
                 if (!isValid) break;
             }
         }
@@ -424,7 +331,39 @@ public class BuildStation : MonoBehaviour {
         return isValid ? block : null;
     }
 
-    bool AppendAffectedBlocks(List<Block> affectedBlocks, Coord blockCoord, Vector3 otherBlockSize, int dimension) {
+    // Возвращает все блоки, рядом с текущим
+    List<Block> GetConnectedBlocks(int x, int y, int z) {
+        List<Block> connectedBlocks = new List<Block>();
+
+        if (x > 0) {
+            connectedBlocks.Add(blocks[x - 1][y][z]);
+        }
+
+        if (x < size - 1) {
+            connectedBlocks.Add(blocks[x + 1][y][z]);
+        }
+
+        if (y > 0) {
+            connectedBlocks.Add(blocks[x][y - 1][z]);
+        }
+
+        if (y < size - 1) {
+            connectedBlocks.Add(blocks[x][y + 1][z]);
+        }
+
+        if (z > 0) {
+            connectedBlocks.Add(blocks[x][y][z - 1]);
+        }
+
+        if (z < size - 1) {
+            connectedBlocks.Add(blocks[x][y][z + 1]);
+        }
+
+        return connectedBlocks;
+    }
+
+    // Добавляет блоки, на которые будет наложен GameObject по одной стороне
+    bool CheckAndAppendAffectedBlocks(List<Block> affectedBlocks, Coord blockCoord, Vector3 otherBlockSize, int dimension) {
 
         var sizeCoord = new Coord(
             blockCoord.x + Mathf.CeilToInt(otherBlockSize.x) - 1, 
@@ -460,36 +399,6 @@ public class BuildStation : MonoBehaviour {
             i--;
         }
         return true;
-    }
-
-    List<Block> GetConnectedBlocks(int x, int y, int z) {
-        List<Block> connectedBlocks = new List<Block>();
-
-        if (x > 0) {
-            connectedBlocks.Add(blocks[x - 1][y][z]);
-        }
-
-        if (x < size - 1) {
-            connectedBlocks.Add(blocks[x + 1][y][z]);
-        }
-
-        if (y > 0) {
-            connectedBlocks.Add(blocks[x][y - 1][z]);
-        }
-
-        if (y < size - 1) {
-            connectedBlocks.Add(blocks[x][y + 1][z]);
-        }
-
-        if (z > 0) {
-            connectedBlocks.Add(blocks[x][y][z - 1]);
-        }
-
-        if (z < size - 1) {
-            connectedBlocks.Add(blocks[x][y][z + 1]);
-        }
-
-        return connectedBlocks;
     }
 
 }

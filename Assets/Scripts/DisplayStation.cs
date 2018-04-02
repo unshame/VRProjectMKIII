@@ -1,8 +1,13 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// Редактор здания, который отображает контент по указаниям другого редактора
+// Создает копии передаваемых объектов для отображения и удаляет их, когда они покидают редактор
+// Можно включить/отключить кисть
 public class DisplayStation : BuildStation {
+
+    public bool ShouldShowBrush = false;
 
     public override void RemoveBlock(GameObject otherBlock) {
         base.RemoveBlock(otherBlock);
@@ -26,9 +31,9 @@ public class DisplayStation : BuildStation {
     }
 
     public override void ShowBrush(Coord blockCoord, Mesh mesh, Vector3 offset) {
-    }
-
-    public override void HideBrush() {
+        if (ShouldShowBrush) {
+            base.ShowBrush(blockCoord, mesh, offset);
+        }
     }
 
     protected override void OnTriggerStay(Collider other) {
