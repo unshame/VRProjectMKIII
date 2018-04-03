@@ -11,9 +11,7 @@ public class DualBuildStation : BuildStation {
     protected override void Start() {
         if (!Equals(size, displayStation.size)) {
             Debug.LogWarning("DualBuildStation: Size will be set equal to DisplayStation's size");
-            sizeX = displayStation.size.x;
-            sizeY = displayStation.size.y;
-            sizeZ = displayStation.size.z;
+            size = displayStation.size;
         }
         base.Start();
         displayStation.SetParentStation(this);
@@ -24,7 +22,7 @@ public class DualBuildStation : BuildStation {
         displayStation.HideBrush();
     }
 
-    public override void ShowBrush(Coord blockCoord, GameObject obj, Quaternion rotation) {
+    public override void ShowBrush(Vector3i blockCoord, GameObject obj, Quaternion rotation) {
         base.ShowBrush(blockCoord, obj, rotation);
         displayStation.ShowBrush(blockCoord, obj, rotation);
     }
@@ -35,7 +33,7 @@ public class DualBuildStation : BuildStation {
         displayStation.RemoveObject(objCoord);
     }
 
-    public override void AddObject(Coord blockCoord, GameObject obj, List<Block> affectedBlocks, Quaternion rotation) {
+    public override void AddObject(Vector3i blockCoord, GameObject obj, List<Block> affectedBlocks, Quaternion rotation) {
         displayStation.AddObject(blockCoord, obj, affectedBlocks, rotation);
         base.AddObject(blockCoord, obj, affectedBlocks, rotation);
     }

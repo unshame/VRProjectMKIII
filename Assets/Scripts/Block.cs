@@ -13,7 +13,7 @@ public class Block {
     private MeshRenderer debugRenderer;
 
     // Конструктор
-    public Block(Vector3 position, Coord coord, Transform parent, GameObject anchor) {
+    public Block(Vector3 position, Vector3i coord, Transform parent, GameObject anchor) {
         affectingBlock = null;
         this.anchor = anchor;
         debugRenderer = anchor.GetComponentInChildren<MeshRenderer>();
@@ -30,7 +30,7 @@ public class Block {
     // Интерфейс
 
     // Координаты блока
-    public readonly Coord coord;
+    public readonly Vector3i coord;
 
     // Блок, хранящий в себе GameObject, который занимает и этот блок
     public Block affectingBlock {
@@ -216,7 +216,7 @@ public class Block {
     }
 
     public void updateAnchorName() {
-        var name = "(" + coord.x + ", " + coord.y + ", " + coord.z + ")";
+        var name = coord.ToString();
         if (!isEmpty) {
             name += " (";
             if (obj) {

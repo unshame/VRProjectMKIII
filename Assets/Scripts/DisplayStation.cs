@@ -27,7 +27,7 @@ public class DisplayStation : BuildStation {
         Destroy(obj);
     }
 
-    public void RemoveObject(Coord blockCoord) {
+    public void RemoveObject(Vector3i blockCoord) {
         var block = GetBlock(blockCoord);
         if (block != null && block.gameObjectOrigin != null) {
             var obj = block.gameObjectOrigin;
@@ -36,7 +36,7 @@ public class DisplayStation : BuildStation {
         }
     }
 
-    public override void AddObject(Coord blockCoord, GameObject obj, List<Block> affectedBlocks, Quaternion rotation) {
+    public override void AddObject(Vector3i blockCoord, GameObject obj, List<Block> affectedBlocks, Quaternion rotation) {
         var blockCopy = Instantiate(obj);
         blockCopy.transform.localScale = Vector3.Scale(blockCopy.transform.localScale, scaleDif);
         List<Block> affectedBlocksCopy = null;
@@ -55,7 +55,7 @@ public class DisplayStation : BuildStation {
         return base.CalculateRotation(_savedObj);
     }
 
-    public override void ShowBrush(Coord blockCoord, GameObject obj, Quaternion rotation) {
+    public override void ShowBrush(Vector3i blockCoord, GameObject obj, Quaternion rotation) {
         if (shouldShowBrush) {
             base.ShowBrush(blockCoord, obj, rotation);
         }
