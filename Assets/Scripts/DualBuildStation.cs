@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -14,6 +14,7 @@ public class DualBuildStation : BuildStation {
             size = displayStation.size;
         }
         base.Start();
+        displayStation.CalculateScaleDif(blockSize);
     }
 
     public override void HideBrush() {
@@ -21,19 +22,19 @@ public class DualBuildStation : BuildStation {
         displayStation.HideBrush();
     }
 
-    public override void ShowBrush(Coord blockCoord, Mesh mesh, Vector3 offset) {
-        base.ShowBrush(blockCoord, mesh, offset);
-        displayStation.ShowBrush(blockCoord, mesh, offset);
+    public override void ShowBrush(Coord blockCoord, GameObject obj) {
+        base.ShowBrush(blockCoord, obj);
+        displayStation.ShowBrush(blockCoord, obj);
     }
 
-    public override void RemoveBlock(GameObject otherBlock) {
-        var otherBlockCoord = GetBlockCoord(otherBlock);
-        base.RemoveBlock(otherBlock);
-        displayStation.RemoveBlock(otherBlockCoord);
+    public override void RemoveObject(GameObject obj) {
+        var objCoord = GetObjectCoord(obj);
+        base.RemoveObject(obj);
+        displayStation.RemoveBlock(objCoord);
     }
 
-    public override void AddBlock(Coord blockCoord, GameObject otherBlock, Vector3 offset, List<Block> affectedBlocks) {
-        base.AddBlock(blockCoord, otherBlock, offset, affectedBlocks);
-        displayStation.AddBlock(blockCoord, otherBlock, offset, affectedBlocks);
+    public override void AddObject(Coord blockCoord, GameObject obj, List<Block> affectedBlocks) {
+        base.AddObject(blockCoord, obj, affectedBlocks);
+        displayStation.AddObject(blockCoord, obj, affectedBlocks);
     }
 }

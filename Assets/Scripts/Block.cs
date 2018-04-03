@@ -7,23 +7,27 @@ using Valve.VR.InteractionSystem;
 public class Block {
 
     // Внутренние переменные
-    private GameObject block = null;
+    private GameObject obj = null;
     private GameObject anchor;
     private bool isFilled = false;
     private Vector3 offset;
 
 
     // Конструктор
-    public Block(Vector3 position, Quaternion rotation, Transform parent) {
+    public Block(Vector3 position, Coord coord, Transform parent) {
         affectingBlock = null;
         anchor = new GameObject();
         anchor.transform.position = position;
-        anchor.transform.rotation = rotation;
         anchor.transform.parent = parent;
+        this.coord = coord;
+        updateAnchorName();
     }
 
 
     // Интерфейс
+
+    // Координаты блока
+    public readonly Coord coord;
 
     // Блок, хранящий в себе GameObject, который занимает и этот блок
     public Block affectingBlock {
@@ -41,7 +45,7 @@ public class Block {
     // Пуст ли блок
     public bool isEmpty {
         get {
-            return !block && !isFilled;
+            return !obj && !isFilled;
         }
     }
 
@@ -55,54 +59,60 @@ public class Block {
     // GameObject, хранящийся в этом блоке или в другом блоке, если он накладывается на этот блок
     public GameObject gameObject {
         get {
-            return affectingBlock == null ? block : affectingBlock.gameObjectOrigin;
+            return affectingBlock == null ? obj : affectingBlock.gameObjectOrigin;
         }
     }
 
     // GameObject, хранящийся исключительно в этом блоке
     public GameObject gameObjectOrigin {
         get {
-            return block;
+            return obj;
         }
     }
 
 
     // GameObject, хранящийся исключительно в этом блоке, совпадает с переданным
-    public bool sameAs(GameObject block) {
-        return this.block != null && this.block == block;
+    public bool has(GameObject block) {
+        return this.obj != null && this.obj == block;
     }
 
 
     // Заполняет блок без GameObject'a
     public void fill() {
-        if (this.block) {
+        if (obj) {
             empty();
         }
         isFilled = true;
+        updateAnchorName();
     }
 
     // Заполняет блок, сохраняя ссылку на блок с GameObject'ом
     public void fill(Block affectingBlock) {
-        fill();
         this.affectingBlock = affectingBlock;
+        fill();
     }
 
     // Заполняет блок переданным GameObject'ом
-    public void fill(GameObject block, bool collide, Vector3 offset, Quaternion rotation, List<Block> affectedBlocks = null) {
+    public void fill(GameObject obj, bool collide, Vector3 offset, Quaternion rotation, List<Block> affectedBlocks = null) {
 
-        if (this.block) {
+        if (this.obj) {
             empty();
         }
 
-        this.block = block;
+        this.obj = obj;
 
         if (affectedBlocks == null) {
             affectedBlocks = new List<Block>();
         }
 
+        var objTransform = getObjectTransform();
+        if (objTransform) {
+            objTransform.parent = anchor.transform;
+        }
+
         this.offset = offset;
         show(collide);
-        setPosition(rotation);
+        updatePosition();
 
         isFilled = true;
 
@@ -111,20 +121,29 @@ public class Block {
         foreach (Block affectedBlock in affectedBlocks) {
             affectedBlock.fill(this);
         }
+
+        updateAnchorName();
     }
 
     // Убирает GameObject или ссылку на блок с ним из блока
     public void empty() {
-        block = null;
+        var objTransform = getObjectTransform();
+        if (objTransform && objTransform.parent == anchor.transform) {
+            objTransform.localPosition = Vector3.zero;
+            objTransform.localRotation = Quaternion.identity;
+            objTransform.parent = null;
+        }
+        obj = null;
         isFilled = false;
         affectingBlock = null;
         emptyAffected();
+        updateAnchorName();
     }
 
     // Убирает GameObject только если он совпадает с переданным
     public void empty(GameObject block) {
 
-        if (this.block == block) {
+        if (this.obj == block) {
             empty();
         }
     }
@@ -152,35 +171,58 @@ public class Block {
 
     // Включает/выключает Rigidbody, Renderer и Collider GameObject'a в блоке
     public void setBlockStatus(bool kinematic, bool visible, bool collide) {
-        if (!block) return;
+        if (!obj) return;
 
-        var rigidbody = block.transform.parent ? block.transform.parent.GetComponent<Rigidbody>() : block.GetComponent<Rigidbody>();
+        var rigidbody = obj.transform.parent ? obj.transform.parent.GetComponent<Rigidbody>() : obj.GetComponent<Rigidbody>();
 
         if (!rigidbody) {
-            rigidbody = block.GetComponent<Rigidbody>();
+            rigidbody = obj.GetComponent<Rigidbody>();
         }
 
         if (rigidbody) {
             rigidbody.isKinematic = kinematic;
         }
 
-        block.GetComponent<Renderer>().enabled = visible;
-        block.GetComponent<Collider>().enabled = collide;
+        obj.GetComponent<Renderer>().enabled = visible;
+        obj.GetComponent<Collider>().enabled = collide;
     }
 
     // Устанавливает позицию блока
-    public void setPosition(Quaternion rotation) {
-        if (!block) return;
+    public void updatePosition() {
+        if (!obj) return;
 
-        var blockTransform = block.transform.parent;
-
-        if (!blockTransform || !blockTransform.gameObject.GetComponent<Throwable>()) {
-            blockTransform = block.transform;
-        }
-
-        if (blockTransform) {
-            blockTransform.position = anchor.transform.position + rotation * offset;
-            blockTransform.rotation = anchor.transform.rotation;
+        var objTransform = getObjectTransform();
+        if (objTransform && objTransform.parent == anchor.transform) {
+            objTransform.localRotation = Quaternion.identity;
+            objTransform.localPosition = offset;
         }
     }
+
+    public void updateAnchorName() {
+        var name = "(" + coord.x + ", " + coord.y + ", " + coord.z + ")";
+        if (!isEmpty) {
+            name += " (";
+            if (obj) {
+                name += "Base '" + obj.name + "'";
+            }
+            else {
+                name += "'" + affectingBlock.obj.name + "'";
+            }
+            name += ")";
+        }
+        anchor.name = name;
+    }
+
+    // Возвращает transform объекта или его parent'a
+    public Transform getObjectTransform() {
+        if (!obj) return null;
+        var blockTransform = obj.transform.parent;
+
+        if (!blockTransform || !blockTransform.gameObject.GetComponent<Throwable>()) {
+            blockTransform = obj.transform;
+        }
+        return blockTransform;
+    }
+
+
 }

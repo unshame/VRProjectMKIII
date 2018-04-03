@@ -291,6 +291,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TypeName: Cylinder
+  Offset: {x: 0, y: 0, z: 0}
+  RotateBy: 0
 --- !u!114 &114736418598358230
 MonoBehaviour:
   m_ObjectHideFlags: 1

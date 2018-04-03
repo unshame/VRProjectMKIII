@@ -7,11 +7,21 @@ using UnityEngine;
 // Можно включить/отключить кисть
 public class DisplayStation : BuildStation {
 
-    public bool ShouldShowBrush = false;
+    public bool shouldShowBrush = false;
+    [HideInInspector]
+    public Vector3 scaleDif;
 
-    public override void RemoveBlock(GameObject otherBlock) {
-        base.RemoveBlock(otherBlock);
-        Destroy(otherBlock);
+    public void CalculateScaleDif(Vector3 parentBlockSize) {
+        scaleDif = new Vector3(
+            blockSize.x / parentBlockSize.x,
+            blockSize.y / parentBlockSize.y,
+            blockSize.z / parentBlockSize.z
+        );
+    }
+
+    public override void RemoveObject(GameObject obj) {
+        base.RemoveObject(obj);
+        Destroy(obj);
     }
 
     public void RemoveBlock(Coord blockCoord) {
@@ -23,16 +33,15 @@ public class DisplayStation : BuildStation {
         }
     }
 
-    public override void AddBlock(Coord blockCoord, GameObject otherBlock, Vector3 offset, List<Block> affectedBlocks) {
-        var blockCopy = Instantiate(otherBlock);
-        var otherCollider = otherBlock.GetComponent<BoxCollider>();
-        offset = new Vector3(otherCollider.size.x, otherCollider.size.y, otherCollider.size.z) * blockSize / 2;
-        base.AddBlock(blockCoord, blockCopy, offset, affectedBlocks);
+    public override void AddObject(Coord blockCoord, GameObject obj, List<Block> affectedBlocks) {
+        var blockCopy = Instantiate(obj);
+        blockCopy.transform.localScale = Vector3.Scale(blockCopy.transform.localScale, scaleDif);
+        base.AddObject(blockCoord, blockCopy, affectedBlocks);
     }
 
-    public override void ShowBrush(Coord blockCoord, Mesh mesh, Vector3 offset) {
-        if (ShouldShowBrush) {
-            base.ShowBrush(blockCoord, mesh, offset);
+    public override void ShowBrush(Coord blockCoord, GameObject obj) {
+        if (shouldShowBrush) {
+            base.ShowBrush(blockCoord, obj);
         }
     }
 
