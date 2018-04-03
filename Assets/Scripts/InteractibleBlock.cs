@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-// Для запоминания, находится ли объект в руке игрока
+// Вращение объектов колесом мыши
 public class InteractibleBlock : Interactible {
 
     void Update() {

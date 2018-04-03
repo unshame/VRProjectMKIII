@@ -9,7 +9,7 @@ public class DualBuildStation : BuildStation {
     public DisplayStation displayStation;
 
     protected override void Start() {
-        if (size != displayStation.size) {
+        if (!Equals(size, displayStation.size)) {
             Debug.LogWarning("DualBuildStation: Size will be set equal to DisplayStation's size");
             size = displayStation.size;
         }

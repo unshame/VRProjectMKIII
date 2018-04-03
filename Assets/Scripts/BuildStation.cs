@@ -15,12 +15,13 @@ public class Coord {
 // Редактор здания
 public class BuildStation : MonoBehaviour {
 
-    // Кол-во клеток сторонам
+    // Кол-во клеток по сторонам
     public int sizeX = 10;
     public int sizeY = 10;
     public int sizeZ = 10;
 
     // Размер сетки
+    [HideInInspector]
     public Coord size;
     
     // Размер блока (рассчитывается из size)
@@ -50,9 +51,17 @@ public class BuildStation : MonoBehaviour {
     // Максимальная удаленность валидного блока от объекта, который планируется туда поставить (дистанция в блоках)
     public int maxBlockDistance = 2;
 
+    // Позволяет блокам выходить за пределы сетки
+    public bool allowOutOfBoundsPlacement = false;
+
+    // Включает дебаг сетку
     public bool debugGridEnabled = true;
 
+    // Префаб дебаг сетки
     public GameObject DebugGridPrefab;
+
+
+    /* События Unity */
 
     // Инициализирует кисть, создает блоки
     protected virtual void Start() {
@@ -117,6 +126,50 @@ public class BuildStation : MonoBehaviour {
         }
     }
 
+    // Каждый тик, когда что-то находится в редакторе
+    // Обрабатывает добавление объектов в редактор
+    protected virtual void OnTriggerStay(Collider other) {
+
+        // Не редактируем
+        // TODO: убрать возможность забирать блоки
+        if (!editable) {
+            HideBrush();
+            return;
+        }
+
+        var obj = other.gameObject;
+        List<Block> closestAffectedBlocks;
+        bool objIsActive;
+
+        // Проверяем валидность объекта и находим ближайший блок, в который можно его поставить
+        var closestBlockCoord = GetClosestBlockCoord(obj, out closestAffectedBlocks, out objIsActive);
+
+        // Блок найден
+        if (closestBlockCoord != null) {
+
+            // Считаем поворот объекта
+            var appliedRotation = CalculateRotation(obj);
+
+            // Если он в руке игрока, показываем кисть
+            if (objIsActive) {
+                ShowBrush(closestBlockCoord, obj, appliedRotation);
+            }
+            else {
+                // Иначе ставим объект
+                AddObject(closestBlockCoord, obj, closestAffectedBlocks, appliedRotation);
+            }
+        }
+    }
+
+    // Когда что-то покидает редактор
+    // Прячет кисть
+    protected virtual void OnTriggerExit(Collider other) {
+        HideBrush();
+    }
+
+
+    /* Добавление/удаление объектов */
+
     // Прячет кисть
     public virtual void HideBrush() {
 
@@ -135,36 +188,6 @@ public class BuildStation : MonoBehaviour {
         brushBlock = block;
         brush.GetComponent<MeshFilter>().mesh = obj.GetComponent<MeshFilter>().mesh;
         brush.transform.localScale = obj.transform.localScale;
-    }
-
-    // Возвращает блок по координатам
-    public Block GetBlock(int x, int y, int z) {
-        return GetBlock(new Coord(x, y, z));
-    }
-
-    // Возвращает блок по координатам
-    public Block GetBlock(Coord coord) {
-
-        if(coord.x < 0 || coord.x >= size.x || coord.y < 0 || coord.y >= size.y || coord.z < 0 || coord.z >= size.z) {
-            return null;
-        }
-
-        return blocks[coord.x][coord.y][coord.z];
-    }
-
-    // Возвращает координаты блока с указанным GameObject'ом
-    public Coord GetObjectCoord(GameObject obj) {
-        for (int x = 0; x < size.x; x++) {
-            for (int y = 0; y < size.y; y++) {
-                for (int z = 0; z < size.z; z++) {
-                    if (blocks[x][y][z].has(obj)) {
-                        return new Coord(x, y, z);
-                    };
-
-                }
-            }
-        }
-        return null;
     }
 
     // Убирает указанный GameObject из редактора
@@ -193,112 +216,42 @@ public class BuildStation : MonoBehaviour {
         block.fill(obj, true, offset, rotation, affectedBlocks);
     }
 
-    protected void WriteDebug(GameObject obj) {
-        var s = CalculateRequiredBlocks(obj);
-        var ss = CalculateSize(obj);
-        var sss = CalculateMinFitSize(obj);
-        var ssss = CalculateRotation(obj);
-        if (debugGridEnabled) {
-            Debug.LogFormat("{3} | {4} | {5} | {0}, {1}, {2}", s.x, s.y, s.z, ss, sss, ssss);
-        }
+
+    /* Работа с блоками */
+
+    // Возвращает блок по координатам
+    public Block GetBlock(int x, int y, int z) {
+        return GetBlock(new Coord(x, y, z));
     }
 
-    // Каждый тик, когда что-то находится в редакторе
-    // Обрабатывает добавление объектов в редактор
-    protected virtual void OnTriggerStay(Collider other) {
+    public Block GetBlock(Coord coord) {
 
-        // Не редактируем
-        if (!editable) {
-            HideBrush();
-            return;
+        if(coord.x < 0 || coord.x >= size.x || coord.y < 0 || coord.y >= size.y || coord.z < 0 || coord.z >= size.z) {
+            return null;
         }
 
-        var obj = other.gameObject;
-        List<Block> closestAffectedBlocks;
-        bool objIsActive;
+        return blocks[coord.x][coord.y][coord.z];
+    }
 
+    // Возвращает координаты блока с указанным GameObject'ом
+    public Coord GetObjectCoord(GameObject obj) {
+        for (int x = 0; x < size.x; x++) {
+            for (int y = 0; y < size.y; y++) {
+                for (int z = 0; z < size.z; z++) {
+                    if (blocks[x][y][z].has(obj)) {
+                        return new Coord(x, y, z);
+                    };
 
-        // Проверяем валидность объекта и находим ближайший блок, в который можно его поставить
-        var closestBlockCoord = GetClosestBlockCoord(obj, out closestAffectedBlocks, out objIsActive);
-
-        // Блок найден
-        if (closestBlockCoord != null) {
-
-            var appliedRotation = CalculateRotation(obj);
-
-            // Если он в руке игрока, показываем кисть
-            if (objIsActive) {
-                ShowBrush(closestBlockCoord, obj, appliedRotation);
-            }
-            else {
-
-                // Иначе ставим объект
-                AddObject(closestBlockCoord, obj, closestAffectedBlocks, appliedRotation);
+                }
             }
         }
+        return null;
     }
 
-    // Когда что-то покидает редактор
-    // Прячет кисть
-    protected virtual void OnTriggerExit(Collider other) {
-        HideBrush();
-    }
 
-    protected virtual Quaternion CalculateRotation(GameObject obj) {
-        Quaternion appliedRotation = Quaternion.identity;
+    /* Расставление объектов */
 
-        var identity = obj.GetComponent<ObjectIdentity>();
-        if (!identity || !identity.CanRotate()) return appliedRotation;
-        
-        var rotationAxis = identity.rotationAxis;
-        var rotationAngle = identity.rotationAngle;
-        var rotationIndex = identity.GetRotationIndex();
-
-        if (rotationAxis == 0) {
-            appliedRotation = Quaternion.Euler(rotationAngle * rotationIndex, 0, 0);
-        }
-        else if(rotationAxis == 1) {
-            appliedRotation = Quaternion.Euler(0, rotationAngle * rotationIndex, 0);
-        }
-        else if (rotationAxis == 2) {
-            appliedRotation = Quaternion.Euler(0, 0, rotationAngle * rotationIndex);
-        }
-
-        return appliedRotation;
-    }
-
-    protected Vector3 CalculateSize(GameObject obj) {
-        var collider = obj.GetComponent<BoxCollider>();
-        var objSize = CalculateRotation(obj) * Vector3.Scale((collider ? collider.size : new Vector3(1, 1, 1)), obj.transform.localScale);
-        return new Vector3(Mathf.Abs(objSize.x), Mathf.Abs(objSize.y), Mathf.Abs(objSize.z));
-    }
-
-    protected Coord CalculateRequiredBlocks(GameObject obj) {
-        var objSize = CalculateSize(obj);
-        return new Coord(
-            Mathf.RoundToInt(objSize.x / blockSize.x),
-            Mathf.RoundToInt(objSize.y / blockSize.y),
-            Mathf.RoundToInt(objSize.z / blockSize.z)
-        );
-    }
-
-    protected Vector3 CalculateMinFitSize(GameObject obj) {
-        var requiredBlocks = CalculateRequiredBlocks(obj);
-        return new Vector3(
-            requiredBlocks.x * blockSize.x,
-            requiredBlocks.y * blockSize.y,
-            requiredBlocks.z * blockSize.z
-        );
-    }
-
-    protected Vector3 CalculateOffset(GameObject obj) {
-        var collider = obj.GetComponent<BoxCollider>();
-        var objIdentity = obj.GetComponent<ObjectIdentity>();
-        var identityOffset = objIdentity ? objIdentity.offset : Vector3.zero;
-        return CalculateMinFitSize(obj) / 2 + Vector3.Scale(identityOffset - (CalculateRotation(obj) * collider.center), obj.transform.localScale);
-    }
-
-    // Вовзращает координаты ближайшего блока, а также оффсет, блоки, на которые будет наложен GameObject и находится ли он в руке игрока
+    // Вовзращает координаты ближайшего валидного блока, а также блоки, на которые будет наложен GameObject и находится ли он в руке игрока
     protected Coord GetClosestBlockCoord(GameObject obj, out List<Block> closestAffectedBlocks, out bool isActive) {
         closestAffectedBlocks = null;
         isActive = false;
@@ -339,18 +292,18 @@ public class BuildStation : MonoBehaviour {
         for (int x = 0; x < size.x; x++) {
             for (int y = 0; y < size.y; y++) {
                 for (int z = 0; z < size.z; z++) {
-                    var blockCoord = new Coord(x, y, z);
-                    List<Block> affectedBlocks;
 
-                    // Проверяем валидность блока
-                    var block = GetValidBlock(blockCoord, obj, out affectedBlocks);
-                    if (block == null) {
+                    // Проверяем валидность блока, находим растояние до блока и задетые блоки
+                    var blockCoord = new Coord(x, y, z);
+                    var block = GetBlock(blockCoord);
+                    var dist = Vector3.Distance(objPosition, block.position);;
+                    List<Block> affectedBlocks = null;
+                    
+                    if (!BlockIsValid(block, dist) || !ObjectFits(blockCoord, obj, out affectedBlocks)) {
                         continue;
                     }
 
-                    // Проверяем дальность блока
-                    var dist = Vector3.Distance(objPosition, block.position);
-                    if (dist < blockSize.magnitude * maxBlockDistance && dist < minDist) {
+                    if (dist < minDist) {
                         closestBlockCoord = new Coord(x, y, z);
                         minDist = dist;
                         closestAffectedBlocks = affectedBlocks;
@@ -363,89 +316,143 @@ public class BuildStation : MonoBehaviour {
     }
 
     // Возвращает ближайший валидный блок и блоки, на которые будет наложен GameObject
-    Block GetValidBlock(Coord blockCoord, GameObject obj, out List<Block> affectedBlocks) {
-        var block = GetBlock(blockCoord);
-        var isValid = false;
-        
-        // Блок на нижнем этаже можно заполнить всегда
-        if (blockCoord.y == 0) {
-            isValid = true;
-        }
-        else {
-            // Проверяем, не будет ли блок висеть в воздухе
-            var connectedBlocks = GetConnectedBlocks(blockCoord.x, blockCoord.y, blockCoord.z);
-            foreach (Block connectedBlock in connectedBlocks) {
-                if (!connectedBlock.isEmpty && !connectedBlock.has(brush)) {
-                    isValid = true;
-                }
-            }
-        }
-
-        affectedBlocks = null;
-
-        // Проверяем, не пересечется ли объект с другими заполненными блоками и сразу собираем все блоки пересеченные блоки в массив
-        if (isValid) {
-            isValid = GetAffectedBlocks(blockCoord, obj, out affectedBlocks);
-            if (!isValid) affectedBlocks = null;
-        }
-
-        isValid = isValid && (block.isEmpty || block.has(brush));
-        
-        return isValid ? block : null;
+    protected bool BlockIsValid(Block block, float distance) {
+        return (block.isEmpty || block.has(brush)) && distance < blockSize.magnitude * maxBlockDistance;
     }
 
-    bool GetAffectedBlocks(Coord blockCoord, GameObject obj, out List<Block> affectedBlocks) {
+    // Проверяет, не пересечется ли объект с другими заполненными блоками и собирает все пересеченные блоки в массив
+    // Также проверяет, прилегает ли блок к ранее поставленному объекту
+    bool ObjectFits(Coord blockCoord, GameObject obj, out List<Block> affectedBlocks) {
         affectedBlocks = new List<Block>();
-        var requiredBlocks = CalculateRequiredBlocks(obj);
-        var sizeCoord = new Coord(
-            blockCoord.x + requiredBlocks.x - 1,
-            blockCoord.y + requiredBlocks.y - 1,
-            blockCoord.z + requiredBlocks.z - 1
-        );
-        for (int x = sizeCoord.x; x >= blockCoord.x; x--) {
-            for (int y = sizeCoord.y; y >= blockCoord.y; y--) {
-                for (int z = sizeCoord.z; z >= blockCoord.z; z--) {
-                    if (blockCoord.x == x && blockCoord.y == y && blockCoord.z == z) continue;
+        var blockReach = CalculateBlockReach(obj, blockCoord);
+        var isConnected = false;
+        for (int x = blockReach.x; x >= blockCoord.x; x--) {
+            for (int y = blockReach.y; y >= blockCoord.y; y--) {
+                for (int z = blockReach.z; z >= blockCoord.z; z--) {
                     var affectedBlock = GetBlock(x, y, z);
+                    if (allowOutOfBoundsPlacement && affectedBlock == null) {
+                        continue;
+                    }
                     if (affectedBlock == null || !affectedBlock.isEmpty) {
+                        affectedBlocks = null;
                         return false;
                     }
+                    isConnected = isConnected || BlockIsConnected(x, y, z);
+                    if (blockCoord.x == x && blockCoord.y == y && blockCoord.z == z) continue;
                     affectedBlocks.Add(affectedBlock);
                 }
             }
         }
-        return true;
+        if (!isConnected) {
+            affectedBlocks = null;
+        }
+        return isConnected;
     }
 
-        // Возвращает все блоки, рядом с текущим
-    List<Block> GetConnectedBlocks(int x, int y, int z) {
-        List<Block> connectedBlocks = new List<Block>();
+    // Проверяет, находится ли блок рядом с хотя бы одним уже заполненным
+    bool BlockIsConnected(int x, int y, int z) {
+        if (y == 0) return true;
 
-        if (x > 0) {
-            connectedBlocks.Add(blocks[x - 1][y][z]);
+        if (x > 0 && !blocks[x - 1][y][z].isEmpty && !blocks[x - 1][y][z].has(brush)) {
+            return true;
         }
 
-        if (x < size.x - 1) {
-            connectedBlocks.Add(blocks[x + 1][y][z]);
+        if (x < size.x - 1 && !blocks[x + 1][y][z].isEmpty && !blocks[x + 1][y][z].has(brush)) {
+            return true;
         }
 
-        if (y > 0) {
-            connectedBlocks.Add(blocks[x][y - 1][z]);
+        if (y > 0 && !blocks[x][y - 1][z].isEmpty && !blocks[x][y - 1][z].has(brush)) {
+            return true;
         }
 
-        if (y < size.y - 1) {
-            connectedBlocks.Add(blocks[x][y + 1][z]);
+        if (y < size.y - 1 && !blocks[x][y + 1][z].isEmpty && !blocks[x][y + 1][z].has(brush)) {
+            return true;
         }
 
-        if (z > 0) {
-            connectedBlocks.Add(blocks[x][y][z - 1]);
+        if (z > 0 && !blocks[x][y][z - 1].isEmpty && !blocks[x][y][z - 1].has(brush)) {
+            return true;
         }
 
-        if (z < size.z - 1) {
-            connectedBlocks.Add(blocks[x][y][z + 1]);
+        if (z < size.z - 1 && !blocks[x][y][z + 1].isEmpty && !blocks[x][y][z + 1].has(brush)) {
+            return true;
         }
 
-        return connectedBlocks;
+        return false;
+    }
+
+
+    /* Размеры с объекта */
+
+    // Считает поворот объекта
+    protected virtual Quaternion CalculateRotation(GameObject obj) {
+        Quaternion appliedRotation = Quaternion.identity;
+
+        var identity = obj.GetComponent<ObjectIdentity>();
+        if (!identity || !identity.CanRotate()) return appliedRotation;
+        
+        var rotationAxis = identity.rotationAxis;
+        var rotationAngle = identity.rotationAngle;
+        var rotationIndex = identity.GetRotationIndex();
+
+        if (rotationAxis == 0) {
+            appliedRotation = Quaternion.Euler(rotationAngle * rotationIndex, 0, 0);
+        }
+        else if(rotationAxis == 1) {
+            appliedRotation = Quaternion.Euler(0, rotationAngle * rotationIndex, 0);
+        }
+        else if (rotationAxis == 2) {
+            appliedRotation = Quaternion.Euler(0, 0, rotationAngle * rotationIndex);
+        }
+
+        return appliedRotation;
+    }
+
+    // Считает размер объекта
+    protected Vector3 CalculateSize(GameObject obj) {
+        var collider = obj.GetComponent<BoxCollider>();
+        var objSize = CalculateRotation(obj) * Vector3.Scale((collider ? collider.size : new Vector3(1, 1, 1)), obj.transform.localScale);
+        return new Vector3(Mathf.Abs(objSize.x), Mathf.Abs(objSize.y), Mathf.Abs(objSize.z));
+    }
+
+    // Возвращает координаты самого дальнего от переданного блока, который будет занят объектом
+    protected Coord CalculateBlockReach(GameObject obj, Coord blockCoord) {
+        var objSize = CalculateSize(obj);
+        return new Coord(
+            blockCoord.x + Mathf.RoundToInt(objSize.x / blockSize.x) - 1,
+            blockCoord.y + Mathf.RoundToInt(objSize.y / blockSize.y) - 1,
+            blockCoord.z + Mathf.RoundToInt(objSize.z / blockSize.z) - 1
+        );
+    }
+
+    // Возвращает размер объекта с округлением до ближайшего блока
+    protected Vector3 CalculateMinFitSize(GameObject obj) {
+        var objSize = CalculateSize(obj);
+        return new Vector3(
+            Mathf.RoundToInt(objSize.x / blockSize.x) * blockSize.x,
+            Mathf.RoundToInt(objSize.y / blockSize.y) * blockSize.y,
+            Mathf.RoundToInt(objSize.z / blockSize.z) * blockSize.z
+        );
+    }
+
+    // Считает необходимый сдвиг объекта, чтобы он визуально умещался в предоставленных ему блоках
+    protected Vector3 CalculateOffset(GameObject obj) {
+        var collider = obj.GetComponent<BoxCollider>();
+        var objIdentity = obj.GetComponent<ObjectIdentity>();
+        var identityOffset = objIdentity ? objIdentity.offset : Vector3.zero;
+        var offset = Vector3.Scale(identityOffset - (CalculateRotation(obj) * collider.center), obj.transform.localScale);
+        return CalculateMinFitSize(obj) / 2 + offset;
+    }
+
+
+    /* Дебаг */
+
+    protected void WriteDebug(GameObject obj) {
+        if (!debugGridEnabled) return;
+        var s1 = CalculateBlockReach(obj, new Coord(0, 0, 0));
+        var s2 = CalculateSize(obj);
+        var s3 = CalculateMinFitSize(obj);
+        var s4 = CalculateRotation(obj);
+        Debug.LogFormat("{3} | {4} | {5} | {0}, {1}, {2}", s1.x, s1.y, s1.z, s2, s3, s4);
     }
 
 }

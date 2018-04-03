@@ -77,8 +77,8 @@ public class Block {
 
 
     // GameObject, хранящийся исключительно в этом блоке, совпадает с переданным
-    public bool has(GameObject block) {
-        return this.obj != null && this.obj == block;
+    public bool has(GameObject obj) {
+        return this.obj != null && this.obj == obj;
     }
 
 
@@ -158,9 +158,9 @@ public class Block {
     }
 
     // Убирает GameObject только если он совпадает с переданным
-    public void empty(GameObject block) {
+    public void empty(GameObject obj) {
 
-        if (this.obj == block) {
+        if (this.obj == obj) {
             empty();
         }
     }

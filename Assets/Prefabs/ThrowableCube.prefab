@@ -20,10 +20,10 @@ GameObject:
   m_Component:
   - component: {fileID: 4544787819074388}
   - component: {fileID: 33187873381735256}
-  - component: {fileID: 65415556503732542}
   - component: {fileID: 23057632809874892}
   - component: {fileID: 114028260202500626}
   - component: {fileID: 114832225237329842}
+  - component: {fileID: 65874136418130526}
   m_Layer: 8
   m_Name: BuildCube
   m_TagString: Untagged
@@ -59,7 +59,7 @@ Transform:
   m_GameObject: {fileID: 1640207898025542}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.25, y: 0.125, z: 0.25}
+  m_LocalScale: {x: 0.125, y: 0.125, z: 0.125}
   m_Children: []
   m_Father: {fileID: 4894264871784454}
   m_RootOrder: 0
@@ -116,7 +116,7 @@ MeshFilter:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1640207898025542}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  m_Mesh: {fileID: 4300000, guid: af4878fa6956aaf4f8de9982324f692a, type: 3}
 --- !u!54 &54299836168764210
 Rigidbody:
   m_ObjectHideFlags: 1
@@ -132,7 +132,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 1
---- !u!65 &65415556503732542
+--- !u!65 &65874136418130526
 BoxCollider:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -142,8 +142,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 3, y: 2.5, z: 5.5}
+  m_Center: {x: 0, y: 1.2608719, z: -0.0000014305115}
 --- !u!114 &114028260202500626
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -158,18 +158,16 @@ MonoBehaviour:
   typeName: Cube
   offset: {x: 0, y: 0, z: 0}
   xAxisRotation: 1
-  yAxisRotation: 0
+  yAxisRotation: 1
   zAxisRotation: 1
   rotationAxis: 0
   rotationAngle: 90
+  usePredefinedRotations: 0
+  predefinedRotations: []
   debugAngleDisplay:
   - 0
   - 0
   - 0
-  possibleAngles:
-  - {x: 0, y: 0, z: 0}
-  - {x: 90, y: 0, z: 0}
-  - {x: 0, y: 0, z: 90}
 --- !u!114 &114668481963661410
 MonoBehaviour:
   m_ObjectHideFlags: 1

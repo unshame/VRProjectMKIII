@@ -39,9 +39,12 @@ public class DisplayStation : BuildStation {
     public override void AddObject(Coord blockCoord, GameObject obj, List<Block> affectedBlocks, Quaternion rotation) {
         var blockCopy = Instantiate(obj);
         blockCopy.transform.localScale = Vector3.Scale(blockCopy.transform.localScale, scaleDif);
-        var affectedBlocksCopy = new List<Block>();
-        foreach(Block affectedBlock in affectedBlocks) {
-            affectedBlocksCopy.Add(GetBlock(affectedBlock.coord));
+        List<Block> affectedBlocksCopy = null;
+        if (affectedBlocks != null) {
+            affectedBlocksCopy = new List<Block>();
+            foreach (Block affectedBlock in affectedBlocks) {
+                affectedBlocksCopy.Add(GetBlock(affectedBlock.coord));
+            }
         }
         _savedObj = obj;
         base.AddObject(blockCoord, blockCopy, affectedBlocksCopy, rotation * obj.transform.localRotation);

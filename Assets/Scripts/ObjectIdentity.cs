@@ -16,18 +16,20 @@ public class ObjectIdentity : MonoBehaviour {
     public int rotationAxis;
     [HideInInspector]
     public float rotationAngle = 90f;
-    public float[] debugAngleDisplay = new float[NUM_AXIS];
 
-    public List<Vector3> possibleAngles = new List<Vector3>();
+    public bool usePredefinedRotations = false;
+    public List<Vector3> predefinedRotations = new List<Vector3>();
+    public float[] debugAngleDisplay = new float[NUM_AXIS];
 
 
     int[] rotationIndexes = new int[NUM_AXIS];
     bool[] rotationAllowed = new bool[NUM_AXIS];
 
     void Start() {
-        rotationAllowed[0] = xAxisRotation;
-        rotationAllowed[1] = yAxisRotation;
-        rotationAllowed[2] = zAxisRotation;
+        if (!CanRotate()) return;
+        if (rotationAxis < 0 || rotationAxis >= NUM_AXIS || !rotationAllowed[rotationAxis]) {
+            NextRotationAxis();
+        }
     }
 
     public void IncreaseRotationIndex(int steps = 1) {
