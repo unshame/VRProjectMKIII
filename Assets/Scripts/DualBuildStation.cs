@@ -14,7 +14,7 @@ public class DualBuildStation : BuildStation {
             size = displayStation.size;
         }
         base.Start();
-        displayStation.CalculateScaleDif(blockSize);
+        displayStation.SetParentStation(this);
     }
 
     public override void HideBrush() {
@@ -22,19 +22,19 @@ public class DualBuildStation : BuildStation {
         displayStation.HideBrush();
     }
 
-    public override void ShowBrush(Coord blockCoord, GameObject obj) {
-        base.ShowBrush(blockCoord, obj);
-        displayStation.ShowBrush(blockCoord, obj);
+    public override void ShowBrush(Coord blockCoord, GameObject obj, Quaternion rotation) {
+        base.ShowBrush(blockCoord, obj, rotation);
+        displayStation.ShowBrush(blockCoord, obj, rotation);
     }
 
     public override void RemoveObject(GameObject obj) {
         var objCoord = GetObjectCoord(obj);
         base.RemoveObject(obj);
-        displayStation.RemoveBlock(objCoord);
+        displayStation.RemoveObject(objCoord);
     }
 
-    public override void AddObject(Coord blockCoord, GameObject obj, List<Block> affectedBlocks) {
-        base.AddObject(blockCoord, obj, affectedBlocks);
-        displayStation.AddObject(blockCoord, obj, affectedBlocks);
+    public override void AddObject(Coord blockCoord, GameObject obj, List<Block> affectedBlocks, Quaternion rotation) {
+        displayStation.AddObject(blockCoord, obj, affectedBlocks, rotation);
+        base.AddObject(blockCoord, obj, affectedBlocks, rotation);
     }
 }

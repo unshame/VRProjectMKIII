@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -24,7 +24,8 @@ public class BuildStation : MonoBehaviour {
     public Coord size;
     
     // Размер блока (рассчитывается из size)
-    protected Vector3 blockSize;
+    [HideInInspector]
+    public Vector3 blockSize;
 
     // Префаб, а после инициализации - инстанция кисти-блока (полупрозрачный блок)
     public GameObject brush;
@@ -47,7 +48,7 @@ public class BuildStation : MonoBehaviour {
     public bool editable = true;
 
     // Максимальная удаленность валидного блока от объекта, который планируется туда поставить (дистанция в блоках)
-    public int maxBlockDistance = 4;
+    public int maxBlockDistance = 2;
 
     // Инициализирует кисть, создает блоки
     protected virtual void Start() {
@@ -115,10 +116,10 @@ public class BuildStation : MonoBehaviour {
     }
 
     // Показывает кисть в указанном блоке
-    public virtual void ShowBrush(Coord blockCoord, GameObject obj) {
+    public virtual void ShowBrush(Coord blockCoord, GameObject obj, Quaternion rotation) {
         var block = GetBlock(blockCoord);
         var offset = CalculateOffset(obj);
-        block.fill(brush, false, offset, transform.rotation);
+        block.fill(brush, false, offset, rotation * obj.transform.localRotation);
         brushBlock = block;
         brush.GetComponent<MeshFilter>().mesh = obj.GetComponent<MeshFilter>().mesh;
         brush.transform.localScale = obj.transform.localScale;
@@ -170,18 +171,12 @@ public class BuildStation : MonoBehaviour {
     }
 
     // Добавляет GameObject по указанным координатам
-    public virtual void AddObject(Coord blockCoord, GameObject obj, List<Block> affectedBlocks) {
+    public virtual void AddObject(Coord blockCoord, GameObject obj, List<Block> affectedBlocks, Quaternion rotation) {
         var block = GetBlock(blockCoord);
-        var objTransform = obj.transform.parent;
-
         var offset = CalculateOffset(obj);
 
-        if (objTransform == null) {
-            objTransform = obj.transform;
-        }
-        objTransform.parent = transform.parent;
         blocksList.Add(obj);
-        block.fill(obj, true, offset, transform.rotation, affectedBlocks);
+        block.fill(obj, true, offset, rotation, affectedBlocks);
     }
 
     // Каждый тик, когда что-то находится в редакторе
@@ -198,19 +193,22 @@ public class BuildStation : MonoBehaviour {
         List<Block> closestAffectedBlocks;
         bool objIsActive;
 
+
         // Проверяем валидность объекта и находим ближайший блок, в который можно его поставить
         var closestBlockCoord = GetClosestBlockCoord(obj, out closestAffectedBlocks, out objIsActive);
 
         // Блок найден
         if (closestBlockCoord != null) {
 
+            var appliedRotation = CalculateRotation(obj);
+
             // Если он в руке игрока, показываем кисть
             if (objIsActive) {
-                ShowBrush(closestBlockCoord, obj);
+                ShowBrush(closestBlockCoord, obj, appliedRotation);
             }
             else {
                 // Иначе ставим объект
-                AddObject(closestBlockCoord, obj, closestAffectedBlocks);
+                AddObject(closestBlockCoord, obj, closestAffectedBlocks, appliedRotation);
             }
         }
     }
@@ -219,6 +217,29 @@ public class BuildStation : MonoBehaviour {
     // Прячет кисть
     protected virtual void OnTriggerExit(Collider other) {
         HideBrush();
+    }
+
+    protected virtual Quaternion CalculateRotation(GameObject obj) {
+        Quaternion appliedRotation = Quaternion.identity;
+
+        var identity = obj.GetComponent<ObjectIdentity>();
+        if (!identity || !identity.CanRotate()) return appliedRotation;
+        
+        var rotationAxis = identity.rotationAxis;
+        var rotationAngle = identity.rotationAngle;
+        var rotationIndex = identity.GetRotationIndex();
+
+        if (rotationAxis == 0) {
+            appliedRotation = Quaternion.Euler(rotationAngle * rotationIndex, 0, 0);
+        }
+        else if(rotationAxis == 1) {
+            appliedRotation = Quaternion.Euler(0, rotationAngle * rotationIndex, 0);
+        }
+        else if (rotationAxis == 2) {
+            appliedRotation = Quaternion.Euler(0, 0, rotationAngle * rotationIndex);
+        }
+
+        return appliedRotation;
     }
 
     protected Vector3 CalculateSize(GameObject obj) {
@@ -246,7 +267,7 @@ public class BuildStation : MonoBehaviour {
 
     protected Vector3 CalculateOffset(GameObject obj) {
         var objIdentity = obj.GetComponent<ObjectIdentity>();
-        var identityOffset = objIdentity ? objIdentity.Offset : Vector3.zero;
+        var identityOffset = objIdentity ? objIdentity.offset : Vector3.zero;
         return CalculateMinFitSize(obj) / 2 + Vector3.Scale(identityOffset, obj.transform.localScale);
     }
 

@@ -28,7 +28,7 @@ public class Spawner : MonoBehaviour {
     bool IsCorrectType(GameObject other) {
         var identity = Prefab.gameObject.GetComponentInChildren<ObjectIdentity>();
         var otherIdentity = other.GetComponent<ObjectIdentity>();
-        return identity && otherIdentity && identity.TypeName == otherIdentity.TypeName;
+        return identity && otherIdentity && identity.typeName == otherIdentity.typeName;
     }
 
     // Устанавливает коллайдер в качестве триггера и спавнит первый объект

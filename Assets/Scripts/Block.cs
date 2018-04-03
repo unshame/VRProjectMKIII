@@ -11,7 +11,7 @@ public class Block {
     private GameObject anchor;
     private bool isFilled = false;
     private Vector3 offset;
-
+    private Quaternion rotation;
 
     // Конструктор
     public Block(Vector3 position, Coord coord, Transform parent) {
@@ -111,6 +111,7 @@ public class Block {
         }
 
         this.offset = offset;
+        this.rotation = rotation;
         show(collide);
         updatePosition();
 
@@ -193,7 +194,7 @@ public class Block {
 
         var objTransform = getObjectTransform();
         if (objTransform && objTransform.parent == anchor.transform) {
-            objTransform.localRotation = Quaternion.identity;
+            objTransform.localRotation = rotation;
             objTransform.localPosition = offset;
         }
     }

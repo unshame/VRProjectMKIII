@@ -10,12 +10,14 @@ public class DisplayStation : BuildStation {
     public bool shouldShowBrush = false;
     [HideInInspector]
     public Vector3 scaleDif;
+    private BuildStation parent;
 
-    public void CalculateScaleDif(Vector3 parentBlockSize) {
+    public void SetParentStation(BuildStation parentStation) {
+        parent = parentStation;
         scaleDif = new Vector3(
-            blockSize.x / parentBlockSize.x,
-            blockSize.y / parentBlockSize.y,
-            blockSize.z / parentBlockSize.z
+            blockSize.x / parent.blockSize.x,
+            blockSize.y / parent.blockSize.y,
+            blockSize.z / parent.blockSize.z
         );
     }
 
@@ -24,24 +26,25 @@ public class DisplayStation : BuildStation {
         Destroy(obj);
     }
 
-    public void RemoveBlock(Coord blockCoord) {
+    public void RemoveObject(Coord blockCoord) {
         var block = GetBlock(blockCoord);
         if (block != null && block.gameObjectOrigin != null) {
-            var gameObject = block.gameObjectOrigin;
+            var obj = block.gameObjectOrigin;
             block.empty();
-            Destroy(gameObject);
+            Destroy(obj);
         }
     }
 
-    public override void AddObject(Coord blockCoord, GameObject obj, List<Block> affectedBlocks) {
+    public override void AddObject(Coord blockCoord, GameObject obj, List<Block> affectedBlocks, Quaternion rotation) {
         var blockCopy = Instantiate(obj);
         blockCopy.transform.localScale = Vector3.Scale(blockCopy.transform.localScale, scaleDif);
-        base.AddObject(blockCoord, blockCopy, affectedBlocks);
+        blockCopy.transform.localRotation = obj.transform.localRotation;
+        base.AddObject(blockCoord, blockCopy, affectedBlocks, rotation * obj.transform.localRotation);
     }
 
-    public override void ShowBrush(Coord blockCoord, GameObject obj) {
+    public override void ShowBrush(Coord blockCoord, GameObject obj, Quaternion rotation) {
         if (shouldShowBrush) {
-            base.ShowBrush(blockCoord, obj);
+            base.ShowBrush(blockCoord, obj, rotation);
         }
     }
 
