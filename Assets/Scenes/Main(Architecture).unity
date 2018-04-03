@@ -4489,6 +4489,12 @@ Prefab:
       propertyPath: maxBlockDistance
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 114268956457568762, guid: ad233b753743c494e82333d1422f97c9,
+        type: 2}
+      propertyPath: DebugGridPrefab
+      value: 
+      objectReference: {fileID: 1254870400884220, guid: 857463dc12868984884f16a18ae5436a,
+        type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: ad233b753743c494e82333d1422f97c9, type: 2}
   m_IsPrefabParent: 0
@@ -16645,11 +16651,14 @@ MonoBehaviour:
   sizeX: 10
   sizeY: 10
   sizeZ: 10
+  blockSize: {x: 0, y: 0, z: 0}
   brush: {fileID: 1931013664773174, guid: bc6571aa36fd64f4c8c51cc8d7e8d131, type: 2}
   brushMaterial: {fileID: 2100000, guid: afe91e5206725c04ba3dbc5746155d1b, type: 2}
   blocksList: []
   editable: 1
   maxBlockDistance: 4
+  debugGridEnabled: 0
+  DebugGridPrefab: {fileID: 0}
   shouldShowBrush: 0
   scaleDif: {x: 0, y: 0, z: 0}
 --- !u!23 &1788651254

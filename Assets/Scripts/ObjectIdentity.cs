@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -14,6 +14,7 @@ public class ObjectIdentity : MonoBehaviour {
     public bool yAxisRotation = false;
     public bool zAxisRotation = false;
     public int rotationAxis;
+    [HideInInspector]
     public float rotationAngle = 90f;
 
     int[] rotationIndexes = new int[NUM_AXIS];

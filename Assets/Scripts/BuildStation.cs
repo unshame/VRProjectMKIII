@@ -50,6 +50,10 @@ public class BuildStation : MonoBehaviour {
     // Максимальная удаленность валидного блока от объекта, который планируется туда поставить (дистанция в блоках)
     public int maxBlockDistance = 2;
 
+    public bool debugGridEnabled = true;
+
+    public GameObject DebugGridPrefab;
+
     // Инициализирует кисть, создает блоки
     protected virtual void Start() {
         size = new Coord(sizeX, sizeY, sizeZ);
@@ -78,10 +82,18 @@ public class BuildStation : MonoBehaviour {
 
                 for (int z = 0; z < size.z; z++) {
 
+                    var gridPrefab = debugGridEnabled ? Instantiate(DebugGridPrefab) : new GameObject();
+                    if (debugGridEnabled) {
+                        var gridMesh = gridPrefab.transform.GetChild(0);
+                        gridMesh.localScale = blockSize;
+                        gridMesh.localPosition = blockSize / 2;
+                    }
+
                     var block = new Block(
                         position + Vector3.Scale(new Vector3(x, y, z), blockSize),
                         new Coord(x, y, z),
-                        transform.parent
+                        transform.parent,
+                        gridPrefab
                     );
 
                     axis.Add(block);
@@ -207,6 +219,10 @@ public class BuildStation : MonoBehaviour {
                 ShowBrush(closestBlockCoord, obj, appliedRotation);
             }
             else {
+                var s = CalculateRequiredBlocks(obj);
+                var ss = CalculateSize(obj);
+                var sss = CalculateMinFitSize(obj);
+                Debug.LogFormat("{3} | {4} | {0}, {1}, {2}", s.x, s.y, s.z, ss, sss);
                 // Иначе ставим объект
                 AddObject(closestBlockCoord, obj, closestAffectedBlocks, appliedRotation);
             }
@@ -244,15 +260,16 @@ public class BuildStation : MonoBehaviour {
 
     protected Vector3 CalculateSize(GameObject obj) {
         var collider = obj.GetComponent<BoxCollider>();
-        return Vector3.Scale((collider ? collider.size : new Vector3(1, 1, 1)), obj.transform.localScale);
+        var objSize = CalculateRotation(obj) * Vector3.Scale((collider ? collider.size : new Vector3(1, 1, 1)), obj.transform.localScale);
+        return new Vector3(Mathf.Abs(objSize.x), Mathf.Abs(objSize.y), Mathf.Abs(objSize.z));
     }
 
     protected Coord CalculateRequiredBlocks(GameObject obj) {
         var objSize = CalculateSize(obj);
         return new Coord(
-            Mathf.CeilToInt(objSize.x / blockSize.x),
-            Mathf.CeilToInt(objSize.y / blockSize.y),
-            Mathf.CeilToInt(objSize.z / blockSize.z)
+            Mathf.RoundToInt(objSize.x / blockSize.x),
+            Mathf.RoundToInt(objSize.y / blockSize.y),
+            Mathf.RoundToInt(objSize.z / blockSize.z)
         );
     }
 
@@ -354,14 +371,12 @@ public class BuildStation : MonoBehaviour {
             }
         }
 
-        affectedBlocks = new List<Block>();
+        affectedBlocks = null;
 
         // Проверяем, не пересечется ли объект с другими заполненными блоками и сразу собираем все блоки пересеченные блоки в массив
         if (isValid) {
-            for (int i = 1; i <= 3; i++) {
-                isValid = CheckAndAppendAffectedBlocks(affectedBlocks, blockCoord, obj, i);
-                if (!isValid) break;
-            }
+            isValid = GetAffectedBlocks(blockCoord, obj, out affectedBlocks);
+            if (!isValid) affectedBlocks = null;
         }
 
         isValid = isValid && (block.isEmpty || block.has(brush));
@@ -369,47 +384,30 @@ public class BuildStation : MonoBehaviour {
         return isValid ? block : null;
     }
 
-    // Добавляет блоки, на которые будет наложен GameObject по одной стороне
-    bool CheckAndAppendAffectedBlocks(List<Block> affectedBlocks, Coord blockCoord, GameObject obj, int dimension) {
-
+    bool GetAffectedBlocks(Coord blockCoord, GameObject obj, out List<Block> affectedBlocks) {
+        affectedBlocks = new List<Block>();
         var requiredBlocks = CalculateRequiredBlocks(obj);
         var sizeCoord = new Coord(
-            blockCoord.x + requiredBlocks.x - 1, 
-            blockCoord.y + requiredBlocks.y - 1, 
+            blockCoord.x + requiredBlocks.x - 1,
+            blockCoord.y + requiredBlocks.y - 1,
             blockCoord.z + requiredBlocks.z - 1
         );
-
-        Block affectedBlock = null;
-        var i = dimension == 1 ? sizeCoord.x : (dimension == 2 ? sizeCoord.y : sizeCoord.z);
-        var cmpi = dimension == 1 ? blockCoord.x : (dimension == 2 ? blockCoord.y : blockCoord.z);
-
-        while (i > cmpi) {
-
-            if(dimension == 1) {
-                affectedBlock = GetBlock(i, sizeCoord.y, sizeCoord.z);
-            }
-            else if (dimension == 2) {
-                affectedBlock = GetBlock(sizeCoord.x, i, sizeCoord.z);
-            }
-            else {
-                affectedBlock = GetBlock(sizeCoord.x, sizeCoord.y, i);
-            }
-
-            if (affectedBlock != null) {
-                if (affectedBlock.isEmpty) {
+        for (int x = sizeCoord.x; x >= blockCoord.x; x--) {
+            for (int y = sizeCoord.y; y >= blockCoord.y; y--) {
+                for (int z = sizeCoord.z; z >= blockCoord.z; z--) {
+                    if (blockCoord.x == x && blockCoord.y == y && blockCoord.z == z) continue;
+                    var affectedBlock = GetBlock(x, y, z);
+                    if (affectedBlock == null || !affectedBlock.isEmpty) {
+                        return false;
+                    }
                     affectedBlocks.Add(affectedBlock);
                 }
-                else {
-                    return false;
-                }
             }
-
-            i--;
         }
         return true;
     }
 
-    // Возвращает все блоки, рядом с текущим
+        // Возвращает все блоки, рядом с текущим
     List<Block> GetConnectedBlocks(int x, int y, int z) {
         List<Block> connectedBlocks = new List<Block>();
 

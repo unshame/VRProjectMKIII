@@ -22,8 +22,8 @@ GameObject:
   - component: {fileID: 33603289941968772}
   - component: {fileID: 65090120961676876}
   - component: {fileID: 23721389943591296}
-  - component: {fileID: 114736418598358230}
   - component: {fileID: 114233503074911410}
+  - component: {fileID: 114289306726017154}
   m_Layer: 8
   m_Name: BuildCylinder
   m_TagString: Untagged
@@ -71,7 +71,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1492919987097344}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.125, y: 0.125, z: 0.125}
   m_Children: []
@@ -183,11 +183,12 @@ MonoBehaviour:
   onPickUp:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 114736418598358230}
+      - m_Target: {fileID: 114289306726017154}
         m_MethodName: StartInteract
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 4151429928942120}
+          m_ObjectArgument: {fileID: 4088615439747164, guid: ce3cc46164b06cc488fab142a9c9ed02,
+            type: 2}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Transform, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
@@ -199,7 +200,7 @@ MonoBehaviour:
   onDetachFromHand:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 114736418598358230}
+      - m_Target: {fileID: 114289306726017154}
         m_MethodName: StopInteract
         m_Mode: 1
         m_Arguments:
@@ -237,19 +238,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   onHandHoverBegin:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 0}
-        m_MethodName: set_material
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 2100000, guid: 6729a932de5127b419aacfd9be7dde0d,
-            type: 2}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Material, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   onHandHoverEnd:
@@ -290,10 +279,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fbdfacbd9a542a48b7e4b26260aad82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TypeName: Cylinder
-  Offset: {x: 0, y: 0, z: 0}
-  RotateBy: 0
---- !u!114 &114736418598358230
+  typeName: Cylinder
+  offset: {x: 0, y: 0, z: 0}
+  xAxisRotation: 1
+  yAxisRotation: 0
+  zAxisRotation: 1
+  rotationAxis: 0
+  rotationAngle: 90
+--- !u!114 &114289306726017154
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -301,7 +294,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1492919987097344}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9eea0b0beba575d4c83bac1aca6e1ed3, type: 3}
+  m_Script: {fileID: 11500000, guid: d7aaf34d7c2b8754597bcd765a0607dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   isActive: 0

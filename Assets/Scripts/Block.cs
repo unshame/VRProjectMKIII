@@ -10,13 +10,18 @@ public class Block {
     private GameObject obj = null;
     private GameObject anchor;
     private bool isFilled = false;
-    private Vector3 offset;
+    public Vector3 offset { get; private set; }
     private Quaternion rotation;
+    private MeshRenderer debugRenderer;
 
     // Конструктор
-    public Block(Vector3 position, Coord coord, Transform parent) {
+    public Block(Vector3 position, Coord coord, Transform parent, GameObject anchor) {
         affectingBlock = null;
-        anchor = new GameObject();
+        this.anchor = anchor;
+        debugRenderer = anchor.GetComponentInChildren<MeshRenderer>();
+        if (debugRenderer) {
+            debugRenderer.enabled = false;
+        }
         anchor.transform.position = position;
         anchor.transform.parent = parent;
         this.coord = coord;
@@ -84,6 +89,9 @@ public class Block {
         }
         isFilled = true;
         updateAnchorName();
+        if (debugRenderer) {
+            debugRenderer.enabled = true;
+        }
     }
 
     // Заполняет блок, сохраняя ссылку на блок с GameObject'ом
@@ -124,6 +132,10 @@ public class Block {
         }
 
         updateAnchorName();
+
+        if (debugRenderer) {
+            debugRenderer.enabled = true;
+        }
     }
 
     // Убирает GameObject или ссылку на блок с ним из блока
@@ -139,6 +151,10 @@ public class Block {
         affectingBlock = null;
         emptyAffected();
         updateAnchorName();
+
+        if (debugRenderer) {
+            debugRenderer.enabled = false;
+        }
     }
 
     // Убирает GameObject только если он совпадает с переданным
@@ -154,6 +170,10 @@ public class Block {
         if (affectedBlocks == null) return;
 
         foreach (Block affectedBlock in affectedBlocks) {
+            if(affectedBlock == this) {
+                Debug.LogError("Block is overlapping itself");
+                continue;
+            }
             affectedBlock.empty();
         }
 
