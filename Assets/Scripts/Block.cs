@@ -39,7 +39,7 @@ public class Block {
     }
 
     // Список блоков, занятых текущим GameObject'ом
-    public List<Block> affectedBlocks {
+    public Block[] affectedBlocks {
         get;
         private set;
     }
@@ -99,17 +99,13 @@ public class Block {
     }
 
     // Заполняет блок переданным GameObject'ом
-    public void fill(GameObject obj, bool collide, Vector3 offset, Quaternion rotation, List<Block> affectedBlocks = null) {
+    public void fill(GameObject obj, bool collide, Vector3 offset, Quaternion rotation, Block[] affectedBlocks = null) {
 
         if (this.obj) {
             empty();
         }
 
         this.obj = obj;
-
-        if (affectedBlocks == null) {
-            affectedBlocks = new List<Block>();
-        }
 
         var objTransform = getObjectTransform();
         if (objTransform) {
@@ -121,10 +117,15 @@ public class Block {
 
         isFilled = true;
 
-        this.affectedBlocks = affectedBlocks;
+        if (affectedBlocks != null) {
 
-        foreach (Block affectedBlock in affectedBlocks) {
-            affectedBlock.fill(this);
+            this.affectedBlocks = affectedBlocks;
+
+            for (var i = 0; i < affectedBlocks.Length; i++) {
+                if (affectedBlocks[i] != null) {
+                    affectedBlocks[i].fill(this);
+                }
+            }
         }
 
         updateAnchorName();
@@ -165,11 +166,13 @@ public class Block {
     private void emptyAffected() {
         if (affectedBlocks == null) return;
 
-        foreach (Block affectedBlock in affectedBlocks) {
-            if(affectedBlock == this) {
+        for (var i = 0; i < affectedBlocks.Length; i++) { 
+            var affectedBlock = affectedBlocks[i];
+            if (affectedBlock == this) {
                 Debug.LogError("Block is overlapping itself");
                 continue;
             }
+            if (affectedBlock == null) continue;
             affectedBlock.empty();
         }
 

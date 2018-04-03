@@ -10,7 +10,6 @@ public class DisplayStation : BuildStation {
     [HideInInspector]
     public Vector3 scaleDif;
     private BuildStation parent;
-    private GameObject _savedObj;
 
     public void SetParentStation(BuildStation parentStation) {
         parent = parentStation;
@@ -35,14 +34,16 @@ public class DisplayStation : BuildStation {
         }
     }
 
-    public override void AddObject(Vector3i blockCoord, GameObject obj, List<Block> affectedBlocks, Quaternion rotation) {
+    public override void AddObject(Vector3i blockCoord, GameObject obj, Block[] affectedBlocks, Quaternion rotation) {
         var objCopy = Instantiate(obj);
         objCopy.transform.localScale = Vector3.Scale(objCopy.transform.localScale, scaleDif);
-        List<Block> affectedBlocksCopy = null;
+        Block[] affectedBlocksCopy = null;
         if (affectedBlocks != null) {
-            affectedBlocksCopy = new List<Block>();
-            foreach (Block affectedBlock in affectedBlocks) {
-                affectedBlocksCopy.Add(GetBlock(affectedBlock.coord));
+            affectedBlocksCopy = new Block[affectedBlocks.Length];
+            for (var i = 0; i < affectedBlocks.Length; i++) {
+                if (affectedBlocks[i] != null) {
+                    affectedBlocksCopy[i] = GetBlock(affectedBlocks[i].coord);
+                }
             }
         }
         var identityCopy = objCopy.GetComponent<ObjectIdentity>();

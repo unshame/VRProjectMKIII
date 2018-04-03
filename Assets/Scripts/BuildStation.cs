@@ -23,7 +23,7 @@ public class BuildStation : MonoBehaviour {
 
     // 3D массив блоков
     [HideInInspector]
-    public List<List<List<Block>>> blocks = new List<List<List<Block>>>();
+    public Block[][][] blocks;
 
     // Массив всех GameObject'ов в редакторе
     [HideInInspector]
@@ -64,12 +64,11 @@ public class BuildStation : MonoBehaviour {
         var offset = transform.localScale / 2;
         var position = transform.position - offset;
 
+        blocks = new Block[size.x][][];
         for (int x = 0; x < size.x; x++) {
-            var dimension = new List<List<Block>>();
-
+            blocks[x] = new Block[size.y][];
             for (int y = 0; y < size.y; y++) {
-                var axis = new List<Block>();
-
+                blocks[x][y] = new Block[size.z];
                 for (int z = 0; z < size.z; z++) {
 
                     var gridPrefab = debugGridEnabled ? Instantiate(DebugGridPrefab) : new GameObject();
@@ -86,13 +85,9 @@ public class BuildStation : MonoBehaviour {
                         gridPrefab
                     );
 
-                    axis.Add(block);
+                    blocks[x][y][z] = block;
                 }
-
-                dimension.Add(axis);
             }
-
-            blocks.Add(dimension);
         }
     }
 
@@ -108,7 +103,7 @@ public class BuildStation : MonoBehaviour {
         }
 
         var obj = other.gameObject;
-        List<Block> closestAffectedBlocks;
+        Block[] closestAffectedBlocks;
         bool objIsActive;
 
         // Проверяем валидность объекта и находим ближайший блок, в который можно его поставить
@@ -178,7 +173,7 @@ public class BuildStation : MonoBehaviour {
     }
 
     // Добавляет GameObject по указанным координатам
-    public virtual void AddObject(Vector3i blockCoord, GameObject obj, List<Block> affectedBlocks, Quaternion rotation) {
+    public virtual void AddObject(Vector3i blockCoord, GameObject obj, Block[] affectedBlocks, Quaternion rotation) {
         WriteDebug(obj);
 
         var block = GetBlock(blockCoord);
@@ -224,7 +219,7 @@ public class BuildStation : MonoBehaviour {
     /* Расставление объектов */
 
     // Вовзращает координаты ближайшего валидного блока, а также блоки, на которые будет наложен GameObject и находится ли он в руке игрока
-    protected Vector3i GetClosestBlockCoord(GameObject obj, out List<Block> closestAffectedBlocks, out bool isActive) {
+    protected Vector3i GetClosestBlockCoord(GameObject obj, out Block[] closestAffectedBlocks, out bool isActive) {
         closestAffectedBlocks = null;
         isActive = false;
 
@@ -269,7 +264,7 @@ public class BuildStation : MonoBehaviour {
                     var blockCoord = new Vector3i(x, y, z);
                     var block = GetBlock(blockCoord);
                     var dist = Vector3.Distance(objPosition, block.position);;
-                    List<Block> affectedBlocks = null;
+                    Block[] affectedBlocks = null;
                     
                     if (!BlockIsValid(block, dist) || !ObjectFits(blockCoord, obj, out affectedBlocks)) {
                         continue;
@@ -294,14 +289,16 @@ public class BuildStation : MonoBehaviour {
 
     // Пуст ли блок
     protected bool BlockIsEmpty(Block block) {
-        return block != null && (block.isEmpty || block.has(brush));
+        return block == null || (block.isEmpty || block.has(brush));
     }
 
     // Проверяет, не пересечется ли объект с другими заполненными блоками и собирает все пересеченные блоки в массив
     // Также проверяет, прилегает ли блок к ранее поставленному объекту
-    bool ObjectFits(Vector3i blockCoord, GameObject obj, out List<Block> affectedBlocks) {
-        affectedBlocks = new List<Block>();
-        var blockReach = CalculateBlockReach(obj, blockCoord);
+    bool ObjectFits(Vector3i blockCoord, GameObject obj, out Block[] affectedBlocks) {
+        var blockMagnitude = CalculateBlockMagnitude(obj);
+        var blockReach = blockCoord + blockMagnitude - Vector3i.one;
+        affectedBlocks = new Block[blockMagnitude.x * blockMagnitude.y * blockMagnitude.z];
+        var i = 0;
         var isConnected = false;
         for (int x = blockReach.x; x >= blockCoord.x; x--) {
             for (int y = blockReach.y; y >= blockCoord.y; y--) {
@@ -319,7 +316,8 @@ public class BuildStation : MonoBehaviour {
 
                     isConnected = isConnected || BlockIsConnected(x, y, z);
                     if (blockCoord.x == x && blockCoord.y == y && blockCoord.z == z) continue;
-                    affectedBlocks.Add(affectedBlock);
+                    affectedBlocks[i] = affectedBlock;
+                    i++;
                 }
             }
         }
@@ -364,9 +362,9 @@ public class BuildStation : MonoBehaviour {
     }
 
     // Возвращает координаты самого дальнего от переданного блока, который будет занят объектом
-    protected Vector3i CalculateBlockReach(GameObject obj, Vector3i blockCoord) {
+    protected Vector3i CalculateBlockMagnitude(GameObject obj) {
         var objSize = CalculateSize(obj);
-        return blockCoord + VectorUtils.RoundToInt(VectorUtils.Divide(objSize, blockSize)) - Vector3i.one;
+        return VectorUtils.RoundToInt(VectorUtils.Divide(objSize, blockSize));
     }
 
     // Возвращает размер объекта с округлением до ближайшего блока
@@ -387,7 +385,7 @@ public class BuildStation : MonoBehaviour {
 
     protected void WriteDebug(GameObject obj) {
         if (!debugGridEnabled) return;
-        var s1 = CalculateBlockReach(obj, new Vector3i(0, 0, 0));
+        var s1 = CalculateBlockMagnitude(obj);
         var s2 = CalculateSize(obj);
         var s3 = CalculateMinFitSize(obj);
         var s4 = CalculateRotation(obj);
