@@ -289,7 +289,7 @@ public class BuildStation : MonoBehaviour {
 
     // Пуст ли блок
     protected bool BlockIsEmpty(Block block) {
-        return block.isEmpty || block.has(brush);
+        return block != null && (block.isEmpty || block.has(brush));
     }
 
     // Проверяет, не пересечется ли объект с другими заполненными блоками и собирает все пересеченные блоки в массив
@@ -328,28 +328,14 @@ public class BuildStation : MonoBehaviour {
     bool BlockIsConnected(int x, int y, int z) {
         if (y == 0) return true;
 
-        if (x > 0 && !BlockIsEmpty(blocks[x - 1][y][z])) {
-            return true;
-        }
+        var coord = new Vector3i(x, y, z);
+        for(int i = 0; i < 3; i++) {
+            var increment = Vector3i.zero;
+            increment[i] = 1;
 
-        if (x < size.x - 1 && !BlockIsEmpty(blocks[x + 1][y][z])) {
-            return true;
-        }
-
-        if (y > 0 && !BlockIsEmpty(blocks[x][y - 1][z])) {
-            return true;
-        }
-
-        if (y < size.y - 1 && !BlockIsEmpty(blocks[x][y + 1][z])) {
-            return true;
-        }
-
-        if (z > 0 && !BlockIsEmpty(blocks[x][y][z - 1])) {
-            return true;
-        }
-
-        if (z < size.z - 1 && !BlockIsEmpty(blocks[x][y][z + 1])) {
-            return true;
+            if (!BlockIsEmpty(GetBlock(coord + increment)) || !BlockIsEmpty(GetBlock(coord - increment))) {
+                return true;
+            }
         }
 
         return false;
