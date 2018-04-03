@@ -317,7 +317,12 @@ public class BuildStation : MonoBehaviour {
 
     // Возвращает ближайший валидный блок и блоки, на которые будет наложен GameObject
     protected bool BlockIsValid(Block block, float distance) {
-        return (block.isEmpty || block.has(brush)) && distance < blockSize.magnitude * maxBlockDistance;
+        return BlockIsEmpty(block) && distance < blockSize.magnitude * maxBlockDistance;
+    }
+
+    // Пуст ли блок
+    protected bool BlockIsEmpty(Block block) {
+        return block.isEmpty || block.has(brush);
     }
 
     // Проверяет, не пересечется ли объект с другими заполненными блоками и собирает все пересеченные блоки в массив
@@ -353,27 +358,27 @@ public class BuildStation : MonoBehaviour {
     bool BlockIsConnected(int x, int y, int z) {
         if (y == 0) return true;
 
-        if (x > 0 && !blocks[x - 1][y][z].isEmpty && !blocks[x - 1][y][z].has(brush)) {
+        if (x > 0 && !BlockIsEmpty(blocks[x - 1][y][z])) {
             return true;
         }
 
-        if (x < size.x - 1 && !blocks[x + 1][y][z].isEmpty && !blocks[x + 1][y][z].has(brush)) {
+        if (x < size.x - 1 && !BlockIsEmpty(blocks[x + 1][y][z])) {
             return true;
         }
 
-        if (y > 0 && !blocks[x][y - 1][z].isEmpty && !blocks[x][y - 1][z].has(brush)) {
+        if (y > 0 && !BlockIsEmpty(blocks[x][y - 1][z])) {
             return true;
         }
 
-        if (y < size.y - 1 && !blocks[x][y + 1][z].isEmpty && !blocks[x][y + 1][z].has(brush)) {
+        if (y < size.y - 1 && !BlockIsEmpty(blocks[x][y + 1][z])) {
             return true;
         }
 
-        if (z > 0 && !blocks[x][y][z - 1].isEmpty && !blocks[x][y][z - 1].has(brush)) {
+        if (z > 0 && !BlockIsEmpty(blocks[x][y][z - 1])) {
             return true;
         }
 
-        if (z < size.z - 1 && !blocks[x][y][z + 1].isEmpty && !blocks[x][y][z + 1].has(brush)) {
+        if (z < size.z - 1 && !BlockIsEmpty(blocks[x][y][z + 1])) {
             return true;
         }
 
@@ -386,25 +391,8 @@ public class BuildStation : MonoBehaviour {
     // Считает поворот объекта
     protected virtual Quaternion CalculateRotation(GameObject obj) {
         Quaternion appliedRotation = Quaternion.identity;
-
         var identity = obj.GetComponent<ObjectIdentity>();
-        if (!identity || !identity.CanRotate()) return appliedRotation;
-        
-        var rotationAxis = identity.rotationAxis;
-        var rotationAngle = identity.rotationAngle;
-        var rotationIndex = identity.GetRotationIndex();
-
-        if (rotationAxis == 0) {
-            appliedRotation = Quaternion.Euler(rotationAngle * rotationIndex, 0, 0);
-        }
-        else if(rotationAxis == 1) {
-            appliedRotation = Quaternion.Euler(0, rotationAngle * rotationIndex, 0);
-        }
-        else if (rotationAxis == 2) {
-            appliedRotation = Quaternion.Euler(0, 0, rotationAngle * rotationIndex);
-        }
-
-        return appliedRotation;
+        return identity ? identity.GetRotation() :  Quaternion.identity;
     }
 
     // Считает размер объекта
@@ -437,9 +425,7 @@ public class BuildStation : MonoBehaviour {
     // Считает необходимый сдвиг объекта, чтобы он визуально умещался в предоставленных ему блоках
     protected Vector3 CalculateOffset(GameObject obj) {
         var collider = obj.GetComponent<BoxCollider>();
-        var objIdentity = obj.GetComponent<ObjectIdentity>();
-        var identityOffset = objIdentity ? objIdentity.offset : Vector3.zero;
-        var offset = Vector3.Scale(identityOffset - (CalculateRotation(obj) * collider.center), obj.transform.localScale);
+        var offset = Vector3.Scale(CalculateRotation(obj) * collider.center, obj.transform.localScale);
         return CalculateMinFitSize(obj) / 2 + offset;
     }
 

@@ -9,7 +9,6 @@ public class ObjectIdentity : MonoBehaviour {
     private static int NUM_AXIS = 3;
 
     public string typeName;
-    public Vector3 offset = Vector3.zero;
     public bool xAxisRotation = false;
     public bool yAxisRotation = false;
     public bool zAxisRotation = false;
@@ -19,7 +18,7 @@ public class ObjectIdentity : MonoBehaviour {
 
     public bool usePredefinedRotations = false;
     public List<Vector3> predefinedRotations = new List<Vector3>();
-    public float[] debugAngleDisplay = new float[NUM_AXIS];
+    public Vector3 debugAngleDisplay = new Vector3();
 
 
     int[] rotationIndexes = new int[NUM_AXIS];
@@ -82,5 +81,22 @@ public class ObjectIdentity : MonoBehaviour {
         rotationAllowed[1] = yAxisRotation;
         rotationAllowed[2] = zAxisRotation;
         return xAxisRotation || yAxisRotation || zAxisRotation;
+    }
+
+    public Quaternion GetRotation(){
+        if(!CanRotate()) return Quaternion.identity;
+
+        var rotationIndex = GetRotationIndex();
+
+        if (rotationAxis == 0) {
+            return Quaternion.Euler(rotationAngle * rotationIndex, 0, 0);
+        }
+        if(rotationAxis == 1) {
+            return Quaternion.Euler(0, rotationAngle * rotationIndex, 0);
+        }
+        if (rotationAxis == 2) {
+            return Quaternion.Euler(0, 0, rotationAngle * rotationIndex);
+        }
+        return Quaternion.identity;
     }
 }
