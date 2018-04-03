@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -19,9 +19,6 @@ public class Spawner : MonoBehaviour {
     // Время с последнего момента, когда коллайдер не был пустым
     private float TimePast = 0f;
 
-    // Коллайдер обработал хотя бы один ивент
-    private bool triggerUpdated = false;
-
     List<GameObject> ObjectsInside = new List<GameObject>();
 
     // Объект имеет TypeName в ObjectIdentity, совпадающий с префабом
@@ -39,11 +36,6 @@ public class Spawner : MonoBehaviour {
 
     // Спавнит объект, если такого нет внутри коллайдера и пришло время
     void Update() {
-
-        // Проверяем, что коллайдер обработал хотя бы один ивент, 
-        // чтобы не заспавнить несколько объектов
-        if (!triggerUpdated) return;
-        triggerUpdated = false;
 
         // Коллайдер не пуст
         if (ObjectsInside.Count != 0) {
@@ -77,7 +69,6 @@ public class Spawner : MonoBehaviour {
                 ObjectsInside.Add(otherObject);
             }
         }
-        triggerUpdated = true;
     }
 
     // Удаляет объект из списка объектов внутри коллайдера
@@ -86,6 +77,5 @@ public class Spawner : MonoBehaviour {
         if (ObjectsInside.Contains(otherObject)) {
             ObjectsInside.Remove(otherObject);
         }
-        triggerUpdated = true;
     }
 }
