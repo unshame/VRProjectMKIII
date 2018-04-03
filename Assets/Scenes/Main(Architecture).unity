@@ -4369,6 +4369,11 @@ Prefab:
       propertyPath: size1.x
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 114268956457568762, guid: ad233b753743c494e82333d1422f97c9,
+        type: 2}
+      propertyPath: shouldShowBrush
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: ad233b753743c494e82333d1422f97c9, type: 2}
   m_IsPrefabParent: 0

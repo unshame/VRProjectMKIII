@@ -7,7 +7,6 @@ using UnityEngine;
 // Можно включить/отключить кисть
 public class DisplayStation : BuildStation {
 
-    public bool shouldShowBrush = false;
     [HideInInspector]
     public Vector3 scaleDif;
     private BuildStation parent;
@@ -56,9 +55,7 @@ public class DisplayStation : BuildStation {
     }
 
     public override void ShowBrush(Vector3i blockCoord, GameObject obj, Quaternion rotation) {
-        if (shouldShowBrush) {
-            base.ShowBrush(blockCoord, obj, rotation);
-        }
+        // TODO: может быть сделать, чтобы он корректно работал
     }
 
     protected override void OnTriggerStay(Collider other) {

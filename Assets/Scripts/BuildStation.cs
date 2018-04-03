@@ -38,8 +38,11 @@ public class BuildStation : MonoBehaviour {
     // Позволяет блокам выходить за пределы сетки
     public bool allowOutOfBoundsPlacement = false;
 
+    // Показывать ли кисть
+    public bool shouldShowBrush = true;
+
     // Включает дебаг сетку
-    public bool debugGridEnabled = true;
+    public bool debugGridEnabled = false;
 
     // Префаб дебаг сетки
     public GameObject DebugGridPrefab;
@@ -149,6 +152,8 @@ public class BuildStation : MonoBehaviour {
 
     // Показывает кисть в указанном блоке
     public virtual void ShowBrush(Vector3i blockCoord, GameObject obj, Quaternion rotation) {
+        if (!shouldShowBrush) return;
+
         var block = GetBlock(blockCoord);
         var offset = CalculateOffset(obj);
         block.fill(brush, false, offset, rotation * obj.transform.localRotation);
