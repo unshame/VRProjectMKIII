@@ -115,17 +115,6 @@ public class BuildStation : MonoBehaviour {
         }
     }
 
-    // Восстанавливает позиции всех GameObject, т.к. SteamVR их решает двигать
-    protected virtual void Update() {
-        for (int x = 0; x < size.x; x++) {
-            for (int y = 0; y < size.y; y++) {
-                for (int z = 0; z < size.z; z++) {
-                    blocks[x][y][z].updatePosition();
-                }
-            }
-        }
-    }
-
     // Каждый тик, когда что-то находится в редакторе
     // Обрабатывает добавление объектов в редактор
     protected virtual void OnTriggerStay(Collider other) {
@@ -335,13 +324,16 @@ public class BuildStation : MonoBehaviour {
             for (int y = blockReach.y; y >= blockCoord.y; y--) {
                 for (int z = blockReach.z; z >= blockCoord.z; z--) {
                     var affectedBlock = GetBlock(x, y, z);
+
                     if (allowOutOfBoundsPlacement && affectedBlock == null) {
                         continue;
                     }
+
                     if (affectedBlock == null || !affectedBlock.isEmpty) {
                         affectedBlocks = null;
                         return false;
                     }
+
                     isConnected = isConnected || BlockIsConnected(x, y, z);
                     if (blockCoord.x == x && blockCoord.y == y && blockCoord.z == z) continue;
                     affectedBlocks.Add(affectedBlock);
@@ -426,7 +418,7 @@ public class BuildStation : MonoBehaviour {
     protected Vector3 CalculateOffset(GameObject obj) {
         var collider = obj.GetComponent<BoxCollider>();
         var offset = Vector3.Scale(CalculateRotation(obj) * collider.center, obj.transform.localScale);
-        return CalculateMinFitSize(obj) / 2 + offset;
+        return CalculateMinFitSize(obj) / 2 - offset;
     }
 
 

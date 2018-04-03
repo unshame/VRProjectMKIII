@@ -10,8 +10,6 @@ public class Block {
     private GameObject obj = null;
     private GameObject anchor;
     private bool isFilled = false;
-    public Vector3 offset { get; private set; }
-    private Quaternion rotation;
     private MeshRenderer debugRenderer;
 
     // Конструктор
@@ -118,10 +116,8 @@ public class Block {
             objTransform.parent = anchor.transform;
         }
 
-        this.offset = offset;
-        this.rotation = rotation;
         show(collide);
-        updatePosition();
+        setPosition(offset, rotation);
 
         isFilled = true;
 
@@ -209,7 +205,7 @@ public class Block {
     }
 
     // Устанавливает позицию блока
-    public void updatePosition() {
+    public void setPosition(Vector3 offset, Quaternion rotation) {
         if (!obj) return;
 
         var objTransform = getObjectTransform();
