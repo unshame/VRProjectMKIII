@@ -49,7 +49,7 @@ public class BuildStation : MonoBehaviour {
 
     // Инициализирует кисть, создает блоки
     protected virtual void Start() {
-        blockSize = VectorUtils.DivideVectors(transform.localScale, size);
+        blockSize = VectorUtils.Divide(transform.localScale, size);
 
         brush = Instantiate(brush, transform.parent);
         brush.GetComponent<Renderer>().material = brushMaterial;
@@ -361,13 +361,13 @@ public class BuildStation : MonoBehaviour {
     // Возвращает координаты самого дальнего от переданного блока, который будет занят объектом
     protected Vector3i CalculateBlockReach(GameObject obj, Vector3i blockCoord) {
         var objSize = CalculateSize(obj);
-        return blockCoord + VectorUtils.DivideVectorsRoundToInt(objSize, blockSize) - Vector3i.one;
+        return blockCoord + VectorUtils.RoundToInt(VectorUtils.Divide(objSize, blockSize)) - Vector3i.one;
     }
 
     // Возвращает размер объекта с округлением до ближайшего блока
     protected Vector3 CalculateMinFitSize(GameObject obj) {
         var objSize = CalculateSize(obj);
-        return Vector3.Scale(VectorUtils.DivideVectorsRoundToInt(objSize, blockSize), blockSize);
+        return Vector3.Scale(VectorUtils.RoundToInt(VectorUtils.Divide(objSize, blockSize)), blockSize);
     }
 
     // Считает необходимый сдвиг объекта, чтобы он визуально умещался в предоставленных ему блоках

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class VectorUtils {
 
-	public static Vector3 DivideVectors(Vector3 a, Vector3 b) {
+	public static Vector3 Divide(Vector3 a, Vector3 b) {
         return new Vector3(
             a.x / b.x,
             a.y / b.y,
@@ -12,27 +12,27 @@ public class VectorUtils {
         );
     }
 
-    public static Vector3i DivideVectorsFloorToInt(Vector3 a, Vector3 b) {
+    public static Vector3i FloorToInt(Vector3 a) {
         return new Vector3i(
-            Mathf.FloorToInt(a.x / b.x),
-            Mathf.FloorToInt(a.y / b.y),
-            Mathf.FloorToInt(a.z / b.z)
+            Mathf.FloorToInt(a.x),
+            Mathf.FloorToInt(a.y),
+            Mathf.FloorToInt(a.z)
         );
     }
 
-    public static Vector3i DivideVectorsCeilToInt(Vector3 a, Vector3 b) {
+    public static Vector3i CeilToInt(Vector3 a) {
         return new Vector3i(
-            Mathf.CeilToInt(a.x / b.x),
-            Mathf.CeilToInt(a.y / b.y),
-            Mathf.CeilToInt(a.z / b.z)
+            Mathf.CeilToInt(a.x),
+            Mathf.CeilToInt(a.y),
+            Mathf.CeilToInt(a.z)
         );
     }
 
-    public static Vector3i DivideVectorsRoundToInt(Vector3 a, Vector3 b) {
+    public static Vector3i RoundToInt(Vector3 a) {
         return new Vector3i(
-            Mathf.RoundToInt(a.x / b.x),
-            Mathf.RoundToInt(a.y / b.y),
-            Mathf.RoundToInt(a.z / b.z)
+            Mathf.RoundToInt(a.x),
+            Mathf.RoundToInt(a.y),
+            Mathf.RoundToInt(a.z)
         );
     }
 }
