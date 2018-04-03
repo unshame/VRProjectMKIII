@@ -11,7 +11,9 @@ public class DualBuildStation : BuildStation {
     protected override void Start() {
         if (!Equals(size, displayStation.size)) {
             Debug.LogWarning("DualBuildStation: Size will be set equal to DisplayStation's size");
-            size = displayStation.size;
+            sizeX = displayStation.size.x;
+            sizeY = displayStation.size.y;
+            sizeZ = displayStation.size.z;
         }
         base.Start();
         displayStation.SetParentStation(this);

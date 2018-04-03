@@ -23,7 +23,7 @@ GameObject:
   - component: {fileID: 23057632809874892}
   - component: {fileID: 114028260202500626}
   - component: {fileID: 114832225237329842}
-  - component: {fileID: 65874136418130526}
+  - component: {fileID: 65699771453156076}
   m_Layer: 8
   m_Name: BuildCube
   m_TagString: Untagged
@@ -132,7 +132,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 1
---- !u!65 &65874136418130526
+--- !u!65 &65699771453156076
 BoxCollider:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -142,7 +142,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 3, y: 2.5, z: 5.5}
+  m_Size: {x: 3.1594024, y: 2.5180607, z: 5.32366}
   m_Center: {x: 0, y: 1.2608719, z: -0.0000014305115}
 --- !u!114 &114028260202500626
 MonoBehaviour:
@@ -156,7 +156,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   typeName: Cube
-  offset: {x: 0, y: 0, z: 0}
   xAxisRotation: 1
   yAxisRotation: 1
   zAxisRotation: 1
@@ -164,10 +163,7 @@ MonoBehaviour:
   rotationAngle: 90
   usePredefinedRotations: 0
   predefinedRotations: []
-  debugAngleDisplay:
-  - 0
-  - 0
-  - 0
+  debugAngleDisplay: {x: 0, y: 0, z: 0}
 --- !u!114 &114668481963661410
 MonoBehaviour:
   m_ObjectHideFlags: 1
