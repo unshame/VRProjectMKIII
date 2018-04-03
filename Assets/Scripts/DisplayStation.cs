@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,6 +11,7 @@ public class DisplayStation : BuildStation {
     [HideInInspector]
     public Vector3 scaleDif;
     private BuildStation parent;
+    private GameObject _savedObj;
 
     public void SetParentStation(BuildStation parentStation) {
         parent = parentStation;
@@ -38,8 +39,17 @@ public class DisplayStation : BuildStation {
     public override void AddObject(Coord blockCoord, GameObject obj, List<Block> affectedBlocks, Quaternion rotation) {
         var blockCopy = Instantiate(obj);
         blockCopy.transform.localScale = Vector3.Scale(blockCopy.transform.localScale, scaleDif);
-        blockCopy.transform.localRotation = obj.transform.localRotation;
-        base.AddObject(blockCoord, blockCopy, affectedBlocks, rotation * obj.transform.localRotation);
+        var affectedBlocksCopy = new List<Block>();
+        foreach(Block affectedBlock in affectedBlocks) {
+            affectedBlocksCopy.Add(GetBlock(affectedBlock.coord));
+        }
+        _savedObj = obj;
+        base.AddObject(blockCoord, blockCopy, affectedBlocksCopy, rotation * obj.transform.localRotation);
+        _savedObj = null;
+    }
+
+    protected override Quaternion CalculateRotation(GameObject obj) {
+        return base.CalculateRotation(_savedObj);
     }
 
     public override void ShowBrush(Coord blockCoord, GameObject obj, Quaternion rotation) {

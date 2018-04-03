@@ -116,7 +116,7 @@ MeshFilter:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1640207898025542}
-  m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!54 &54299836168764210
 Rigidbody:
   m_ObjectHideFlags: 1
@@ -157,11 +157,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   typeName: Cube
   offset: {x: 0, y: 0, z: 0}
-  xAxisRotation: 0
-  yAxisRotation: 1
-  zAxisRotation: 0
+  xAxisRotation: 1
+  yAxisRotation: 0
+  zAxisRotation: 1
   rotationAxis: 0
   rotationAngle: 90
+  debugAngleDisplay:
+  - 0
+  - 0
+  - 0
+  possibleAngles:
+  - {x: 0, y: 0, z: 0}
+  - {x: 90, y: 0, z: 0}
+  - {x: 0, y: 0, z: 90}
 --- !u!114 &114668481963661410
 MonoBehaviour:
   m_ObjectHideFlags: 1

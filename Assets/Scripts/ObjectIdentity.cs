@@ -16,6 +16,10 @@ public class ObjectIdentity : MonoBehaviour {
     public int rotationAxis;
     [HideInInspector]
     public float rotationAngle = 90f;
+    public float[] debugAngleDisplay = new float[NUM_AXIS];
+
+    public List<Vector3> possibleAngles = new List<Vector3>();
+
 
     int[] rotationIndexes = new int[NUM_AXIS];
     bool[] rotationAllowed = new bool[NUM_AXIS];
@@ -69,6 +73,9 @@ public class ObjectIdentity : MonoBehaviour {
     }
 
     public bool CanRotate() {
+        for(int i = 0; i < NUM_AXIS; i++) {
+            debugAngleDisplay[i] = rotationIndexes[i] * rotationAngle;
+        }
         rotationAllowed[0] = xAxisRotation;
         rotationAllowed[1] = yAxisRotation;
         rotationAllowed[2] = zAxisRotation;

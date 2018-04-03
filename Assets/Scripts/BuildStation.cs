@@ -184,11 +184,23 @@ public class BuildStation : MonoBehaviour {
 
     // Добавляет GameObject по указанным координатам
     public virtual void AddObject(Coord blockCoord, GameObject obj, List<Block> affectedBlocks, Quaternion rotation) {
+        WriteDebug(obj);
+
         var block = GetBlock(blockCoord);
         var offset = CalculateOffset(obj);
 
         blocksList.Add(obj);
         block.fill(obj, true, offset, rotation, affectedBlocks);
+    }
+
+    protected void WriteDebug(GameObject obj) {
+        var s = CalculateRequiredBlocks(obj);
+        var ss = CalculateSize(obj);
+        var sss = CalculateMinFitSize(obj);
+        var ssss = CalculateRotation(obj);
+        if (debugGridEnabled) {
+            Debug.LogFormat("{3} | {4} | {5} | {0}, {1}, {2}", s.x, s.y, s.z, ss, sss, ssss);
+        }
     }
 
     // Каждый тик, когда что-то находится в редакторе
@@ -219,10 +231,7 @@ public class BuildStation : MonoBehaviour {
                 ShowBrush(closestBlockCoord, obj, appliedRotation);
             }
             else {
-                var s = CalculateRequiredBlocks(obj);
-                var ss = CalculateSize(obj);
-                var sss = CalculateMinFitSize(obj);
-                Debug.LogFormat("{3} | {4} | {0}, {1}, {2}", s.x, s.y, s.z, ss, sss);
+
                 // Иначе ставим объект
                 AddObject(closestBlockCoord, obj, closestAffectedBlocks, appliedRotation);
             }
@@ -283,9 +292,10 @@ public class BuildStation : MonoBehaviour {
     }
 
     protected Vector3 CalculateOffset(GameObject obj) {
+        var collider = obj.GetComponent<BoxCollider>();
         var objIdentity = obj.GetComponent<ObjectIdentity>();
         var identityOffset = objIdentity ? objIdentity.offset : Vector3.zero;
-        return CalculateMinFitSize(obj) / 2 + Vector3.Scale(identityOffset, obj.transform.localScale);
+        return CalculateMinFitSize(obj) / 2 + Vector3.Scale(identityOffset - (CalculateRotation(obj) * collider.center), obj.transform.localScale);
     }
 
     // Вовзращает координаты ближайшего блока, а также оффсет, блоки, на которые будет наложен GameObject и находится ли он в руке игрока
