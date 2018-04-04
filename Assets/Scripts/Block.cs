@@ -9,6 +9,7 @@ public class Block {
     // Внутренние переменные
     private GameObject obj = null;
     private GameObject anchor;
+    private Transform holder;
     private bool isFilled = false;
     private MeshRenderer debugRenderer;
 
@@ -22,6 +23,7 @@ public class Block {
         }
         anchor.transform.position = position;
         anchor.transform.parent = parent;
+        holder = anchor.transform.GetChild(anchor.transform.childCount - 1);
         this.coord = coord;
         updateAnchorName();
     }
@@ -109,7 +111,7 @@ public class Block {
 
         var objTransform = getObjectTransform();
         if (objTransform) {
-            objTransform.parent = anchor.transform;
+            objTransform.parent = holder;
         }
 
         show(collide);
@@ -138,7 +140,7 @@ public class Block {
     // Убирает GameObject или ссылку на блок с ним из блока
     public void empty() {
         var objTransform = getObjectTransform();
-        if (objTransform && objTransform.parent == anchor.transform) {
+        if (objTransform && objTransform.parent == holder) {
             objTransform.localPosition = Vector3.zero;
             objTransform.localRotation = Quaternion.identity;
             objTransform.parent = null;
@@ -172,7 +174,7 @@ public class Block {
                 Debug.LogError("Block is overlapping itself");
                 continue;
             }
-            if (affectedBlock == null) continue;
+            if(affectedBlock == null) continue;
             affectedBlock.empty();
         }
 
@@ -212,10 +214,13 @@ public class Block {
         if (!obj) return;
 
         var objTransform = getObjectTransform();
-        if (objTransform && objTransform.parent == anchor.transform) {
-            objTransform.localRotation = rotation;
-            objTransform.localPosition = offset;
+        if (objTransform && objTransform.parent == holder) {
+            objTransform.localPosition = Vector3.zero;
+            objTransform.localRotation = Quaternion.identity;
         }
+
+        holder.localRotation = rotation;
+        holder.localPosition = offset;            
     }
 
     public void updateAnchorName() {

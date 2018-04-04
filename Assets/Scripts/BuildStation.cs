@@ -56,7 +56,6 @@ public class BuildStation : MonoBehaviour {
 
         brush = Instantiate(brush, transform.parent);
         brush.GetComponent<Renderer>().material = brushMaterial;
-        brush.GetComponent<Rigidbody>().isKinematic = true;
         brush.GetComponent<Renderer>().enabled = false;
         brush.GetComponent<Collider>().enabled = false;
         brush.transform.localScale = blockSize;
@@ -67,22 +66,17 @@ public class BuildStation : MonoBehaviour {
         blocks = new Block[size.x][][];
         for (int x = 0; x < size.x; x++) {
             blocks[x] = new Block[size.y][];
+
             for (int y = 0; y < size.y; y++) {
                 blocks[x][y] = new Block[size.z];
-                for (int z = 0; z < size.z; z++) {
 
-                    var gridPrefab = debugGridEnabled ? Instantiate(DebugGridPrefab) : new GameObject();
-                    if (debugGridEnabled) {
-                        var gridMesh = gridPrefab.transform.GetChild(0);
-                        gridMesh.localScale = blockSize;
-                        gridMesh.localPosition = blockSize / 2;
-                    }
+                for (int z = 0; z < size.z; z++) {
 
                     var block = new Block(
                         position + Vector3.Scale(new Vector3(x, y, z), blockSize),
                         new Vector3i(x, y, z),
                         transform.parent,
-                        gridPrefab
+                        CreateBlockAnchor()
                     );
 
                     blocks[x][y][z] = block;
@@ -185,6 +179,19 @@ public class BuildStation : MonoBehaviour {
 
 
     /* Работа с блоками */
+
+    protected GameObject CreateBlockAnchor() {
+        var blockAnchor = debugGridEnabled ? Instantiate(DebugGridPrefab) : new GameObject();
+        if (debugGridEnabled) {
+            var gridMesh = blockAnchor.transform.GetChild(0);
+            gridMesh.localScale = blockSize;
+            gridMesh.localPosition = blockSize / 2;
+        }
+        var childObject = new GameObject();
+        childObject.transform.parent = blockAnchor.transform;
+        childObject.AddComponent<BlockHolder>();
+        return blockAnchor;
+    }
 
     // Возвращает блок по координатам
     public Block GetBlock(int x, int y, int z) {
