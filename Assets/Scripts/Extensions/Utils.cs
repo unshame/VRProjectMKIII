@@ -35,4 +35,20 @@ public class VectorUtils {
             Mathf.RoundToInt(a.z)
         );
     }
+
+    public static Vector3i Min(Vector3i a, Vector3i b) {
+        return new Vector3i(
+            Mathf.Min(a.x, b.x),
+            Mathf.Min(a.y, b.y),
+            Mathf.Min(a.z, b.z)
+        );
+    }
+
+    public static Vector3i Max(Vector3i a, Vector3i b) {
+        return new Vector3i(
+            Mathf.Max(a.x, b.x),
+            Mathf.Max(a.y, b.y),
+            Mathf.Max(a.z, b.z)
+        );
+    }
 }

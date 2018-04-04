@@ -22,8 +22,8 @@ GameObject:
   - component: {fileID: 33603289941968772}
   - component: {fileID: 65090120961676876}
   - component: {fileID: 23721389943591296}
-  - component: {fileID: 114233503074911410}
   - component: {fileID: 114289306726017154}
+  - component: {fileID: 114257679651977696}
   m_Layer: 8
   m_Name: BuildCylinder
   m_TagString: Untagged
@@ -268,7 +268,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
---- !u!114 &114233503074911410
+--- !u!114 &114257679651977696
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -276,20 +276,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 1492919987097344}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3fbdfacbd9a542a48b7e4b26260aad82, type: 3}
+  m_Script: {fileID: 11500000, guid: 26f1585e2a94e5b449ad1a4fb002d514, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   typeName: Cylinder
-  xAxisRotation: 1
-  yAxisRotation: 0
-  zAxisRotation: 1
-  rotationAxis: 0
-  usePredefinedRotations: 1
+  offset: {x: 0, y: 0, z: 0}
+  debugAngleDisplay: {x: 0, y: 0, z: 0}
   predefinedRotations:
   - {x: 0, y: 0, z: 0}
   - {x: 90, y: 0, z: 0}
   - {x: 0, y: 0, z: 90}
-  debugAngleDisplay: {x: 0, y: 0, z: 0}
   predefinedRotationIndex: 0
 --- !u!114 &114289306726017154
 MonoBehaviour:

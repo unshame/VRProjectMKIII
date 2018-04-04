@@ -55,10 +55,9 @@ public class DisplayStation : BuildStation {
             }
         }
         var identityCopy = objCopy.GetComponent<ObjectIdentity>();
-        var identity = obj.GetComponent<ObjectIdentity>();
+
         if (identityCopy) {
-            identityCopy.rotationAxis = identity.rotationAxis;
-            identityCopy.SetRotationIndex(identity.GetRotationIndex());
+            identityCopy.CopyIdentity(obj);
         }
         base.AddObject(blockCoord, objCopy, affectedBlocksCopy, rotation * obj.transform.localRotation);
     }

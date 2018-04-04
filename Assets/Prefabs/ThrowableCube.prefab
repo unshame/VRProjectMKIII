@@ -21,9 +21,9 @@ GameObject:
   - component: {fileID: 4544787819074388}
   - component: {fileID: 33187873381735256}
   - component: {fileID: 23057632809874892}
-  - component: {fileID: 114028260202500626}
   - component: {fileID: 114832225237329842}
   - component: {fileID: 65696064100710142}
+  - component: {fileID: 114007448991327596}
   m_Layer: 8
   m_Name: BuildCube
   m_TagString: Untagged
@@ -59,7 +59,7 @@ Transform:
   m_GameObject: {fileID: 1640207898025542}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.375, y: 0.25, z: 0.125}
+  m_LocalScale: {x: 0.25, y: 0.25, z: 0.0625}
   m_Children: []
   m_Father: {fileID: 4894264871784454}
   m_RootOrder: 0
@@ -144,7 +144,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &114028260202500626
+--- !u!114 &114007448991327596
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -152,24 +152,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 1640207898025542}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3fbdfacbd9a542a48b7e4b26260aad82, type: 3}
+  m_Script: {fileID: 11500000, guid: 26f1585e2a94e5b449ad1a4fb002d514, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   typeName: Cube
-  xAxisRotation: 1
-  yAxisRotation: 1
-  zAxisRotation: 1
-  rotationAxis: 0
-  usePredefinedRotations: 1
+  offset: {x: 0, y: 0, z: -0.5}
+  debugAngleDisplay: {x: 270, y: 0, z: 0}
   predefinedRotations:
   - {x: 0, y: 0, z: 0}
   - {x: 0, y: 90, z: 0}
+  - {x: 180, y: 90, z: 0}
   - {x: 90, y: 0, z: 0}
-  - {x: 90, y: 0, z: 90}
-  - {x: 0, y: 0, z: 90}
-  - {x: 0, y: 90, z: 90}
-  debugAngleDisplay: {x: 0, y: 90, z: 90}
-  predefinedRotationIndex: 0
+  - {x: 270, y: 0, z: 0}
+  - {x: 0, y: 180, z: 0}
+  predefinedRotationIndex: 4
 --- !u!114 &114668481963661410
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -3,17 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // Вращение объектов колесом мыши
+[RequireComponent(typeof(ObjectIdentity))]
 public class InteractibleBlock : Interactible {
+
+    private bool wasPickedUpBefore = false;
 
     void Update() {
         if (!isActive) return;
 
         var identity = GetComponent<ObjectIdentity>();
+        var freeRotatingIdentity = GetComponent<FreeRotatingObjectIdentity>();
         if (!identity) return;
 
         var ctrlDown = Input.GetKeyDown(KeyCode.LeftControl);
-        if (ctrlDown) {
-            identity.NextRotationAxis();
+        if (freeRotatingIdentity && ctrlDown) {
+            freeRotatingIdentity.NextRotationAxis();
         }
 
         var direction = Input.GetAxis("Mouse ScrollWheel");
@@ -26,6 +30,18 @@ public class InteractibleBlock : Interactible {
         }
         else {
             identity.DecreaseRotationIndex(abs);
+        }
+    }
+
+    public override void StartInteract(Transform instigator) {
+        base.StartInteract(instigator);
+        var identity = GetComponent<ObjectIdentity>();
+        if (!wasPickedUpBefore) {
+            identity.UpdateRotationIndex();
+            wasPickedUpBefore = true;
+        }
+        else {
+            identity.SaveRotationIndex();
         }
     }
 }

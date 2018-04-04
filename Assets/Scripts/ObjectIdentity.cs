@@ -4,142 +4,41 @@ using UnityEngine;
 
 
 // Используется для различения блоков редактором
-public class ObjectIdentity : MonoBehaviour {
-
-    private static int NUM_AXIS = 3;
+public abstract class ObjectIdentity : MonoBehaviour {
 
     public string typeName;
-    public bool xAxisRotation = false;
-    public bool yAxisRotation = false;
-    public bool zAxisRotation = false;
-    public int rotationAxis;
-    private float rotationAngle = 90f;
-
-    public bool usePredefinedRotations = false;
-    public List<Vector3> predefinedRotations = new List<Vector3>();
-    public int predefinedRotationIndex = 0;
+    public Vector3 offset = Vector3.zero;
+    protected float rotationAngle = 90f;
     public Vector3 debugAngleDisplay = new Vector3();
 
-
-    int[] rotationIndexes = new int[NUM_AXIS];
-    bool[] rotationAllowed = new bool[NUM_AXIS];
-
-    void Start() {
-        if (!CanRotate()) return;
-        WrapRotationIndex();
-        if (!rotationAllowed[rotationAxis]) {
-            NextRotationAxis();
-        }
+    protected virtual void Start() {
     }
 
-    public void IncreaseRotationIndex(int steps = 1) {
+    public virtual void IncreaseRotationIndex(int steps = 1) {
         if (!CanRotate()) return;
         SetRotationIndex(GetRotationIndex() + steps);
         WrapRotationIndex();
     }
 
-    public void DecreaseRotationIndex(int steps = 1) {
+    public virtual void DecreaseRotationIndex(int steps = 1) {
         if (!CanRotate()) return;
         SetRotationIndex(GetRotationIndex() - steps);
         WrapRotationIndex();
     }
 
-    void WrapRotationIndex() {
-        if (usePredefinedRotations) {
-            if(predefinedRotationIndex < 0) {
-                SetRotationIndex(predefinedRotations.Count - 1);
-            }
-            else if(predefinedRotationIndex >= predefinedRotations.Count) {
-                SetRotationIndex(0);
-            }
-        }
-        else {
-            var rotationIndex = GetRotationIndex();
-            if (Mathf.Abs(Mathf.FloorToInt(rotationAngle * rotationIndex)) % 360 == 0) {
-                SetRotationIndex(0);
-            }
-        }
-    }
+    protected abstract void WrapRotationIndex();
 
-    public int GetRotationIndex(int axis = -1) {
-        if (!CanRotate()) return 0;
-        if (usePredefinedRotations) return predefinedRotationIndex;
-        if (axis == -1) axis = rotationAxis;
-        return rotationIndexes[axis];
-    }
+    public abstract int GetRotationIndex(int axis = -1);
 
-    public void SetRotationIndex(int index) {
-        if (!CanRotate()) return;
-        if (usePredefinedRotations) {
-            predefinedRotationIndex = index;
-        }
-        else {
-            rotationIndexes[rotationAxis] = index;
-        }
-    }
+    public abstract void SetRotationIndex(int index);
 
-    public void NextRotationAxis() {
-        if (usePredefinedRotations) return;
-        if (!CanRotate()) return;
-        if (usePredefinedRotations) {
-            predefinedRotationIndex++;
-            if (predefinedRotationIndex >= predefinedRotations.Count) {
-                predefinedRotationIndex = 0;
-            }
-        }
-        else {
-            rotationAxis++;
-            if (rotationAxis >= NUM_AXIS) rotationAxis = 0;
-            if (!rotationAllowed[rotationAxis]) NextRotationAxis();
-        }
-    }
-    public void PrevRotationAxis() {
-        if (usePredefinedRotations) return;
-        if (!CanRotate()) return;
-        if (usePredefinedRotations) {
-            predefinedRotationIndex++;
-            if (predefinedRotationIndex < 0) {
-                predefinedRotationIndex = predefinedRotations.Count - 1;
-            }
-        }
-        else {
-            rotationAxis--;
-            if (rotationAxis <= 0) rotationAxis = NUM_AXIS;
-            if (!rotationAllowed[rotationAxis]) PrevRotationAxis();
-        }
-    }
+    public abstract void UpdateRotationIndex();
 
-    public bool CanRotate() {
-        if (!usePredefinedRotations) {
-            for (int i = 0; i < NUM_AXIS; i++) {
-                debugAngleDisplay[i] = rotationIndexes[i] * rotationAngle;
-            }
-            rotationAllowed[0] = xAxisRotation;
-            rotationAllowed[1] = yAxisRotation;
-            rotationAllowed[2] = zAxisRotation;
-        }
-        return usePredefinedRotations && predefinedRotations.Count > 0 || xAxisRotation || yAxisRotation || zAxisRotation;
-    }
+    public abstract void SaveRotationIndex();
 
-    public Quaternion GetRotation(){
-        if(!CanRotate()) return Quaternion.identity;
+    public abstract void CopyIdentity(GameObject obj);
 
-        if (usePredefinedRotations) {
-            var rotation = predefinedRotations[predefinedRotationIndex];
-            return Quaternion.Euler(rotation.x, rotation.y, rotation.z);
-        }
-        else {
-            var rotationIndex = GetRotationIndex();
-            if (rotationAxis == 0) {
-                return Quaternion.Euler(rotationAngle * rotationIndex, 0, 0);
-            }
-            if (rotationAxis == 1) {
-                return Quaternion.Euler(0, rotationAngle * rotationIndex, 0);
-            }
-            if (rotationAxis == 2) {
-                return Quaternion.Euler(0, 0, rotationAngle * rotationIndex);
-            }
-        }
-        return Quaternion.identity;
-    }
+    public abstract bool CanRotate();
+
+    public abstract Quaternion GetRotation();
 }

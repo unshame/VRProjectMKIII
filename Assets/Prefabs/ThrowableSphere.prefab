@@ -40,10 +40,10 @@ GameObject:
   m_Component:
   - component: {fileID: 4907462236819432}
   - component: {fileID: 33105322892736362}
-  - component: {fileID: 65160613618765288}
   - component: {fileID: 23079864134828760}
-  - component: {fileID: 114759602543349308}
-  - component: {fileID: 114895125179493544}
+  - component: {fileID: 114369940758711506}
+  - component: {fileID: 114286993905843302}
+  - component: {fileID: 65751978627000012}
   m_Layer: 8
   m_Name: BuildSphere
   m_TagString: Untagged
@@ -73,7 +73,7 @@ Transform:
   m_GameObject: {fileID: 1848137899061614}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.125, y: 0.125, z: 0.125}
+  m_LocalScale: {x: 0.3455254, y: 0.34552544, z: 0.3455254}
   m_Children: []
   m_Father: {fileID: 4088615439747164}
   m_RootOrder: 0
@@ -116,7 +116,7 @@ MeshFilter:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1848137899061614}
-  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+  m_Mesh: {fileID: 4300004, guid: b96643ad5c85bff40b7b6af54ef823e4, type: 3}
 --- !u!54 &54858130104421736
 Rigidbody:
   m_ObjectHideFlags: 1
@@ -132,7 +132,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 1
---- !u!65 &65160613618765288
+--- !u!65 &65751978627000012
 BoxCollider:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -142,7 +142,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 0.2376222, y: 0.72353566, z: 0.7235372}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &114013968946814176
 MonoBehaviour:
@@ -172,8 +172,8 @@ MonoBehaviour:
   onHandHoverBegin:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 114759602543349308}
-        m_MethodName: IncreaseRotationIndex
+      - m_Target: {fileID: 1848137899061614}
+        m_MethodName: 
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -188,8 +188,8 @@ MonoBehaviour:
   onHandHoverEnd:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_MethodName: set_material
+      - m_Target: {fileID: 1848137899061614}
+        m_MethodName: 
         m_Mode: 2
         m_Arguments:
           m_ObjectArgument: {fileID: 2100000, guid: 7e90f10e44a186a49a00679d068515ed,
@@ -212,7 +212,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
---- !u!114 &114759602543349308
+--- !u!114 &114286993905843302
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -220,16 +220,28 @@ MonoBehaviour:
   m_GameObject: {fileID: 1848137899061614}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3fbdfacbd9a542a48b7e4b26260aad82, type: 3}
+  m_Script: {fileID: 11500000, guid: d7aaf34d7c2b8754597bcd765a0607dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isActive: 0
+--- !u!114 &114369940758711506
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1848137899061614}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba98cb115f6352f4bb464591cf4b5f5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   typeName: Sphere
-  offset: {x: 0, y: 0, z: 0}
+  offset: {x: -0.06, y: 0, z: 0}
+  debugAngleDisplay: {x: 0, y: 0, z: 0}
   xAxisRotation: 0
-  yAxisRotation: 0
-  zAxisRotation: 0
+  yAxisRotation: 1
+  zAxisRotation: 1
   rotationAxis: 0
-  rotationAngle: 90
 --- !u!114 &114765118000583356
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -280,7 +292,7 @@ MonoBehaviour:
   onPickUp:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 114895125179493544}
+      - m_Target: {fileID: 114286993905843302}
         m_MethodName: StartInteract
         m_Mode: 2
         m_Arguments:
@@ -296,7 +308,7 @@ MonoBehaviour:
   onDetachFromHand:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 114895125179493544}
+      - m_Target: {fileID: 114286993905843302}
         m_MethodName: StopInteract
         m_Mode: 1
         m_Arguments:
@@ -310,15 +322,3 @@ MonoBehaviour:
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   snapAttachEaseInCompleted: 0
---- !u!114 &114895125179493544
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1848137899061614}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d7aaf34d7c2b8754597bcd765a0607dc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isActive: 0

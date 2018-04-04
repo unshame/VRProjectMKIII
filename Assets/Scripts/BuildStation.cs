@@ -373,20 +373,22 @@ public class BuildStation : MonoBehaviour {
     // Возвращает координаты самого дальнего от переданного блока, который будет занят объектом
     protected Vector3i CalculateBlockMagnitude(GameObject obj) {
         var objSize = CalculateSize(obj);
-        return VectorUtils.RoundToInt(VectorUtils.Divide(objSize, blockSize));
+        return VectorUtils.Max(VectorUtils.RoundToInt(VectorUtils.Divide(objSize, blockSize)), Vector3i.one);
     }
 
     // Возвращает размер объекта с округлением до ближайшего блока
     protected Vector3 CalculateMinFitSize(GameObject obj) {
         var objSize = CalculateSize(obj);
-        return Vector3.Scale(VectorUtils.RoundToInt(VectorUtils.Divide(objSize, blockSize)), blockSize);
+        return Vector3.Scale(VectorUtils.Max(VectorUtils.RoundToInt(VectorUtils.Divide(objSize, blockSize)), Vector3i.one), blockSize);
     }
 
     // Считает необходимый сдвиг объекта, чтобы он визуально умещался в предоставленных ему блоках
     protected Vector3 CalculateOffset(GameObject obj) {
         var collider = obj.GetComponent<BoxCollider>();
-        var offset = Vector3.Scale(CalculateRotation(obj) * collider.center, obj.transform.localScale);
-        return CalculateMinFitSize(obj) / 2 - offset;
+        var objIdentity = obj.GetComponent<ObjectIdentity>();
+        var identityOffset = objIdentity ? objIdentity.offset : Vector3.zero;
+        var offset = CalculateRotation(obj) * Vector3.Scale(identityOffset - collider.center, obj.transform.localScale);
+        return CalculateMinFitSize(obj) / 2 + offset;
     }
 
 
