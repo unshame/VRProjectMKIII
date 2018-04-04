@@ -24,6 +24,7 @@ public class Block {
         anchor.transform.position = position;
         anchor.transform.parent = parent;
         holder = anchor.transform.GetChild(anchor.transform.childCount - 1);
+        holder.GetComponent<BlockHolder>().enabled = false;
         this.coord = coord;
         updateAnchorName();
     }
@@ -130,6 +131,8 @@ public class Block {
             }
         }
 
+        holder.GetComponent<BlockHolder>().enabled = true;
+
         updateAnchorName();
 
         if (debugRenderer) {
@@ -149,6 +152,7 @@ public class Block {
         isFilled = false;
         affectingBlock = null;
         emptyAffected();
+        holder.GetComponent<BlockHolder>().enabled = false;
         updateAnchorName();
 
         if (debugRenderer) {

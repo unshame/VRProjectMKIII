@@ -163,10 +163,12 @@ MonoBehaviour:
   usePredefinedRotations: 1
   predefinedRotations:
   - {x: 0, y: 0, z: 0}
-  - {x: 90, y: 0, z: 0}
   - {x: 0, y: 90, z: 0}
+  - {x: 90, y: 0, z: 0}
+  - {x: 90, y: 0, z: 90}
   - {x: 0, y: 0, z: 90}
-  debugAngleDisplay: {x: 0, y: 0, z: 0}
+  - {x: 0, y: 90, z: 90}
+  debugAngleDisplay: {x: 0, y: 90, z: 90}
   predefinedRotationIndex: 0
 --- !u!114 &114668481963661410
 MonoBehaviour:

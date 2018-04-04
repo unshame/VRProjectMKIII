@@ -17,12 +17,12 @@ public class ObjectIdentity : MonoBehaviour {
 
     public bool usePredefinedRotations = false;
     public List<Vector3> predefinedRotations = new List<Vector3>();
+    public int predefinedRotationIndex = 0;
     public Vector3 debugAngleDisplay = new Vector3();
 
 
     int[] rotationIndexes = new int[NUM_AXIS];
     bool[] rotationAllowed = new bool[NUM_AXIS];
-    public int predefinedRotationIndex = 0;
 
     void Start() {
         if (!CanRotate()) return;

@@ -290,7 +290,7 @@ MonoBehaviour:
   - {x: 90, y: 0, z: 0}
   - {x: 0, y: 0, z: 90}
   debugAngleDisplay: {x: 0, y: 0, z: 0}
-  predefinedRotationIndex: 3
+  predefinedRotationIndex: 0
 --- !u!114 &114289306726017154
 MonoBehaviour:
   m_ObjectHideFlags: 1
