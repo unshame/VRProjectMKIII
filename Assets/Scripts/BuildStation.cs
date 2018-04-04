@@ -85,6 +85,8 @@ public class BuildStation : MonoBehaviour {
         }
     }
 
+    protected virtual void Update() { }
+
     // Каждый тик, когда что-то находится в редакторе
     // Обрабатывает добавление объектов в редактор
     protected virtual void OnTriggerStay(Collider other) {

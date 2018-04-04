@@ -7,17 +7,25 @@ using UnityEngine;
 // Можно включить/отключить кисть
 public class DisplayStation : BuildStation {
 
-    [HideInInspector]
-    public Vector3 scaleDif;
+    private Vector3 scaleDif;
     private BuildStation parent;
+    private bool started = false;
+
+    protected override void Start() {
+        if (!started) {
+            started = true;
+            base.Start();
+        }
+    }
 
     public void SetParentStation(BuildStation parentStation) {
         parent = parentStation;
-        scaleDif = new Vector3(
-            blockSize.x / parent.blockSize.x,
-            blockSize.y / parent.blockSize.y,
-            blockSize.z / parent.blockSize.z
-        );
+        if (!started) {
+            started = true;
+            base.Start();
+        }
+        scaleDif = VectorUtils.Divide(blockSize, parent.blockSize);
+
     }
 
     public override void RemoveObject(GameObject obj) {
