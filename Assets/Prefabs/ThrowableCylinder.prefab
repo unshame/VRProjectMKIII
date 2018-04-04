@@ -280,20 +280,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   typeName: Cylinder
-  offset: {x: 0, y: 0, z: 0}
   xAxisRotation: 1
   yAxisRotation: 0
   zAxisRotation: 1
   rotationAxis: 0
-  rotationAngle: 90
-  debugAngleDisplay:
-  - 0
-  - 0
-  - 0
-  possibleAngles:
+  usePredefinedRotations: 1
+  predefinedRotations:
   - {x: 0, y: 0, z: 0}
   - {x: 90, y: 0, z: 0}
   - {x: 0, y: 0, z: 90}
+  debugAngleDisplay: {x: 0, y: 0, z: 0}
+  predefinedRotationIndex: 3
 --- !u!114 &114289306726017154
 MonoBehaviour:
   m_ObjectHideFlags: 1

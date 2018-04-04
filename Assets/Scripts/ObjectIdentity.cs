@@ -22,10 +22,12 @@ public class ObjectIdentity : MonoBehaviour {
 
     int[] rotationIndexes = new int[NUM_AXIS];
     bool[] rotationAllowed = new bool[NUM_AXIS];
+    public int predefinedRotationIndex = 0;
 
     void Start() {
         if (!CanRotate()) return;
-        if (rotationAxis < 0 || rotationAxis >= NUM_AXIS || !rotationAllowed[rotationAxis]) {
+        WrapRotationIndex();
+        if (!rotationAllowed[rotationAxis]) {
             NextRotationAxis();
         }
     }
@@ -43,58 +45,100 @@ public class ObjectIdentity : MonoBehaviour {
     }
 
     void WrapRotationIndex() {
-        if (Mathf.Abs(Mathf.FloorToInt(rotationAngle * GetRotationIndex())) % 360 == 0) {
-            SetRotationIndex(0);
+        if (usePredefinedRotations) {
+            if(predefinedRotationIndex < 0) {
+                SetRotationIndex(predefinedRotations.Count - 1);
+            }
+            else if(predefinedRotationIndex >= predefinedRotations.Count) {
+                SetRotationIndex(0);
+            }
+        }
+        else {
+            var rotationIndex = GetRotationIndex();
+            if (Mathf.Abs(Mathf.FloorToInt(rotationAngle * rotationIndex)) % 360 == 0) {
+                SetRotationIndex(0);
+            }
         }
     }
 
     public int GetRotationIndex(int axis = -1) {
         if (!CanRotate()) return 0;
+        if (usePredefinedRotations) return predefinedRotationIndex;
         if (axis == -1) axis = rotationAxis;
         return rotationIndexes[axis];
     }
 
     public void SetRotationIndex(int index) {
         if (!CanRotate()) return;
-        rotationIndexes[rotationAxis] = index;
+        if (usePredefinedRotations) {
+            predefinedRotationIndex = index;
+        }
+        else {
+            rotationIndexes[rotationAxis] = index;
+        }
     }
 
     public void NextRotationAxis() {
+        if (usePredefinedRotations) return;
         if (!CanRotate()) return;
-        rotationAxis++;
-        if (rotationAxis >= NUM_AXIS) rotationAxis = 0;
-        if (!rotationAllowed[rotationAxis]) NextRotationAxis();
+        if (usePredefinedRotations) {
+            predefinedRotationIndex++;
+            if (predefinedRotationIndex >= predefinedRotations.Count) {
+                predefinedRotationIndex = 0;
+            }
+        }
+        else {
+            rotationAxis++;
+            if (rotationAxis >= NUM_AXIS) rotationAxis = 0;
+            if (!rotationAllowed[rotationAxis]) NextRotationAxis();
+        }
     }
     public void PrevRotationAxis() {
+        if (usePredefinedRotations) return;
         if (!CanRotate()) return;
-        rotationAxis--;
-        if (rotationAxis <= 0) rotationAxis = NUM_AXIS;
-        if (!rotationAllowed[rotationAxis]) PrevRotationAxis();
+        if (usePredefinedRotations) {
+            predefinedRotationIndex++;
+            if (predefinedRotationIndex < 0) {
+                predefinedRotationIndex = predefinedRotations.Count - 1;
+            }
+        }
+        else {
+            rotationAxis--;
+            if (rotationAxis <= 0) rotationAxis = NUM_AXIS;
+            if (!rotationAllowed[rotationAxis]) PrevRotationAxis();
+        }
     }
 
     public bool CanRotate() {
-        for(int i = 0; i < NUM_AXIS; i++) {
-            debugAngleDisplay[i] = rotationIndexes[i] * rotationAngle;
+        if (!usePredefinedRotations) {
+            for (int i = 0; i < NUM_AXIS; i++) {
+                debugAngleDisplay[i] = rotationIndexes[i] * rotationAngle;
+            }
+            rotationAllowed[0] = xAxisRotation;
+            rotationAllowed[1] = yAxisRotation;
+            rotationAllowed[2] = zAxisRotation;
         }
-        rotationAllowed[0] = xAxisRotation;
-        rotationAllowed[1] = yAxisRotation;
-        rotationAllowed[2] = zAxisRotation;
-        return xAxisRotation || yAxisRotation || zAxisRotation;
+        return usePredefinedRotations && predefinedRotations.Count > 0 || xAxisRotation || yAxisRotation || zAxisRotation;
     }
 
     public Quaternion GetRotation(){
         if(!CanRotate()) return Quaternion.identity;
 
-        var rotationIndex = GetRotationIndex();
-
-        if (rotationAxis == 0) {
-            return Quaternion.Euler(rotationAngle * rotationIndex, 0, 0);
+        if (usePredefinedRotations) {
+            var rotation = predefinedRotations[predefinedRotationIndex];
+            return Quaternion.Euler(rotation.x, rotation.y, rotation.z);
         }
-        if(rotationAxis == 1) {
-            return Quaternion.Euler(0, rotationAngle * rotationIndex, 0);
-        }
-        if (rotationAxis == 2) {
-            return Quaternion.Euler(0, 0, rotationAngle * rotationIndex);
+        else {
+            var rotationIndex = GetRotationIndex();
+            if (rotationAxis == 0) {
+                return Quaternion.Euler(rotationAngle * rotationIndex, 0, 0);
+            }
+            if (rotationAxis == 1) {
+                return Quaternion.Euler(0, rotationAngle * rotationIndex, 0);
+            }
+            if (rotationAxis == 2) {
+                return Quaternion.Euler(0, 0, rotationAngle * rotationIndex);
+            }
         }
         return Quaternion.identity;
     }
