@@ -13,8 +13,7 @@ public class ObjectIdentity : MonoBehaviour {
     public bool yAxisRotation = false;
     public bool zAxisRotation = false;
     public int rotationAxis;
-    [HideInInspector]
-    public float rotationAngle = 90f;
+    private float rotationAngle = 90f;
 
     public bool usePredefinedRotations = false;
     public List<Vector3> predefinedRotations = new List<Vector3>();
