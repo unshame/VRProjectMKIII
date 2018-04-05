@@ -74,14 +74,12 @@ public class BuildStation : MonoBehaviour {
 
                 for (int z = 0; z < size.z; z++) {
 
-                    var block = new Block(
+                    blocks[x][y][z] = new Block(
                         position + Vector3.Scale(new Vector3(x, y, z), blockSize),
                         new Vector3i(x, y, z),
                         transform.parent,
                         CreateBlockAnchor()
                     );
-
-                    blocks[x][y][z] = block;
                 }
             }
         }
@@ -317,7 +315,7 @@ public class BuildStation : MonoBehaviour {
         return BlockIsEmpty(block) && distance < blockSize.magnitude * maxBlockDistance;
     }
 
-    // Пуст ли блок
+    // Пуст ли блок (несуществующие блоки считаются здесь пустыми)
     protected bool BlockIsEmpty(Block block) {
         return block == null || (block.isEmpty || block.has(brush));
     }
@@ -344,8 +342,8 @@ public class BuildStation : MonoBehaviour {
                         continue;
                     }
 
-                    // Объект не удастся разместить, т.к. блок занят
-                    if (!BlockIsEmpty(affectedBlock)) {
+                    // Объект не удастся разместить, т.к. блок занят или не существует
+                    if (affectedBlock == null || !affectedBlock.isEmpty) {
                         affectedBlocks = null;
                         return false;
                     }
