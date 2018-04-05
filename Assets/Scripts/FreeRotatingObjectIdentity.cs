@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-// Используется для различения блоков редактором
+// Блок со свободным поворотом
 public class FreeRotatingObjectIdentity : ObjectIdentity {
 
     private static int NUM_AXIS = 3;

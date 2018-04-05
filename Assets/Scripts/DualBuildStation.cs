@@ -9,11 +9,16 @@ public class DualBuildStation : BuildStation {
     public DisplayStation displayStation;
 
     protected override void Start() {
+
+        // Синхронизируем размеры редакторов перед инициализацией
         if (!Equals(size, displayStation.size)) {
             Debug.LogWarning("DualBuildStation: Size will be set equal to DisplayStation's size");
             size = displayStation.size;
         }
+
         base.Start();
+
+        // Устанавливаем главенствующий редактор
         displayStation.SetParentStation(this);
     }
 
@@ -28,8 +33,10 @@ public class DualBuildStation : BuildStation {
     }
 
     public override void RemoveObject(GameObject obj) {
-        var objCoord = GetObjectCoord(obj);
         base.RemoveObject(obj);
+
+        // Удаляем блок в дисплее по координатам
+        var objCoord = GetObjectCoord(obj);
         displayStation.RemoveObject(objCoord);
     }
 

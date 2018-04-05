@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-// Используется для различения блоков редактором
+// Используется для различения блоков редактором, указания сдвига и поворота блока
 public abstract class ObjectIdentity : MonoBehaviour {
 
     public string typeName;

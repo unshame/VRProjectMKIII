@@ -15,11 +15,13 @@ public class InteractibleBlock : Interactible {
         var freeRotatingIdentity = GetComponent<FreeRotatingObjectIdentity>();
         if (!identity) return;
 
+        // Изменение оси вращения по нажатию ctrl
         var ctrlDown = Input.GetKeyDown(KeyCode.LeftControl);
         if (freeRotatingIdentity && ctrlDown) {
             freeRotatingIdentity.NextRotationAxis();
         }
 
+        // Изменение вращения по колесику мыши
         var direction = Input.GetAxis("Mouse ScrollWheel");
         if (direction == 0) return;
 
@@ -36,11 +38,14 @@ public class InteractibleBlock : Interactible {
     public override void StartInteract(Transform instigator) {
         base.StartInteract(instigator);
         var identity = GetComponent<ObjectIdentity>();
+
+        // Загружаем поворот этого объекта из менеджера, если он не был поднят ранее
         if (!wasPickedUpBefore) {
             identity.UpdateRotationIndex();
             wasPickedUpBefore = true;
         }
         else {
+            // либо сохраняем вращение в менеджер, если объект уже поднимался
             identity.SaveRotationIndex();
         }
     }

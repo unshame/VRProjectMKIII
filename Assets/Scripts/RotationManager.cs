@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// Менеджер поворота блоков (синглтон)
+// Хранит последний поворот различных типов блоков
 public class RotationManager : MonoBehaviour {
 
     public Dictionary<string, int> rotationDictionary;

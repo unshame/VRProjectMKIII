@@ -7,30 +7,36 @@ using Valve.VR.InteractionSystem;
 public class Block {
 
     // Внутренние переменные
-    private GameObject obj = null;
-    private GameObject anchor;
-    private Transform holder;
-    private bool isFilled = false;
-    private MeshRenderer debugRenderer;
+    private GameObject obj = null;         // Объект добавленный в блок
+    private GameObject anchor;             // Объект, представляющий блок в игровом мире
+    private Transform holder;              // Объект внутри anchor, держащий добавленный блок
+    private bool isFilled = false;         // Заполнен ли блок
+    private MeshRenderer debugRenderer;    // Визуальное отображение блока
 
     // Конструктор
     public Block(Vector3 position, Vector3i coord, Transform parent, GameObject anchor) {
         affectingBlock = null;
+
+        // Устанавливаем позицию объекта, представляющего блок в игровом мире
         this.anchor = anchor;
+        anchor.transform.position = position;
+        anchor.transform.parent = parent;
+
+        // Сохраняем и выключаем визуальное отображение блока
         debugRenderer = anchor.GetComponentInChildren<MeshRenderer>();
         if (debugRenderer) {
             debugRenderer.enabled = false;
         }
-        anchor.transform.position = position;
-        anchor.transform.parent = parent;
+
+        // Запоминаем т выключаем держатель блока
         holder = anchor.transform.GetChild(anchor.transform.childCount - 1);
         holder.GetComponent<BlockHolder>().enabled = false;
+
         this.coord = coord;
+
         updateAnchorName();
     }
 
-
-    // Интерфейс
 
     // Координаты блока
     public readonly Vector3i coord;
@@ -46,7 +52,6 @@ public class Block {
         get;
         private set;
     }
-
 
     // Пуст ли блок
     public bool isEmpty {
@@ -85,11 +90,15 @@ public class Block {
 
     // Заполняет блок без GameObject'a
     public void fill() {
+
         if (obj) {
             empty();
         }
+
         isFilled = true;
+
         updateAnchorName();
+
         if (debugRenderer) {
             debugRenderer.enabled = true;
         }
@@ -110,16 +119,15 @@ public class Block {
 
         this.obj = obj;
 
-        var objTransform = getObjectTransform();
-        if (objTransform) {
-            objTransform.parent = holder;
-        }
+        // Помещаем объект в держатель объекта и включаем его
+        addObjectToHolder(position, rotation);
 
+        // Показываем блок и устанавливаем его позицию и поворот
         show(collide);
-        setPosition(offset, rotation);
 
         isFilled = true;
 
+        // Запоминаем и заполняем блоки, задетые объектом
         if (affectedBlocks != null) {
 
             this.affectedBlocks = affectedBlocks;
@@ -131,8 +139,6 @@ public class Block {
             }
         }
 
-        holder.GetComponent<BlockHolder>().enabled = true;
-
         updateAnchorName();
 
         if (debugRenderer) {
@@ -142,17 +148,16 @@ public class Block {
 
     // Убирает GameObject или ссылку на блок с ним из блока
     public void empty() {
-        var objTransform = getObjectTransform();
-        if (objTransform && objTransform.parent == holder) {
-            objTransform.localPosition = Vector3.zero;
-            objTransform.localRotation = Quaternion.identity;
-            objTransform.parent = null;
-        }
+
+        // Убираем объект из держателя и отключаем держатель
+        removeObjectFromHolder();
+
         obj = null;
         isFilled = false;
+        
         affectingBlock = null;
         emptyAffected();
-        holder.GetComponent<BlockHolder>().enabled = false;
+        
         updateAnchorName();
 
         if (debugRenderer) {
@@ -168,7 +173,7 @@ public class Block {
         }
     }
 
-    // Опусташает блоки, задетые текущим GameObject'ом
+    // Опустошает блоки, задетые текущим GameObject'ом
     private void emptyAffected() {
         if (affectedBlocks == null) return;
 
@@ -213,20 +218,42 @@ public class Block {
         obj.GetComponent<Collider>().enabled = collide;
     }
 
-    // Устанавливает позицию блока
-    public void setPosition(Vector3 offset, Quaternion rotation) {
-        if (!obj) return;
+    // Добавляет блок в держатель, включает держатель, устанавливает его позицию и поворот
+    public void addObjectToHolder(Vector3 offset, Quaternion rotation) {
 
         var objTransform = getObjectTransform();
-        if (objTransform && objTransform.parent == holder) {
+        if (objTransform) {
+            objTransform.parent = holder;
+
             objTransform.localPosition = Vector3.zero;
             objTransform.localRotation = Quaternion.identity;
+
+            holder.localPosition = offset;
+            holder.localRotation = rotation;
+
+            holder.GetComponent<BlockHolder>().enabled = true;
         }
 
-        holder.localRotation = rotation;
-        holder.localPosition = offset;            
     }
 
+    // Убирает блок из держателя, отключает блок
+    public void removeObjectFromHolder() {
+        var objTransform = getObjectTransform();
+        if (objTransform && objTransform.parent == holder) {
+
+            objTransform.localPosition = Vector3.zero;
+            objTransform.localRotation = Quaternion.identity;
+
+            objTransform.parent = null;
+
+            holder.localPosition = Vector3.zero;
+            holder.localRotation = Quaternion.identity;
+
+            holder.GetComponent<BlockHolder>().enabled = false;
+        }
+    }
+
+    // Обновляет имя объекта, представляющего блок в игровом мире
     public void updateAnchorName() {
         var name = coord.ToString();
         if (!isEmpty) {

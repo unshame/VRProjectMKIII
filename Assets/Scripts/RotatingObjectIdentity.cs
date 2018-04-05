@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-// Используется для различения блоков редактором
+// Блок с указанным списком возможных поворотов
 public class RotatingObjectIdentity : ObjectIdentity {
 
     public List<Vector3> predefinedRotations = new List<Vector3>();

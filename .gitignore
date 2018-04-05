@@ -4,9 +4,6 @@
 Temp/
 Library/
 build/
-Assets/@Themes/**/*
-Assets/@Themes.meta
-!Assets/@Themes/Palettes/Sublime.unitypalette
 
 # ===================================== #
 # Visual Studio / MonoDevelop generated #
