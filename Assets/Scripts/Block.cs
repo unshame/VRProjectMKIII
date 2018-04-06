@@ -120,7 +120,7 @@ public class Block {
         this.obj = obj;
 
         // Помещаем объект в держатель объекта и включаем его
-        addObjectToHolder(position, rotation);
+        addObjectToHolder(offset, rotation);
 
         // Показываем блок и устанавливаем его позицию и поворот
         show(collide);
@@ -190,6 +190,7 @@ public class Block {
         affectedBlocks = null;
     }
 
+
     // Прячет GameObject в этом блоке
     public void hide() {
         setBlockStatus(true, false, false);
@@ -218,8 +219,9 @@ public class Block {
         obj.GetComponent<Collider>().enabled = collide;
     }
 
+
     // Добавляет блок в держатель, включает держатель, устанавливает его позицию и поворот
-    public void addObjectToHolder(Vector3 offset, Quaternion rotation) {
+    private void addObjectToHolder(Vector3 offset, Quaternion rotation) {
 
         var objTransform = getObjectTransform();
         if (objTransform) {
@@ -237,7 +239,7 @@ public class Block {
     }
 
     // Убирает блок из держателя, отключает блок
-    public void removeObjectFromHolder() {
+    private void removeObjectFromHolder() {
         var objTransform = getObjectTransform();
         if (objTransform && objTransform.parent == holder) {
 
@@ -246,15 +248,12 @@ public class Block {
 
             objTransform.parent = null;
 
-            holder.localPosition = Vector3.zero;
-            holder.localRotation = Quaternion.identity;
-
             holder.GetComponent<BlockHolder>().enabled = false;
         }
     }
 
     // Обновляет имя объекта, представляющего блок в игровом мире
-    public void updateAnchorName() {
+    private void updateAnchorName() {
         var name = coord.ToString();
         if (!isEmpty) {
             name += " (";
@@ -270,7 +269,7 @@ public class Block {
     }
 
     // Возвращает transform объекта или его parent'a
-    public Transform getObjectTransform() {
+    private Transform getObjectTransform() {
         if (!obj) return null;
         var blockTransform = obj.transform.parent;
 
@@ -279,6 +278,4 @@ public class Block {
         }
         return blockTransform;
     }
-
-
 }

@@ -35,6 +35,9 @@ public class BuildStation : MonoBehaviour {
     // Максимальная удаленность валидного блока от объекта, который планируется туда поставить (дистанция в блоках)
     public int maxBlockDistance = 2;
 
+    // Максимальный выступ объекта за блок, после которого считается, что объект занимает блок
+    public float maxObjectProtrusion = 0.1f;
+
     // Позволяет блокам выходить за пределы сетки
     public bool allowOutOfBoundsPlacement = false;
 
@@ -206,6 +209,7 @@ public class BuildStation : MonoBehaviour {
         var childObject = new GameObject();
         childObject.transform.parent = blockAnchor.transform;
         childObject.AddComponent<BlockHolder>();
+        childObject.name = "Holder";
 
         return blockAnchor;
     }
@@ -322,7 +326,7 @@ public class BuildStation : MonoBehaviour {
 
     // Проверяет, не пересечется ли объект с другими заполненными блоками и собирает все пересеченные блоки в массив
     // Также проверяет, прилегает ли блок к ранее поставленному объекту
-    bool ObjectFits(Vector3i blockCoord, GameObject obj, out Block[] affectedBlocks) {
+    protected bool ObjectFits(Vector3i blockCoord, GameObject obj, out Block[] affectedBlocks) {
         var blockMagnitude = CalculateBlockMagnitude(obj);
         
         // Самый дальний блок, который будет занят объектом
@@ -369,7 +373,7 @@ public class BuildStation : MonoBehaviour {
     }
 
     // Проверяет, находится ли блок рядом с хотя бы одним уже заполненным
-    bool BlockIsConnected(int x, int y, int z) {
+    protected bool BlockIsConnected(int x, int y, int z) {
         if (y == 0) return true;
 
         var coord = new Vector3i(x, y, z);
@@ -392,7 +396,7 @@ public class BuildStation : MonoBehaviour {
 
     // Считает поворот объекта
     // Учитывается только поворот в identity блока, реальный поворот применяется позже только визуально
-    protected virtual Quaternion CalculateRotation(GameObject obj) {
+    protected Quaternion CalculateRotation(GameObject obj) {
         Quaternion appliedRotation = Quaternion.identity;
         var identity = obj.GetComponent<ObjectIdentity>();
         return identity ? identity.GetRotation() :  Quaternion.identity;
@@ -409,13 +413,13 @@ public class BuildStation : MonoBehaviour {
     // Считает число блоков между двумя крайними блоками, которые будет занимать объект (минимум один блок)
     protected Vector3i CalculateBlockMagnitude(GameObject obj) {
         var objSize = CalculateSize(obj);
-        return VectorUtils.Max(VectorUtils.RoundToInt(VectorUtils.Divide(objSize, blockSize)), Vector3i.one);
+        return VectorUtils.Max(VectorUtils.RoundAroundToInt(VectorUtils.Divide(objSize, blockSize), maxObjectProtrusion), Vector3i.one);
     }
 
     // Возвращает размер объекта с округлением до ближайшего блока (минимум один блок)
     protected Vector3 CalculateMinFitSize(GameObject obj) {
         var objSize = CalculateSize(obj);
-        return Vector3.Scale(VectorUtils.Max(VectorUtils.RoundToInt(VectorUtils.Divide(objSize, blockSize)), Vector3i.one), blockSize);
+        return Vector3.Scale(VectorUtils.Max(VectorUtils.RoundAroundToInt(VectorUtils.Divide(objSize, blockSize), maxObjectProtrusion), Vector3i.one), blockSize);
     }
 
     // Считает необходимый сдвиг объекта, чтобы он визуально умещался в предоставленных ему блоках

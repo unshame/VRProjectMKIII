@@ -59,7 +59,7 @@ Transform:
   m_GameObject: {fileID: 1640207898025542}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.25, y: 0.25, z: 0.0625}
+  m_LocalScale: {x: 0.28, y: 0.25, z: 0.0625}
   m_Children: []
   m_Father: {fileID: 4894264871784454}
   m_RootOrder: 0
@@ -156,16 +156,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   typeName: Cube
-  offset: {x: 0, y: -0.12, z: -0.5}
+  offset: {x: 0, y: 0, z: 0}
   debugAngleDisplay: {x: 270, y: 0, z: 0}
   predefinedRotations:
-  - {x: 34, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
   - {x: 0, y: 90, z: 0}
   - {x: 180, y: 90, z: 0}
   - {x: 90, y: 0, z: 0}
   - {x: 270, y: 0, z: 0}
   - {x: 0, y: 180, z: 0}
-  predefinedRotationIndex: 4
+  predefinedRotationIndex: 0
 --- !u!114 &114668481963661410
 MonoBehaviour:
   m_ObjectHideFlags: 1

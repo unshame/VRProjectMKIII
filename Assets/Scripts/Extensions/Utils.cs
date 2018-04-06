@@ -36,6 +36,14 @@ public class VectorUtils {
         );
     }
 
+    public static Vector3i RoundAroundToInt(Vector3 a, float breakpoint) {
+        return new Vector3i(
+            (a.x % 1) > breakpoint ? Mathf.CeilToInt(a.x) : Mathf.FloorToInt(a.x),
+            (a.y % 1) > breakpoint ? Mathf.CeilToInt(a.y) : Mathf.FloorToInt(a.y),
+            (a.z % 1) > breakpoint ? Mathf.CeilToInt(a.z) : Mathf.FloorToInt(a.z)
+        );
+    }
+
     public static Vector3i Min(Vector3i a, Vector3i b) {
         return new Vector3i(
             Mathf.Min(a.x, b.x),

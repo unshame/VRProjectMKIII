@@ -4342,7 +4342,7 @@ Prefab:
     - target: {fileID: 114268956457568762, guid: ad233b753743c494e82333d1422f97c9,
         type: 2}
       propertyPath: debugGridEnabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 114057654522374854, guid: ad233b753743c494e82333d1422f97c9,
         type: 2}
@@ -4373,6 +4373,11 @@ Prefab:
         type: 2}
       propertyPath: shouldShowBrush
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114268956457568762, guid: ad233b753743c494e82333d1422f97c9,
+        type: 2}
+      propertyPath: maxObjectProtrusion
+      value: 0.01
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: ad233b753743c494e82333d1422f97c9, type: 2}
@@ -6805,6 +6810,11 @@ Prefab:
         type: 2}
       propertyPath: size.z
       value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 114236711568530810, guid: cc2777865be32aa41860da4dfad310fd,
+        type: 2}
+      propertyPath: maxObjectProtrusion
+      value: 0.01
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: cc2777865be32aa41860da4dfad310fd, type: 2}
