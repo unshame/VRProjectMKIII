@@ -138,7 +138,7 @@ BoxCollider:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1848137899061614}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 78af283751e95a54c8c5bef60b876f23, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -225,6 +225,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   typeName: Sphere
   offset: {x: 0, y: 0, z: 0}
+  rotationAngle: 90
   debugAngleDisplay: {x: 0, y: 0, z: 0}
   predefinedRotations: []
   predefinedRotationIndex: 0
