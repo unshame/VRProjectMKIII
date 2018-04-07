@@ -88,6 +88,21 @@ public class DisplayStation : BuildStation {
         // TODO: может быть сделать, чтобы он корректно работал
     }
 
+    public override void Clear() {
+        for (int x = 0; x < size.x; x++) {
+            for (int y = 0; y < size.y; y++) {
+                for (int z = 0; z < size.z; z++) {
+                    var obj = blocks[x][y][z].gameObject;
+                    if (obj) {
+                        blocks[x][y][z].eject();
+                        Destroy(obj);
+                    }
+                }
+            }
+        }
+        objList.Clear();
+    }
+
     // Не реагируем на коллизии
     protected override void OnTriggerStay(Collider other) {
     }

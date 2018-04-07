@@ -24,7 +24,7 @@ public class RotatingObjectIdentity : PredefinedRotatingObjectIdentity {
             var allowedRotation = allowedRotationMin[i];
             allowedRotations[i] = new List<float>() { 0f };
             while (allowedRotation <= allowedRotationMax[i]) {
-                if (!allowedRotation.Equals(0f)) {
+                if (Mathf.Abs(allowedRotation.CompareTo(0f)) > Mathf.Epsilon) {
                     allowedRotations[i].Add(allowedRotation);
                 }
                 allowedRotation += rotationAngle;

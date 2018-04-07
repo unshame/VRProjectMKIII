@@ -190,6 +190,26 @@ public class Block {
         affectedBlocks = null;
     }
 
+    // Опустошает блок, выкидывая объект в случайную сторону
+    public void eject(float force = 5) {
+        if (!obj) return;
+        var rigidbody = getObjectTransform().GetComponent<Rigidbody>();
+        empty();
+
+        if (rigidbody) {
+            rigidbody.isKinematic = false;
+            var x = Random.Range(0.3f, 1);
+            var z = Random.Range(0.3f, 1);
+            if(x > 0.65f) {
+                z = -z;
+            }
+            if (z > 0.65f) {
+                x = -x;
+            }
+            rigidbody.velocity = new Vector3(x, 1, z) * force;
+        }
+    }
+
 
     // Прячет GameObject в этом блоке
     public void hide() {
@@ -205,11 +225,7 @@ public class Block {
     public void setBlockStatus(bool kinematic, bool visible, bool collide) {
         if (!obj) return;
 
-        var rigidbody = obj.transform.parent ? obj.transform.parent.GetComponent<Rigidbody>() : obj.GetComponent<Rigidbody>();
-
-        if (!rigidbody) {
-            rigidbody = obj.GetComponent<Rigidbody>();
-        }
+        var rigidbody = getObjectTransform().GetComponent<Rigidbody>();
 
         if (rigidbody) {
             rigidbody.isKinematic = kinematic;

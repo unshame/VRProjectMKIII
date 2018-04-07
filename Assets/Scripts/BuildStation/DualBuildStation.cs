@@ -45,4 +45,9 @@ public class DualBuildStation : BuildStation {
         displayStation.AddObject(blockCoord, obj, affectedBlocks, rotation);
         base.AddObject(blockCoord, obj, affectedBlocks, rotation);
     }
+
+    public override void Clear() {
+        base.Clear();
+        displayStation.Clear();
+    }
 }

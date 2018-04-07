@@ -12,6 +12,18 @@ public class BuildStation : MonoBehaviour {
     [HideInInspector]
     public Vector3 blockSize;
 
+    // 3D массив блоков
+    [HideInInspector]
+    public Block[][][] blocks;
+
+    // Массив всех GameObject'ов в редакторе
+    [HideInInspector]
+    public List<GameObject> objList = new List<GameObject>();
+
+
+    // Показывать ли кисть
+    public bool shouldShowBrush = true;
+
     // Префаб, а после инициализации - инстанция кисти-блока (полупрозрачный блок)
     public GameObject brush;
 
@@ -21,13 +33,9 @@ public class BuildStation : MonoBehaviour {
     // Блок, в котором находится кисть
     protected Block brushBlock = null;
 
-    // 3D массив блоков
-    [HideInInspector]
-    public Block[][][] blocks;
+    // Для какого объекта показана кисть
+    protected GameObject brushShownFor = null;
 
-    // Массив всех GameObject'ов в редакторе
-    [HideInInspector]
-    public List<GameObject> objList = new List<GameObject>();
 
     // Можно ли изменять контент редактора в игре
     public bool editable { get; private set; }
@@ -41,23 +49,19 @@ public class BuildStation : MonoBehaviour {
     // Интервал проверки позиции объекта в поле
     public float objectUpdateInterval = 0.1f;
 
-    // Позволяет блокам выходить за пределы сетки
-    public bool allowOutOfBoundsPlacement = false;
 
-    // Показывать ли кисть
-    public bool shouldShowBrush = true;
+    // Когда объект был обновлен в последний раз
+    protected float sinceLastUpdate = 0f;
+
+    // Очередь объектов на обработку
+    protected List<GameObject> updateQueue = new List<GameObject>();
+
 
     // Включает дебаг сетку
     public bool debugGridEnabled = false;
 
     // Префаб дебаг сетки
     public GameObject DebugGridPrefab;
-
-    // Когда объект был обновлен в последний раз
-    protected Dictionary<GameObject, float> sinceLastUpdate = new Dictionary<GameObject, float>();
-
-    // Для какого объекта показана кисть
-    protected GameObject brushShownFor = null;
 
 
     /* События Unity */
@@ -100,7 +104,22 @@ public class BuildStation : MonoBehaviour {
         }
     }
 
-    protected virtual void Update() { }
+    // Обрабатывает объекты в очереди
+    protected virtual void Update() {
+
+        sinceLastUpdate += Time.deltaTime;
+
+        if (!editable) {
+            HideBrush();
+            return;
+        }
+
+        if (sinceLastUpdate >= objectUpdateInterval && updateQueue.Count > 0) {
+            sinceLastUpdate = 0;
+
+            PlaceObject(DequeueObject());
+        }
+    }
 
     // Каждый тик, когда что-то находится в редакторе
     // Обрабатывает добавление объектов в редактор
@@ -108,39 +127,16 @@ public class BuildStation : MonoBehaviour {
 
         // Не редактируем
         if (!editable) {
-            HideBrush();
             return;
         }
 
-        var obj = other.gameObject;
-        Block[] closestAffectedBlocks;
-        bool objIsActive;
-
-        // Проверяем валидность объекта и находим ближайший блок, в который можно его поставить
-        var closestBlockCoord = GetClosestBlockCoord(obj, out closestAffectedBlocks, out objIsActive);
-
-        // Блок найден
-        if (closestBlockCoord != -Vector3i.one) {
-
-            HideBrush();
-
-            // Считаем поворот объекта
-            var appliedRotation = CalculateRotation(obj);
-
-            // Если он в руке игрока, показываем кисть
-            if (objIsActive) {
-                ShowBrush(closestBlockCoord, obj, appliedRotation);
-            }
-            else {
-                // Иначе ставим объект
-                AddObject(closestBlockCoord, obj, closestAffectedBlocks, appliedRotation);
-            }
-        }
+        ProcessObject(other.gameObject);
     }
 
     // Когда что-то покидает редактор
-    // Прячет кисть
+    // Прячет кисть, удаляет объект из очереди на добавление
     protected virtual void OnTriggerExit(Collider other) {
+        DequeueObject(other.gameObject);
         HideBrush();
     }
 
@@ -190,9 +186,6 @@ public class BuildStation : MonoBehaviour {
         }
 
         objList.Remove(obj);
-        if (sinceLastUpdate.ContainsKey(obj)) {
-            sinceLastUpdate.Remove(obj);
-        }
     }
 
     // Добавляет GameObject по указанным координатам
@@ -204,9 +197,6 @@ public class BuildStation : MonoBehaviour {
 
         // Заполняем массив объектов и блоки объектом
         objList.Add(obj);
-        if (sinceLastUpdate.ContainsKey(obj)) {
-            sinceLastUpdate.Remove(obj);
-        }
         block.fill(obj, true, offset, rotation, affectedBlocks);
     }
 
@@ -218,12 +208,35 @@ public class BuildStation : MonoBehaviour {
         editable = false;
     }
 
+    // Отключает редактирование на x секунд
+    public virtual IEnumerator LockFor(float seconds) {
+        Lock();
+        yield return new WaitForSeconds(seconds);
+        Unlock();
+    }
+
     // Включает редактирование
     public virtual void Unlock() {
         for (int i = 0; i < objList.Count; i++) {
             objList[i].GetComponent<Interactible>().isLocked = false;
         }
         editable = true;
+    }
+
+    // Убирает все объекты
+    public virtual void Clear() {
+        if (!editable) return;
+
+        for (int x = 0; x < size.x; x++) {
+            for (int y = 0; y < size.y; y++) {
+                for (int z = 0; z < size.z; z++) {
+                    blocks[x][y][z].eject();
+                }
+            }
+        }
+
+        objList.Clear();
+        StartCoroutine(LockFor(1));
     }
 
 
@@ -283,26 +296,23 @@ public class BuildStation : MonoBehaviour {
 
     /* Расставление объектов */
 
-    // Вовзращает координаты ближайшего валидного блока, а также блоки, на которые будет наложен GameObject и находится ли он в руке игрока
-    // Возращает -1 вектор, если такого блока нет
-    protected Vector3i GetClosestBlockCoord(GameObject obj, out Block[] closestAffectedBlocks, out bool isActive) {
-        closestAffectedBlocks = null;
-        isActive = false;
+    // Проверяет тип объекта и либо размещает его сразу, либо помещает его в очередь
+    protected void ProcessObject(GameObject obj) {
 
         var interactible = obj.GetComponent<Interactible>();
 
         // Это не объект для редактора
         if (!interactible) {
-            return -Vector3i.one;
+            return;
         }
 
         // Держит ли игрок объект
-        isActive = interactible.isActive;
-        
+        var objIsActive = interactible.isActive;
+
         // Объект уже в редакторе
         if (objList.Contains(obj)) {
 
-            if (isActive) {
+            if (objIsActive) {
 
                 // Игрок взял объект, который ранее был поставлен в редактор
                 RemoveObject(obj);
@@ -310,22 +320,85 @@ public class BuildStation : MonoBehaviour {
             else {
 
                 // Этот объект уже поставлен в редактор и его никто не трогает
-                return -Vector3i.one;
+                return;
             }
         }
 
-        // Проверяем интервал обновления
-        if (!sinceLastUpdate.ContainsKey(obj)) {
-            sinceLastUpdate.Add(obj, 0);
-        }
-        // Неактивные объекты нужно обновлять каждый кадр, чтобы они не могли упасть после того, как их отпустили
-        if (isActive && sinceLastUpdate[obj] < objectUpdateInterval) {
-            sinceLastUpdate[obj] += Time.deltaTime;
-            return -Vector3i.one;
-        }
+        var rigidbody = obj.transform.parent.GetComponent<Rigidbody>();
+        var objectIsMoving = !objIsActive && rigidbody && !rigidbody.velocity.Equals(Vector3.zero);
+
+        // Размещаем объект сразу же, если игрок его отпустил и он движется
+        if (objectIsMoving) {
+            sinceLastUpdate = 0;
+
+            DequeueObject(obj);
+            PlaceObject(obj);
+        } 
         else {
-            sinceLastUpdate[obj] = 0;
+            // Иначе добавляем его в очередь
+            EnqueueObject(obj);
         }
+
+    }
+
+    // Добавляет объект в очередь на добавление
+    protected void EnqueueObject(GameObject obj) {
+        if (!updateQueue.Contains(obj)) {
+            updateQueue.Add(obj);
+        }
+    }
+
+    // Удаляет и возвращает первый объект в очереди
+    protected GameObject DequeueObject() {
+        if (updateQueue.Count > 0) {
+            var obj = updateQueue[0];
+            updateQueue.RemoveAt(0);
+            return obj;
+        }
+        return null;
+    }
+
+    // Удаляет объект из очереди
+    protected void DequeueObject(GameObject obj) {
+        if (updateQueue.Contains(obj)) {
+            updateQueue.Remove(obj);
+        }
+    }
+
+    // Размещает объект в редакторе или показывает браш, если есть место
+    protected void PlaceObject(GameObject obj) {
+        // Проверяем валидность объекта и находим ближайший блок, в который можно его поставить
+        Block[] closestAffectedBlocks;
+        var closestBlockCoord = GetClosestBlockCoord(obj, out closestAffectedBlocks);
+
+        // Блок найден
+        if (closestBlockCoord != -Vector3i.one) {
+
+            HideBrush();
+
+            // Считаем поворот объекта
+            var appliedRotation = CalculateRotation(obj);
+            var objIsActive = obj.GetComponent<Interactible>().isActive;
+
+            // Если он в руке игрока, показываем кисть
+            if (objIsActive) {
+                ShowBrush(closestBlockCoord, obj, appliedRotation);
+            }
+            else {
+                // Иначе ставим объект
+                AddObject(closestBlockCoord, obj, closestAffectedBlocks, appliedRotation);
+            }
+        }
+        else if (brushShownFor == obj) {
+            // Прячем кисть, если для объекта нет места и кисть показана для него
+            HideBrush();
+        }
+    }
+
+    // Вовзращает координаты ближайшего валидного блока, а также блоки, на которые будет наложен GameObject и находится ли он в руке игрока
+    // Возращает -1 вектор, если такого блока нет
+    protected Vector3i GetClosestBlockCoord(GameObject obj, out Block[] closestAffectedBlocks) {
+        closestAffectedBlocks = null;   
 
         var minDist = Mathf.Infinity;
         Vector3i closestBlockCoord = -Vector3i.one;
@@ -359,11 +432,6 @@ public class BuildStation : MonoBehaviour {
             }
         }
 
-        // Прячем кисть, если для объекта нет места и кисть показана для него
-        if(closestBlockCoord == -Vector3i.one && brushShownFor == obj) {
-            HideBrush();
-        }
-
         return closestBlockCoord;
     }
 
@@ -393,11 +461,6 @@ public class BuildStation : MonoBehaviour {
             for (int y = blockReach.y; y >= blockCoord.y; y--) {
                 for (int z = blockReach.z; z >= blockCoord.z; z--) {
                     var affectedBlock = GetBlock(x, y, z);
-
-                    // Если объектам разрешено выходить за пределы редактора, пропускаем несуществующие блоки
-                    if (allowOutOfBoundsPlacement && affectedBlock == null) {
-                        continue;
-                    }
 
                     // Объект не удастся разместить, т.к. блок занят или не существует
                     if (!BlockIsEmpty(affectedBlock, true)) {
