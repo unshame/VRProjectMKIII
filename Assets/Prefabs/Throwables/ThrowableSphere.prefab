@@ -41,9 +41,9 @@ GameObject:
   - component: {fileID: 4907462236819432}
   - component: {fileID: 33105322892736362}
   - component: {fileID: 23079864134828760}
-  - component: {fileID: 114369940758711506}
   - component: {fileID: 114286993905843302}
   - component: {fileID: 65751978627000012}
+  - component: {fileID: 114257231202914178}
   m_Layer: 8
   m_Name: BuildSphere
   m_TagString: Untagged
@@ -212,6 +212,28 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
+--- !u!114 &114257231202914178
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1848137899061614}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26f1585e2a94e5b449ad1a4fb002d514, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  typeName: Sphere
+  offset: {x: 0, y: 0, z: 0}
+  debugAngleDisplay: {x: 0, y: 0, z: 0}
+  predefinedRotations: []
+  predefinedRotationIndex: 0
+  allowedRotationMin: {x: 0, y: 0, z: 0}
+  allowedRotationMax: {x: 0, y: 90, z: 90}
+  xyPermutate: 0
+  xzPermutate: 0
+  yzPermutate: 0
+  xyzPermutate: 0
 --- !u!114 &114286993905843302
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -224,24 +246,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isActive: 0
---- !u!114 &114369940758711506
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1848137899061614}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ba98cb115f6352f4bb464591cf4b5f5d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  typeName: Sphere
-  offset: {x: -0.06, y: 0, z: 0}
-  debugAngleDisplay: {x: 0, y: 0, z: 0}
-  xAxisRotation: 0
-  yAxisRotation: 1
-  zAxisRotation: 1
-  rotationAxis: 0
+  _isLocked: 0
+  spawner: {fileID: 0}
 --- !u!114 &114765118000583356
 MonoBehaviour:
   m_ObjectHideFlags: 1

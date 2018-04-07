@@ -67,7 +67,6 @@ public class Spawner : MonoBehaviour {
         }
         var identity = item.GetComponentInChildren<ObjectIdentity>();
         if (identity) {
-            identity.UpdateRotationIndex();
             item.transform.rotation = RotationManager.MainBuildStation.transform.rotation * identity.GetRotation();
         }
     }

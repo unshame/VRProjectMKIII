@@ -282,11 +282,14 @@ MonoBehaviour:
   typeName: Cylinder
   offset: {x: 0, y: 0, z: 0}
   debugAngleDisplay: {x: 0, y: 0, z: 0}
-  predefinedRotations:
-  - {x: 0, y: 0, z: 0}
-  - {x: 90, y: 0, z: 0}
-  - {x: 0, y: 0, z: 90}
+  predefinedRotations: []
   predefinedRotationIndex: 0
+  allowedRotationMin: {x: 0, y: 0, z: 0}
+  allowedRotationMax: {x: 90, y: 0, z: 90}
+  xyPermutate: 0
+  xzPermutate: 0
+  yzPermutate: 0
+  xyzPermutate: 0
 --- !u!114 &114289306726017154
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -299,6 +302,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isActive: 0
+  _isLocked: 0
+  spawner: {fileID: 0}
 --- !u!114 &114902968811506172
 MonoBehaviour:
   m_ObjectHideFlags: 1

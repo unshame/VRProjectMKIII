@@ -8,8 +8,11 @@ public abstract class ObjectIdentity : MonoBehaviour {
 
     public string typeName;
     public Vector3 offset = Vector3.zero;
-    protected float rotationAngle = 90f;
+    public float rotationAngle = 90f;
     public Vector3 debugAngleDisplay = new Vector3();
+
+    protected virtual void Awake() {
+    }
 
     protected virtual void Start() {
     }

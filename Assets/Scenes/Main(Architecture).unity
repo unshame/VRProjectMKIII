@@ -4512,7 +4512,7 @@ Prefab:
     - target: {fileID: 114268956457568762, guid: ad233b753743c494e82333d1422f97c9,
         type: 2}
       propertyPath: debugGridEnabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114057654522374854, guid: ad233b753743c494e82333d1422f97c9,
         type: 2}

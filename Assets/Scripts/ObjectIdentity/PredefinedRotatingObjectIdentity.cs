@@ -4,12 +4,12 @@ using UnityEngine;
 
 
 // Блок с указанным списком возможных поворотов
-public class RotatingObjectIdentity : ObjectIdentity {
+public class PredefinedRotatingObjectIdentity : ObjectIdentity {
 
     public List<Vector3> predefinedRotations = new List<Vector3>();
     public int predefinedRotationIndex = 0;
 
-    protected override void Start() {
+    protected override void Awake() {
         if (!CanRotate()) return;
         UpdateRotationIndex();
     }
@@ -68,6 +68,6 @@ public class RotatingObjectIdentity : ObjectIdentity {
         if (!CanRotate()) return Quaternion.identity;
 
         var rotation = predefinedRotations[predefinedRotationIndex];
-        return Quaternion.Euler(rotation.x, rotation.y, rotation.z);       
+        return Quaternion.Euler(rotation.x, rotation.y, rotation.z);
     }
 }

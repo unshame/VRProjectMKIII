@@ -16,7 +16,7 @@ public class FreeRotatingObjectIdentity : ObjectIdentity {
     int[] rotationIndexes = new int[NUM_AXIS];
     bool[] rotationAllowed = new bool[NUM_AXIS];
 
-    protected override void Start() {
+    protected override void Awake() {
         if (!CanRotate()) return;
         WrapRotationIndex();
         if (!rotationAllowed[rotationAxis]) {

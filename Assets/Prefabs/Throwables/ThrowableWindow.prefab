@@ -226,15 +226,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   typeName: Window
   offset: {x: 0, y: 0, z: 0}
-  debugAngleDisplay: {x: 270, y: 0, z: 0}
-  predefinedRotations:
-  - {x: 0, y: 0, z: 0}
-  - {x: 0, y: 90, z: 0}
-  - {x: 180, y: 90, z: 0}
-  - {x: 90, y: 0, z: 0}
-  - {x: 270, y: 0, z: 0}
-  - {x: 0, y: 180, z: 0}
+  debugAngleDisplay: {x: 0, y: 0, z: 0}
+  predefinedRotations: []
   predefinedRotationIndex: 0
+  allowedRotationMin: {x: 0, y: 0, z: 0}
+  allowedRotationMax: {x: 0, y: 270, z: 0}
+  xyPermutate: 0
+  xzPermutate: 0
+  yzPermutate: 0
+  xyzPermutate: 0
 --- !u!114 &114379096699323002
 MonoBehaviour:
   m_ObjectHideFlags: 1
