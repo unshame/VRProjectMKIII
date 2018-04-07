@@ -6,9 +6,17 @@ using UnityEngine;
 // Хранит последний поворот различных типов блоков
 public class RotationManager : MonoBehaviour {
 
-    public Dictionary<string, int> rotationDictionary;
+    private Dictionary<string, int> rotationDictionary;
 
     private static RotationManager rotationManager;
+
+    public static BuildStation MainBuildStation {
+        get {
+            return instance.mainBuildStation;
+        }
+    }
+
+    private BuildStation mainBuildStation;
 
     public static RotationManager instance {
         get {
@@ -31,6 +39,7 @@ public class RotationManager : MonoBehaviour {
         if (rotationDictionary == null) {
             rotationDictionary = new Dictionary<string, int>();
         }
+        mainBuildStation = FindObjectOfType<DualBuildStation>();
     }
 
     public static void SetRotation(string typeName, int rotationIndex) {

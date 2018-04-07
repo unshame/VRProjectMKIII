@@ -6,10 +6,29 @@ ModelImporter:
   serializedVersion: 19
   fileIDToRecycleName:
     100000: //RootNode
+    100002: ' 1'
+    100004: Box001
+    100006: Box002
+    100008: Box003
     400000: //RootNode
+    400002: ' 1'
+    400004: Box001
+    400006: Box002
+    400008: Box003
     2300000: //RootNode
+    2300002: ' 1'
+    2300004: Box001
+    2300006: Box002
+    2300008: Box003
     3300000: //RootNode
+    3300002: ' 1'
+    3300004: Box001
+    3300006: Box002
+    3300008: Box003
     4300000: apartment_large_mesh
+    4300002: Box001
+    4300004: Box002
+    4300006: Box003
   materials:
     importMaterials: 1
     materialName: 0

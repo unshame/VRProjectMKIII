@@ -7,6 +7,8 @@ using UnityEngine;
 public class InteractibleBlock : Interactible {
 
     private bool wasPickedUpBefore = false;
+    private bool wasPutDownBefore = false;
+    public Spawner spawner;
 
     void Update() {
         if (!isActive) return;
@@ -23,16 +25,19 @@ public class InteractibleBlock : Interactible {
 
         // Изменение вращения по колесику мыши
         var direction = Input.GetAxis("Mouse ScrollWheel");
-        if (direction == 0) return;
+        if (direction != 0) {
 
-        var abs = (int)Mathf.Abs(Mathf.Round(direction * 10));
+            var abs = (int)Mathf.Abs(Mathf.Round(direction * 10));
 
-        if (direction > 0) {
-            identity.IncreaseRotationIndex(abs);
+            if (direction > 0) {
+                identity.IncreaseRotationIndex(abs);
+            }
+            else {
+                identity.DecreaseRotationIndex(abs);
+            }
         }
-        else {
-            identity.DecreaseRotationIndex(abs);
-        }
+
+        transform.parent.rotation = RotationManager.MainBuildStation.transform.rotation * identity.GetRotation();
     }
 
     public override void StartInteract(Transform instigator) {
@@ -43,10 +48,24 @@ public class InteractibleBlock : Interactible {
         if (!wasPickedUpBefore) {
             identity.UpdateRotationIndex();
             wasPickedUpBefore = true;
+            if (spawner) {
+                spawner.SpawningAllowed = false;
+            }
         }
         else {
             // либо сохраняем вращение в менеджер, если объект уже поднимался
             identity.SaveRotationIndex();
+        }
+    }
+
+    public override void StopInteract() {
+        base.StopInteract();
+
+        if (!wasPutDownBefore) {
+            if (spawner) {
+                spawner.SpawningAllowed = true;
+            }
+            wasPutDownBefore = true;
         }
     }
 }

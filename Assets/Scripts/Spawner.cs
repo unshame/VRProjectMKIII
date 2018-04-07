@@ -16,6 +16,8 @@ public class Spawner : MonoBehaviour {
     [HideInInspector]
     public bool IsEmpty = true;
 
+    public bool SpawningAllowed = true;
+
     // Время с последнего момента, когда коллайдер не был пустым
     private float TimePast = 0f;
 
@@ -49,7 +51,7 @@ public class Spawner : MonoBehaviour {
         IsEmpty = true;
 
         // Пришло время спавнить
-        if (TimePast > SpawnDelay) {
+        if (SpawningAllowed && TimePast > SpawnDelay) {
             SpawnObject(Prefab);
             TimePast = 0;
             IsEmpty = false;
@@ -58,7 +60,16 @@ public class Spawner : MonoBehaviour {
 
     // Спавнит объект
     public void SpawnObject(GameObject Item) {
-        Instantiate(Item, transform.position, transform.rotation);
+        var item = Instantiate(Item, transform.position, transform.rotation);
+        var interactible = item.GetComponentInChildren<InteractibleBlock>();
+        if (interactible) {
+            interactible.spawner = this;
+        }
+        var identity = item.GetComponentInChildren<ObjectIdentity>();
+        if (identity) {
+            identity.UpdateRotationIndex();
+            item.transform.rotation = RotationManager.MainBuildStation.transform.rotation * identity.GetRotation();
+        }
     }
 
     // Добавляет объект в список объектов внутри коллайдера, если он подходящий
