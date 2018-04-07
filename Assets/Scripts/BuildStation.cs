@@ -30,7 +30,7 @@ public class BuildStation : MonoBehaviour {
     public List<GameObject> objList = new List<GameObject>();
 
     // Можно ли изменять контент редактора в игре
-    public bool editable = true;
+    public bool editable { get; private set; }
 
     // Максимальная удаленность валидного блока от объекта, который планируется туда поставить (дистанция в блоках)
     public int maxBlockDistance = 2;
@@ -64,6 +64,9 @@ public class BuildStation : MonoBehaviour {
 
     // Инициализирует кисть, создает блоки
     protected virtual void Start() {
+
+        editable = true;
+
         blockSize = VectorUtils.Divide(transform.localScale, size);
 
         // Инстанциируем кисть
@@ -104,7 +107,6 @@ public class BuildStation : MonoBehaviour {
     protected virtual void OnTriggerStay(Collider other) {
 
         // Не редактируем
-        // TODO: убрать возможность забирать блоки
         if (!editable) {
             HideBrush();
             return;
@@ -206,6 +208,22 @@ public class BuildStation : MonoBehaviour {
             sinceLastUpdate.Remove(obj);
         }
         block.fill(obj, true, offset, rotation, affectedBlocks);
+    }
+
+    // Отключает редактирование
+    public virtual void Lock() {
+        for(int i = 0; i < objList.Count; i++) {
+            objList[i].GetComponent<Interactible>().isLocked = true;
+        }
+        editable = false;
+    }
+
+    // Включает редактирование
+    public virtual void Unlock() {
+        for (int i = 0; i < objList.Count; i++) {
+            objList[i].GetComponent<Interactible>().isLocked = false;
+        }
+        editable = true;
     }
 
 
