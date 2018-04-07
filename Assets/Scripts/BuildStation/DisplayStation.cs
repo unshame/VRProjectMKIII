@@ -13,6 +13,8 @@ public class DisplayStation : BuildStation {
 
     protected override void Start() {
 
+        editable = true;
+
         if (!started) {
             started = true;
             base.Start();

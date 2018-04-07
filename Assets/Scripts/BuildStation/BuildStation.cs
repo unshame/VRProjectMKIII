@@ -38,7 +38,7 @@ public class BuildStation : MonoBehaviour {
 
 
     // Можно ли изменять контент редактора в игре
-    public bool editable { get; private set; }
+    public bool editable;
 
     // Максимальная удаленность валидного блока от объекта, который планируется туда поставить (дистанция в блоках)
     public int maxBlockDistance = 2;
@@ -69,7 +69,9 @@ public class BuildStation : MonoBehaviour {
     // Инициализирует кисть, создает блоки
     protected virtual void Start() {
 
-        editable = true;
+        if (!editable) {
+            Lock();
+        }
 
         blockSize = VectorUtils.Divide(transform.localScale, size);
 
