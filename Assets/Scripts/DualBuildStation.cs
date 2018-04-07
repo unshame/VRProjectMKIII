@@ -33,10 +33,11 @@ public class DualBuildStation : BuildStation {
     }
 
     public override void RemoveObject(GameObject obj) {
+        var objCoord = GetObjectCoord(obj);
+
         base.RemoveObject(obj);
 
         // Удаляем блок в дисплее по координатам
-        var objCoord = GetObjectCoord(obj);
         displayStation.RemoveObject(objCoord);
     }
 

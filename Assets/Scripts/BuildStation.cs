@@ -37,6 +37,9 @@ public class BuildStation : MonoBehaviour {
 
     // Максимальный выступ объекта за блок, после которого считается, что объект занимает блок
     public float maxObjectProtrusion = 0.1f;
+    
+    // Интервал проверки позиции объекта в поле
+    public float objectUpdateInterval = 0.1f;
 
     // Позволяет блокам выходить за пределы сетки
     public bool allowOutOfBoundsPlacement = false;
@@ -49,6 +52,12 @@ public class BuildStation : MonoBehaviour {
 
     // Префаб дебаг сетки
     public GameObject DebugGridPrefab;
+
+    // Когда объект был обновлен в последний раз
+    protected Dictionary<GameObject, float> sinceLastUpdate = new Dictionary<GameObject, float>();
+
+    // Для какого объекта показана кисть
+    protected GameObject brushShownFor = null;
 
 
     /* События Unity */
@@ -111,6 +120,8 @@ public class BuildStation : MonoBehaviour {
         // Блок найден
         if (closestBlockCoord != -Vector3i.one) {
 
+            HideBrush();
+
             // Считаем поворот объекта
             var appliedRotation = CalculateRotation(obj);
 
@@ -141,6 +152,7 @@ public class BuildStation : MonoBehaviour {
             brushBlock.hide();
             brushBlock.empty();
             brushBlock = null;
+            brushShownFor = null;
         }
     }
 
@@ -154,6 +166,7 @@ public class BuildStation : MonoBehaviour {
         // Заполняем блоки кистью
         block.fill(brush, false, offset, rotation * obj.transform.localRotation);
         brushBlock = block;
+        brushShownFor = obj;
 
         // Устанавливаем меш и масштаб кисти
         brush.GetComponent<MeshFilter>().mesh = obj.GetComponent<MeshFilter>().mesh;
@@ -175,6 +188,9 @@ public class BuildStation : MonoBehaviour {
         }
 
         objList.Remove(obj);
+        if (sinceLastUpdate.ContainsKey(obj)) {
+            sinceLastUpdate.Remove(obj);
+        }
     }
 
     // Добавляет GameObject по указанным координатам
@@ -186,6 +202,9 @@ public class BuildStation : MonoBehaviour {
 
         // Заполняем массив объектов и блоки объектом
         objList.Add(obj);
+        if (sinceLastUpdate.ContainsKey(obj)) {
+            sinceLastUpdate.Remove(obj);
+        }
         block.fill(obj, true, offset, rotation, affectedBlocks);
     }
 
@@ -276,8 +295,16 @@ public class BuildStation : MonoBehaviour {
             }
         }
 
-        // Мы уже знаем, что это объект для редактора, так что можно убрать кисть из старой позиции
-        HideBrush();
+        if (!sinceLastUpdate.ContainsKey(obj)) {
+            sinceLastUpdate.Add(obj, 0);
+        }
+        if (isActive && sinceLastUpdate[obj] < objectUpdateInterval) {
+            sinceLastUpdate[obj] += Time.deltaTime;
+            return -Vector3i.one;
+        }
+        else {
+            sinceLastUpdate[obj] = 0;
+        }
 
         var minDist = Mathf.Infinity;
         Vector3i closestBlockCoord = -Vector3i.one;
@@ -311,6 +338,12 @@ public class BuildStation : MonoBehaviour {
             }
         }
 
+        if(closestBlockCoord == -Vector3i.one) {
+            if (brushShownFor == obj) {
+                HideBrush();
+            }
+        }
+
         return closestBlockCoord;
     }
 
@@ -319,9 +352,9 @@ public class BuildStation : MonoBehaviour {
         return BlockIsEmpty(block) && distance < blockSize.magnitude * maxBlockDistance;
     }
 
-    // Пуст ли блок (несуществующие блоки считаются здесь пустыми)
-    protected bool BlockIsEmpty(Block block) {
-        return block == null || (block.isEmpty || block.has(brush));
+    // Пуст ли блок
+    protected bool BlockIsEmpty(Block block, bool mustExist = false) {
+        return !mustExist && block == null || block != null && (block.isEmpty || block.has(brush));
     }
 
     // Проверяет, не пересечется ли объект с другими заполненными блоками и собирает все пересеченные блоки в массив
@@ -347,7 +380,7 @@ public class BuildStation : MonoBehaviour {
                     }
 
                     // Объект не удастся разместить, т.к. блок занят или не существует
-                    if (affectedBlock == null || !affectedBlock.isEmpty) {
+                    if (!BlockIsEmpty(affectedBlock, true)) {
                         affectedBlocks = null;
                         return false;
                     }
