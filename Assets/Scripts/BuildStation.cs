@@ -278,6 +278,7 @@ public class BuildStation : MonoBehaviour {
             return -Vector3i.one;
         }
 
+        // Держит ли игрок объект
         isActive = interactible.isActive;
         
         // Объект уже в редакторе
@@ -295,9 +296,11 @@ public class BuildStation : MonoBehaviour {
             }
         }
 
+        // Проверяем интервал обновления
         if (!sinceLastUpdate.ContainsKey(obj)) {
             sinceLastUpdate.Add(obj, 0);
         }
+        // Неактивные объекты нужно обновлять каждый кадр, чтобы они не могли упасть после того, как их отпустили
         if (isActive && sinceLastUpdate[obj] < objectUpdateInterval) {
             sinceLastUpdate[obj] += Time.deltaTime;
             return -Vector3i.one;
@@ -338,10 +341,9 @@ public class BuildStation : MonoBehaviour {
             }
         }
 
-        if(closestBlockCoord == -Vector3i.one) {
-            if (brushShownFor == obj) {
-                HideBrush();
-            }
+        // Прячем кисть, если для объекта нет места и кисть показана для него
+        if(closestBlockCoord == -Vector3i.one && brushShownFor == obj) {
+            HideBrush();
         }
 
         return closestBlockCoord;
@@ -358,7 +360,7 @@ public class BuildStation : MonoBehaviour {
     }
 
     // Проверяет, не пересечется ли объект с другими заполненными блоками и собирает все пересеченные блоки в массив
-    // Также проверяет, прилегает ли блок к ранее поставленному объекту
+    // Также проверяет прилегает ли блок к ранее поставленному объекту
     protected bool ObjectFits(Vector3i blockCoord, GameObject obj, out Block[] affectedBlocks) {
         var blockMagnitude = CalculateBlockMagnitude(obj);
         
