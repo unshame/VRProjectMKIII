@@ -291,7 +291,8 @@ public class Block {
         if (!obj) return null;
         var blockTransform = obj.transform.parent;
 
-        if (!blockTransform || !blockTransform.gameObject.GetComponent<Throwable>()) {
+        if (!blockTransform || !blockTransform.GetComponent<VRTK.VRTK_InteractableObject>()) {
+            Debug.Log("found");
             blockTransform = obj.transform;
         }
         return blockTransform;
