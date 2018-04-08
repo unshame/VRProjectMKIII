@@ -8,13 +8,19 @@ public class DualBuildStation : BuildStation {
 
     public DisplayStation displayStation;
 
-    protected override void Start() {
+    protected override void Awake() {
 
         // Синхронизируем размеры редакторов перед инициализацией
-        if (!Equals(size, displayStation.size)) {
-            Debug.LogWarning("DualBuildStation: Size will be set equal to DisplayStation's size");
+        if (size != displayStation.size) {
+            Debug.LogWarning("DualBuildStation: Size will be set equal to match DisplayStation's size");
             size = displayStation.size;
         }
+
+        base.Awake();
+    }
+
+
+    protected override void Start() {
 
         base.Start();
 
@@ -48,6 +54,8 @@ public class DualBuildStation : BuildStation {
 
     public override void Clear() {
         base.Clear();
-        displayStation.Clear();
+        if (editable) {
+            displayStation.Clear();
+        }
     }
 }

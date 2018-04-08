@@ -19,8 +19,8 @@ public class Block {
 
         // Устанавливаем позицию объекта, представляющего блок в игровом мире
         this.anchor = anchor;
-        anchor.transform.position = position;
         anchor.transform.parent = parent;
+        anchor.transform.position = position;
 
         // Сохраняем и выключаем визуальное отображение блока
         debugRenderer = anchor.GetComponentInChildren<MeshRenderer>();
@@ -206,7 +206,9 @@ public class Block {
             if (z > 0.65f) {
                 x = -x;
             }
-            rigidbody.velocity = new Vector3(x, 1, z) * force;
+            var velocity = new Vector3(x, 1, z);
+            rigidbody.velocity = velocity * force;
+            rigidbody.angularVelocity = velocity / 2;
         }
     }
 

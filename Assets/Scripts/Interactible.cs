@@ -14,10 +14,7 @@ public class Interactible : MonoBehaviour {
     public bool isLocked {
         get { return _isLocked; }
         set {
-            var collider = GetComponent<Collider>();
-            if (collider) {
-                collider.enabled = !value;
-            }
+            gameObject.layer = value ? 0 : 8;
             _isLocked = value;
         }
     }

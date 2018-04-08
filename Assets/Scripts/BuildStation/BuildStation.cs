@@ -66,21 +66,24 @@ public class BuildStation : MonoBehaviour {
 
     /* События Unity */
 
+    // Считает размер блоков
+    protected virtual void Awake() {
+        blockSize = VectorUtils.Divide(transform.localScale, size);  
+    }
+
     // Инициализирует кисть, создает блоки
     protected virtual void Start() {
-
-        if (!editable) {
-            Lock();
-        }
-
-        blockSize = VectorUtils.Divide(transform.localScale, size);
-
         // Инстанциируем кисть
         brush = Instantiate(brush, transform.parent);
         brush.GetComponent<Renderer>().material = brushMaterial;
         brush.GetComponent<Renderer>().enabled = false;
         brush.GetComponent<Collider>().enabled = false;
         brush.transform.localScale = blockSize;
+
+        var blockHolder = new GameObject {
+            name = "BlockHolder"            
+        };
+        blockHolder.transform.parent = transform.parent;
 
         var offset = transform.localScale / 2;
         var position = transform.position - offset;
@@ -95,10 +98,12 @@ public class BuildStation : MonoBehaviour {
 
                 for (int z = 0; z < size.z; z++) {
 
+                    var blockCoord = new Vector3i(x, y, z);
+
                     blocks[x][y][z] = new Block(
-                        position + Vector3.Scale(new Vector3(x, y, z), blockSize),
-                        new Vector3i(x, y, z),
-                        transform.parent,
+                        position + Vector3.Scale(blockCoord, blockSize),
+                        blockCoord,
+                        blockHolder.transform,
                         CreateBlockAnchor()
                     );
                 }

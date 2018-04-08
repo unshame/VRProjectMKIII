@@ -61,6 +61,8 @@ namespace Valve.VR.InteractionSystem {
         [Tooltip("If true, the transform of the GameObject this component is on will be rotated accordingly")]
         public bool rotateGameObject = true;
 
+        public GameObject objectToRotate = null;
+
         [Tooltip("If true, the path of the Hand (red) and the projected value (green) will be drawn")]
         public bool debugPath = false;
         [Tooltip("If debugPath is true, this is the maximum number of GameObjects to create to draw the path")]
@@ -349,7 +351,8 @@ namespace Valve.VR.InteractionSystem {
             if (rotateGameObject) {
                 // ИЗМЕНЕННЫЙ КОД
                 // Вращаем parent, вместо текущего объекта
-                transform.parent.localRotation = start * Quaternion.AngleAxis(outAngle, localPlaneNormal);
+                var objectTransform = objectToRotate ? objectToRotate.transform : transform;
+                objectTransform.localRotation = start * Quaternion.AngleAxis(outAngle, localPlaneNormal);
             }
         }
 
