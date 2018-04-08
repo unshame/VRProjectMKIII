@@ -53,9 +53,9 @@ public class DualBuildStation : BuildStation {
     }
 
     public override void Clear() {
-        base.Clear();
         if (editable) {
             displayStation.Clear();
         }
+        base.Clear();
     }
 }
