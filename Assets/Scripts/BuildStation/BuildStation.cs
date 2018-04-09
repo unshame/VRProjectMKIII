@@ -56,6 +56,9 @@ public class BuildStation : MonoBehaviour {
     // Очередь объектов на обработку
     protected List<GameObject> updateQueue = new List<GameObject>();
 
+    // Свободные объекты внутри поля, которые уже были обновлены
+    protected List<GameObject> movingObjects = new List<GameObject>();
+
 
     // Включает дебаг сетку
     public bool debugGridEnabled = false;
@@ -143,7 +146,14 @@ public class BuildStation : MonoBehaviour {
     // Когда что-то покидает редактор
     // Прячет кисть, удаляет объект из очереди на добавление
     protected virtual void OnTriggerExit(Collider other) {
-        DequeueObject(other.gameObject);
+        var obj = other.gameObject;
+
+        DequeueObject(obj);
+
+        if (movingObjects.Contains(obj)) { 
+            movingObjects.Remove(obj); 
+        }
+
         HideBrush();
     }
 
@@ -205,6 +215,10 @@ public class BuildStation : MonoBehaviour {
         // Заполняем массив объектов и блоки объектом
         objList.Add(obj);
         block.fill(obj, true, offset, rotation, affectedBlocks);
+
+        if (movingObjects.Contains(obj)) { 
+            movingObjects.Remove(obj); 
+        }
     }
 
     // Отключает редактирование
@@ -334,18 +348,21 @@ public class BuildStation : MonoBehaviour {
         var rigidbody = obj.transform.parent.GetComponent<Rigidbody>();
         var objectIsMoving = !objIsActive && rigidbody && !rigidbody.velocity.Equals(Vector3.zero);
 
-        // Размещаем объект сразу же, если игрок его отпустил и он движется
-        if (objectIsMoving) {
-            sinceLastUpdate = 0;
-
+        // Размещаем объект сразу же, если игрок его отпустил, он движется и мы его раньше не обрабатывали
+        if (objectIsMoving && !movingObjects.Contains(obj)) {
+            movingObjects.Add(obj);
             DequeueObject(obj);
             PlaceObject(obj);
-        } 
-        else {
-            // Иначе добавляем его в очередь
-            EnqueueObject(obj);
+            return;
         }
 
+        // Объект снова в руке игрока, убираем его из списка свободных
+        if (objIsActive && movingObjects.Contains(obj)) { 
+            movingObjects.Remove(obj); 
+        }
+        
+        // Добавляем объект в очередь
+        EnqueueObject(obj);
     }
 
     // Добавляет объект в очередь на добавление
