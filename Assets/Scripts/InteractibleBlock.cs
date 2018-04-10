@@ -8,6 +8,7 @@ public class InteractibleBlock : Interactible {
 
     private bool wasPickedUpBefore = false;
     private bool wasPutDownBefore = false;
+    public bool alwaysUpdateRotation = true;
     public Spawner spawner;
 
     void Update() {
@@ -17,10 +18,13 @@ public class InteractibleBlock : Interactible {
         var freeRotatingIdentity = GetComponent<FreeRotatingObjectIdentity>();
         if (!identity) return;
 
+        var shouldUpdateRotation = false;
+
         // Изменение оси вращения по нажатию ctrl
         var ctrlDown = Input.GetKeyDown(KeyCode.LeftControl);
         if (freeRotatingIdentity && ctrlDown) {
             freeRotatingIdentity.NextRotationAxis();
+            shouldUpdateRotation = true;
         }
 
         // Изменение вращения по колесику мыши
@@ -35,9 +39,12 @@ public class InteractibleBlock : Interactible {
             else {
                 identity.DecreaseRotationIndex(abs);
             }
+            shouldUpdateRotation = true;
         }
 
-        transform.parent.rotation = RotationManager.MainBuildStation.transform.rotation * identity.GetRotation();
+        if (shouldUpdateRotation || alwaysUpdateRotation) {
+            transform.parent.rotation = RotationManager.MainBuildStation.transform.rotation * identity.GetRotation();
+        }
     }
 
     public override void StartInteract(Transform instigator) {
