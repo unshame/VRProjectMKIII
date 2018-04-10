@@ -11,10 +11,11 @@ public class Block {
     private GameObject anchor;             // Объект, представляющий блок в игровом мире
     private Transform holder;              // Объект внутри anchor, держащий добавленный блок
     private bool isFilled = false;         // Заполнен ли блок
-    private MeshRenderer debugRenderer;    // Визуальное отображение блока
+    private MeshRenderer debugRenderer;    // Визуальное отображение блока    
+    public Vector3i spaces;                // Свободное место после блока
 
     // Конструктор
-    public Block(Vector3 position, Vector3i coord, Transform parent, GameObject anchor) {
+    public Block(Vector3 position, Vector3i coord, Transform parent, GameObject anchor, Vector3i spaces) {
         affectingBlock = null;
 
         // Устанавливаем позицию объекта, представляющего блок в игровом мире
@@ -33,6 +34,7 @@ public class Block {
         holder.GetComponent<BlockHolder>().enabled = false;
 
         this.coord = coord;
+        this.spaces = spaces;
 
         updateAnchorName();
     }

@@ -107,7 +107,8 @@ public class BuildStation : MonoBehaviour {
                         position + Vector3.Scale(blockCoord, blockSize),
                         blockCoord,
                         blockHolder.transform,
-                        CreateBlockAnchor()
+                        CreateBlockAnchor(),
+                        new Vector3i(size.x - x - 1, size.y - y - 1, size.z - z - 1)
                     );
                 }
             }
@@ -203,6 +204,8 @@ public class BuildStation : MonoBehaviour {
         }
 
         objList.Remove(obj);
+
+        UpdateBlockSpaces();
     }
 
     // Добавляет GameObject по указанным координатам
@@ -219,6 +222,8 @@ public class BuildStation : MonoBehaviour {
         if (movingObjects.Contains(obj)) { 
             movingObjects.Remove(obj); 
         }
+
+        UpdateBlockSpaces();
     }
 
     // Отключает редактирование
@@ -256,6 +261,8 @@ public class BuildStation : MonoBehaviour {
             }
         }
 
+        UpdateBlockSpaces();
+
         objList.Clear();
         StartCoroutine(LockFor(1));
     }
@@ -263,7 +270,34 @@ public class BuildStation : MonoBehaviour {
 
     /* Работа с блоками */
 
-    // Создает GameObject для блока
+    // Возвращает блок по координатам
+    public Block GetBlock(int x, int y, int z) {
+        if (x < 0 || x >= size.x || y < 0 || y >= size.y || z < 0 || z >= size.z) {
+            return null;
+        }
+
+        return blocks[x][y][z];
+    }
+
+    public Block GetBlock(Vector3i coord) {
+        return GetBlock(coord.x, coord.y, coord.z);
+    }
+
+    // Возвращает координаты блока с указанным GameObject'ом или -1 вектор
+    public Vector3i GetObjectCoord(GameObject obj) {
+        for (int x = 0; x < size.x; x++) {
+            for (int y = 0; y < size.y; y++) {
+                for (int z = 0; z < size.z; z++) {
+                    if (blocks[x][y][z].has(obj)) {
+                        return new Vector3i(x, y, z);
+                    };
+                }
+            }
+        }
+        return -Vector3i.one;
+    }
+
+        // Создает GameObject для блока
     protected GameObject CreateBlockAnchor() {
 
         // Дебаг отображение блока или пустой объект
@@ -285,33 +319,32 @@ public class BuildStation : MonoBehaviour {
         return blockAnchor;
     }
 
-    // Возвращает блок по координатам
-    public Block GetBlock(int x, int y, int z) {
-        return GetBlock(new Vector3i(x, y, z));
-    }
+    // Обновляет счетчики пустого места после блоков
+    protected void UpdateBlockSpaces() {
+        for (int x = size.x - 1; x >= 0; x--) {
+            for (int y = size.y - 1; y >= 0; y--) {
+                for (int z = size.z - 1; z >= 0; z--) {
+                    var block = blocks[x][y][z];
 
-    public Block GetBlock(Vector3i coord) {
+                    // Блок не пуст, заполняем минус единицами
+                    if (!block.isEmpty) {
+                        block.spaces = -Vector3i.one;
+                        continue;
+                    }
 
-        if(coord.x < 0 || coord.x >= size.x || coord.y < 0 || coord.y >= size.y || coord.z < 0 || coord.z >= size.z) {
-            return null;
-        }
+                    // Блоки после этого
+                    var blockx = GetBlock(x + 1, y, z);
+                    var blocky = GetBlock(x, y + 1, z);
+                    var blockz = GetBlock(x, y, z + 1);
 
-        return blocks[coord.x][coord.y][coord.z];
-    }
-
-    // Возвращает координаты блока с указанным GameObject'ом или -1 вектор
-    public Vector3i GetObjectCoord(GameObject obj) {
-        for (int x = 0; x < size.x; x++) {
-            for (int y = 0; y < size.y; y++) {
-                for (int z = 0; z < size.z; z++) {
-                    if (blocks[x][y][z].has(obj)) {
-                        return new Vector3i(x, y, z);
-                    };
-
+                    // Если блоков не существует, то места нет
+                    var fx = blockx != null ? blockx.spaces.x + 1 : 0;
+                    var fy = blocky != null ? blocky.spaces.y + 1 : 0;
+                    var fz = blockz != null ? blockz.spaces.z + 1 : 0;
+                    block.spaces = new Vector3i(fx, fy, fz);
                 }
             }
         }
-        return -Vector3i.one;
     }
 
 
@@ -473,9 +506,17 @@ public class BuildStation : MonoBehaviour {
     // Также проверяет прилегает ли блок к ранее поставленному объекту
     protected bool ObjectFits(Vector3i blockCoord, GameObject obj, out Block[] affectedBlocks) {
         var blockMagnitude = CalculateBlockMagnitude(obj);
-        
+        var blockNumAfter = blockMagnitude - Vector3i.one;
+        var block = GetBlock(blockCoord);
+
+        // Проверяем вмещается ли объект по счетчикам места после блока
+        if(blockNumAfter.x > block.spaces.x || blockNumAfter.y > block.spaces.y || blockNumAfter.z > block.spaces.z) {
+            affectedBlocks = null;
+            return false;
+        }
+
         // Самый дальний блок, который будет занят объектом
-        var blockReach = blockCoord + blockMagnitude - Vector3i.one;
+        var blockReach = blockCoord + blockNumAfter;
 
         affectedBlocks = new Block[blockMagnitude.x * blockMagnitude.y * blockMagnitude.z];
         var i = 0;
@@ -486,14 +527,10 @@ public class BuildStation : MonoBehaviour {
                 for (int z = blockReach.z; z >= blockCoord.z; z--) {
                     var affectedBlock = GetBlock(x, y, z);
 
-                    // Объект не удастся разместить, т.к. блок занят или не существует
-                    if (!BlockIsEmpty(affectedBlock, true)) {
-                        affectedBlocks = null;
-                        return false;
+                    // Проверяем прилегающие блоки по краям
+                    if (x == 0 || y == 0 || z == 0 || x == blockReach.x || y == blockReach.y || z == blockReach.z) {
+                        isConnected = isConnected || BlockIsConnected(x, y, z);
                     }
-
-                    // Проверяем прилегающие блоки
-                    isConnected = isConnected || BlockIsConnected(x, y, z);
 
                     // Пропускаем текущий блок
                     if (blockCoord.x == x && blockCoord.y == y && blockCoord.z == z) continue;
@@ -509,6 +546,7 @@ public class BuildStation : MonoBehaviour {
         if (!isConnected) {
             affectedBlocks = null;
         }
+
         return isConnected;
     }
 
