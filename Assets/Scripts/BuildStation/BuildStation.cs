@@ -454,10 +454,6 @@ public class BuildStation : MonoBehaviour {
         }
     }
 
-    public Vector3 RotatePointAroundPivot(Vector3 point, Vector3 pivot, Quaternion rotation) {
-        return rotation * (point - pivot) + pivot;
-    }
-
     // Вовзращает координаты ближайшего валидного блока, а также блоки, на которые будет наложен GameObject и находится ли он в руке игрока
     // Возращает -1 вектор, если такого блока нет
     protected Vector3i GetClosestBlockCoord(GameObject obj, out Block[] closestAffectedBlocks) {
