@@ -454,28 +454,34 @@ public class BuildStation : MonoBehaviour {
         }
     }
 
+    public Vector3 RotatePointAroundPivot(Vector3 point, Vector3 pivot, Quaternion rotation) {
+        return rotation * (point - pivot) + pivot;
+    }
+
     // Вовзращает координаты ближайшего валидного блока, а также блоки, на которые будет наложен GameObject и находится ли он в руке игрока
     // Возращает -1 вектор, если такого блока нет
     protected Vector3i GetClosestBlockCoord(GameObject obj, out Block[] closestAffectedBlocks) {
         closestAffectedBlocks = null;
 
 
-        // Рассчитываем оффсет объекта
-        var offset = CalculateOffset(obj);
-        var objPosition = obj.transform.position - transform.rotation * offset;
+        // Рассчитываем позицию объекта и диапазон блоков
+        Vector3i rangeStart, rangeEnd;
+        var objPosition = CalculatePositionAndRanges(obj, out rangeStart, out rangeEnd);
 
-        // Находим все достаточно близкие незаполненные блоки, в которые уместится объект
+        // Находим все пустые блоки в диапазоне, в которые уместится объект
         possibleBlocks.Clear();
-        for (int x = 0; x < size.x; x++) {
-            for (int y = 0; y < size.y; y++) {
-                for (int z = 0; z < size.z; z++) {
+        for (int x = rangeStart.x; x < rangeEnd.x; x++) {
+            for (int y = rangeStart.y; y < rangeEnd.y; y++) {
+                for (int z = rangeStart.z; z < rangeEnd.z; z++) {
 
                     // Проверяем валидность блока, находим растояние до блока и задетые блоки
                     var blockCoord = new Vector3i(x, y, z);
                     var block = GetBlock(blockCoord);
+                    if (block == null) continue;
+
                     var dist = Vector3.Distance(objPosition, block.position); ;
 
-                    if (BlockIsValid(block, dist) && ObjectFits(block, obj)) {
+                    if (BlockIsEmpty(block) && ObjectFits(block, obj)) {
                         possibleBlocks.Add(new KeyValuePair<float, Vector3i>(dist, blockCoord));
                     }
                 }
@@ -505,18 +511,12 @@ public class BuildStation : MonoBehaviour {
         return closestBlockCoord;
     }
 
-    // Проверяет удаленность и заполненность блока
-    protected bool BlockIsValid(Block block, float distance) {
-        return BlockIsEmpty(block) && distance < blockSize.magnitude * maxBlockDistance;
-    }
-
     // Пуст ли блок
     protected bool BlockIsEmpty(Block block, bool mustExist = false) {
         return !mustExist && block == null || block != null && (block.isEmpty || block.has(brush));
     }
 
-    // Проверяет, не пересечется ли объект с другими заполненными блоками и собирает все пересеченные блоки в массив
-    // Также проверяет прилегает ли блок к ранее поставленному объекту
+    // Проверяет, не пересечется ли объект с другими заполненными блоками
     protected bool ObjectFits(Block block, GameObject obj) {
         var blockNumAfter = CalculateBlockMagnitude(obj) - Vector3i.one;
 
@@ -524,6 +524,7 @@ public class BuildStation : MonoBehaviour {
         return !(blockNumAfter.x > block.spaces.x || blockNumAfter.y > block.spaces.y || blockNumAfter.z > block.spaces.z);
     }
 
+    // Проверяет соединен ли объект с другими блоками в данной позиции и находит задетые блоки
     protected bool ObjectIsConnected(Vector3i blockCoord, GameObject obj, out Block[] affectedBlocks) {
         var blockMagnitude = CalculateBlockMagnitude(obj);
 
@@ -540,7 +541,7 @@ public class BuildStation : MonoBehaviour {
                     var affectedBlock = GetBlock(x, y, z);
 
                     // Проверяем прилегающие блоки по краям
-                    if (x == 0 || y == 0 || z == 0 || x == blockReach.x || y == blockReach.y || z == blockReach.z) {
+                    if (x == blockCoord.x || y == blockCoord.y || z == blockCoord.z || x == blockReach.x || y == blockReach.y || z == blockReach.z) {
                         isConnected = isConnected || BlockIsConnected(x, y, z);
                     }
 
@@ -582,7 +583,7 @@ public class BuildStation : MonoBehaviour {
     }
 
 
-    /* Размеры с объекта */
+    /* Размеры и позиции объекта */
 
     // Считает поворот объекта
     // Учитывается только поворот в identity блока, реальный поворот применяется позже только визуально
@@ -621,6 +622,33 @@ public class BuildStation : MonoBehaviour {
         var identityOffset = objIdentity ? objIdentity.offset : Vector3.zero;
         var offset = CalculateRotation(obj) * Vector3.Scale(identityOffset - collider.center, obj.transform.localScale);
         return CalculateMinFitSize(obj) / 2 + offset;
+    }
+
+    // Считает позицию объекта с оффсетом и диапазон подходящих координат блоков
+    protected Vector3 CalculatePositionAndRanges(GameObject obj, out Vector3i rangeStart, out Vector3i rangeEnd) {
+
+        // Реальная позиция с учетом оффсета
+        var offset = CalculateOffset(obj);
+        var objPosition = obj.transform.position - transform.rotation * offset;
+
+        // Нам нужна локальная позиция повернутая в противоположную сторону редактору
+        // Вращаем вокруг центра редактора
+        var localObjPosition = (Quaternion.Inverse(transform.rotation) * (obj.transform.position - transform.position) + transform.localScale / 2 - offset);
+
+        // Локальная позиция в блоках
+        var localObjPositionInBlocks = Vector3.Scale(localObjPosition, VectorUtils.Divide(size, transform.localScale));
+
+        // Сколько блоков вокруг текущего нам подходят
+        var addedRange = new Vector3(maxBlockDistance, maxBlockDistance, maxBlockDistance);
+
+        // Начало и конец диапазона подходящих блоков
+        rangeStart = VectorUtils.Max(VectorUtils.FloorToInt(localObjPositionInBlocks - addedRange), Vector3i.zero);
+        rangeEnd = VectorUtils.Min(VectorUtils.CeilToInt(localObjPositionInBlocks + addedRange), size);
+
+        // Debug.DrawRay(localObjPosition + transform.position - transform.localScale / 2, transform.localScale / 2);
+        // Debug.LogFormat("{2} - {0} {1}", rangeStart, rangeEnd, localObjPosition);
+
+        return objPosition;
     }
 
 
