@@ -9969,6 +9969,21 @@ Prefab:
       propertyPath: maxBlockDistance
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 114236711568530810, guid: cc2777865be32aa41860da4dfad310fd,
+        type: 2}
+      propertyPath: filePath
+      value: test/whatever.txt
+      objectReference: {fileID: 0}
+    - target: {fileID: 114236711568530810, guid: cc2777865be32aa41860da4dfad310fd,
+        type: 2}
+      propertyPath: debugFilePath
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 114236711568530810, guid: cc2777865be32aa41860da4dfad310fd,
+        type: 2}
+      propertyPath: objectUpdateInterval
+      value: 0.03
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: cc2777865be32aa41860da4dfad310fd, type: 2}
   m_IsPrefabParent: 0
@@ -12280,6 +12295,21 @@ Prefab:
         type: 2}
       propertyPath: debugGridEnabled
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114581013106838518, guid: ad233b753743c494e82333d1422f97c9,
+        type: 2}
+      propertyPath: filePath
+      value: test/cube.txt
+      objectReference: {fileID: 0}
+    - target: {fileID: 114581013106838518, guid: ad233b753743c494e82333d1422f97c9,
+        type: 2}
+      propertyPath: debugFilePath
+      value: debug/cube.txt
+      objectReference: {fileID: 0}
+    - target: {fileID: 114581013106838518, guid: ad233b753743c494e82333d1422f97c9,
+        type: 2}
+      propertyPath: size.x
+      value: 17
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: ad233b753743c494e82333d1422f97c9, type: 2}

@@ -4,6 +4,8 @@
 Temp/
 Library/
 build/
+debug/**/*
+!debug/.gitkeep
 
 # ===================================== #
 # Visual Studio / MonoDevelop generated #

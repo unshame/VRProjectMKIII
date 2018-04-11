@@ -1,6 +1,10 @@
+//#define GRID_DEBUG
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
+using Conditional = System.Diagnostics.ConditionalAttribute;
 
 // Редактор здания
 public class BuildStation : MonoBehaviour {
@@ -63,17 +67,11 @@ public class BuildStation : MonoBehaviour {
     protected List<KeyValuePair<float, Vector3i>> possibleBlocks = new List<KeyValuePair<float, Vector3i>>();
 
 
-    // Включает дебаг сетку
-    public bool debugGridEnabled = false;
-
-    // Префаб дебаг сетки
-    public GameObject DebugGridPrefab;
-
-
     /* События Unity */
 
     // Считает размер блоков
     protected virtual void Awake() {
+        OpenDebugFile();
         blockSize = VectorUtils.Divide(transform.localScale, size);
     }
 
@@ -116,6 +114,10 @@ public class BuildStation : MonoBehaviour {
                 }
             }
         }
+    }
+
+    protected virtual void OnDestroy() {
+        CloseDebugFile();
     }
 
     // Обрабатывает объекты в очереди
@@ -213,7 +215,6 @@ public class BuildStation : MonoBehaviour {
 
     // Добавляет GameObject по указанным координатам
     public virtual void AddObject(Vector3i blockCoord, GameObject obj, Block[] affectedBlocks, Quaternion rotation) {
-        WriteDebug(obj);
 
         var block = GetBlock(blockCoord);
         var offset = CalculateOffset(obj);
@@ -221,6 +222,8 @@ public class BuildStation : MonoBehaviour {
         // Заполняем массив объектов и блоки объектом
         objList.Add(obj);
         block.fill(obj, true, offset, rotation, affectedBlocks);
+
+        WriteDebug(obj);
 
         if (movingObjects.Contains(obj)) {
             movingObjects.Remove(obj);
@@ -324,14 +327,29 @@ public class BuildStation : MonoBehaviour {
 
     // Обновляет счетчики пустого места после блоков
     protected void UpdateBlockSpaces() {
+        WriteToFileDebug("================================");
+
         for (int x = size.x - 1; x >= 0; x--) {
+
+            WriteToFileDebug();
+            WriteToFileDebug();
+            WriteToFileDebug(string.Format("({0})", x).PadRight(4));
             for (int y = size.y - 1; y >= 0; y--) {
+                WriteToFileDebug(y.ToString().PadLeft(15));
+            }
+
+            for (int y = size.y - 1; y >= 0; y--) {
+
+                WriteToFileDebug();
+                WriteToFileDebug(string.Format("{0}: ", y).PadLeft(5));
+
                 for (int z = size.z - 1; z >= 0; z--) {
                     var block = blocks[x][y][z];
 
                     // Блок не пуст, заполняем минус единицами
-                    if (!block.isEmpty) {
+                    if (!block.isEmpty && !block.has(brush)) {
                         block.spaces = -Vector3i.one;
+                        WriteToFileDebug(string.Format("[{0}, {1}, {2}] ", -1, -1, -1).PadLeft(15));
                         continue;
                     }
 
@@ -345,9 +363,12 @@ public class BuildStation : MonoBehaviour {
                     var fy = blocky != null ? blocky.spaces.y + 1 : 0;
                     var fz = blockz != null ? blockz.spaces.z + 1 : 0;
                     block.spaces = new Vector3i(fx, fy, fz);
+
+                    WriteToFileDebug(string.Format("[{0}, {1}, {2}] ", fx, fy, fz).PadLeft(15));
                 }
             }
         }
+        WriteToFileDebug();
     }
 
 
@@ -476,7 +497,7 @@ public class BuildStation : MonoBehaviour {
 
                     var dist = Vector3.Distance(objPosition, block.position); ;
 
-                    if (BlockIsEmpty(block) && ObjectFits(block, obj)) {
+                    if (BlockIsEmpty(block) && ObjectFits(blockCoord, obj)) {
                         possibleBlocks.Add(new KeyValuePair<float, Vector3i>(dist, blockCoord));
                     }
                 }
@@ -497,6 +518,7 @@ public class BuildStation : MonoBehaviour {
         for (int i = 0; i < possibleBlocks.Count; i++) {
             var blockCoord = possibleBlocks[i].Value;
             if (ObjectIsConnected(blockCoord, obj, out affectedBlocks)) {
+                // Debug.LogFormat("{0} {1}", CalculateBlockMagnitude(obj), GetBlock(blockCoord).spaces);
                 return blockCoord;
             }
         }
@@ -510,11 +532,29 @@ public class BuildStation : MonoBehaviour {
     }
 
     // Проверяет, не пересечется ли объект с другими заполненными блоками
-    protected bool ObjectFits(Block block, GameObject obj) {
+    protected bool ObjectFits(Vector3i blockCoord, GameObject obj) {
         var blockNumAfter = CalculateBlockMagnitude(obj) - Vector3i.one;
 
-        // Проверяем вмещается ли объект по счетчикам места после блока
-        return !(blockNumAfter.x > block.spaces.x || blockNumAfter.y > block.spaces.y || blockNumAfter.z > block.spaces.z);
+        var dec = new Vector3i(1, 0, 1);
+        while (blockNumAfter.x != -1 && blockNumAfter.z != -1) {
+            var block = GetBlock(blockCoord);
+
+            // Проверяем вмещается ли объект по оси y
+            if (blockNumAfter.y > block.spaces.y) return false;
+
+            // Двигаем позицию объекта снизу вверх и проверяем вмещение по осям x и z
+            var reachY = blockCoord.y + blockNumAfter.y;
+            for (int y = blockCoord.y; y <= reachY; y++) {
+                var otherBlock = GetBlock(blockCoord.x, y, blockCoord.z);
+                if (blockNumAfter.x > otherBlock.spaces.x || blockNumAfter.z > otherBlock.spaces.z) return false;
+            }
+
+            // Сдвигаем координаты диагонально по горизонтали 
+            blockNumAfter -= dec;
+            blockCoord += dec;
+        }
+
+        return true;
     }
 
     // Проверяет соединен ли объект с другими блоками в данной позиции и находит задетые блоки
@@ -524,7 +564,7 @@ public class BuildStation : MonoBehaviour {
         // Самый дальний блок, который будет занят объектом
         var blockReach = blockCoord + blockMagnitude - Vector3i.one;
 
-        affectedBlocks = new Block[blockMagnitude.x * blockMagnitude.y * blockMagnitude.z];
+        affectedBlocks = new Block[blockMagnitude.x * blockMagnitude.y * blockMagnitude.z - 1];
         var i = 0;
         var isConnected = false;
 
@@ -532,6 +572,10 @@ public class BuildStation : MonoBehaviour {
             for (int y = blockReach.y; y >= blockCoord.y; y--) {
                 for (int z = blockReach.z; z >= blockCoord.z; z--) {
                     var affectedBlock = GetBlock(x, y, z);
+
+                    if (!BlockIsEmpty(affectedBlock)) {
+                        Debug.LogWarningFormat("Affected block isn't empty {0}", affectedBlock.coord);
+                    }
 
                     // Проверяем прилегающие блоки по краям
                     if (x == blockCoord.x || y == blockCoord.y || z == blockCoord.z || x == blockReach.x || y == blockReach.y || z == blockReach.z) {
@@ -647,13 +691,54 @@ public class BuildStation : MonoBehaviour {
 
     /* Дебаг */
 
+    public bool debugGridEnabled = false;
+
+    public GameObject DebugGridPrefab;
+
+    public string debugFilePath;
+    StreamWriter debugFile;
+
+    [Conditional("GRID_DEBUG")]
     protected void WriteDebug(GameObject obj) {
         if (!debugGridEnabled) return;
         var s1 = CalculateBlockMagnitude(obj);
         var s2 = CalculateSize(obj);
         var s3 = CalculateMinFitSize(obj);
         var s4 = CalculateRotation(obj);
-        Debug.LogFormat("{0} | {1} | {2} | {3}", s1, s2, s3, s4);
+        var s5 = GetObjectCoord(obj);
+        Debug.LogFormat("{0} | {1} | {2} | {3} | {4}", s1, s2, s3, s4, s5);
+    }
+
+    [Conditional("GRID_DEBUG")]
+    protected void OpenDebugFile() {
+        if (debugFilePath != null && debugFilePath != "") {
+            debugFile = new StreamWriter(debugFilePath, false);
+        }
+    }
+
+    [Conditional("GRID_DEBUG")]
+    protected void CloseDebugFile() {
+        if (debugFile != null) {
+            debugFile.Close();
+        }
+    }
+
+    [Conditional("GRID_DEBUG")]
+    protected void WriteToFileDebug(string str = "", bool newLine = false) {
+        if (debugFile == null) return;
+        if (newLine) {
+            debugFile.WriteLine(str);
+        }
+        else {
+            debugFile.Write(str);
+        }
+    }
+
+    [Conditional("GRID_DEBUG")]
+    protected void WriteToFileDebug() {
+        if (debugFile != null) {
+            debugFile.WriteLine();
+        }
     }
 
 }
