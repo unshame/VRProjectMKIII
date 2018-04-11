@@ -59,6 +59,7 @@ public class BuildStation : MonoBehaviour {
     // Свободные объекты внутри поля, которые уже были обновлены
     protected List<GameObject> movingObjects = new List<GameObject>();
 
+    // Массив для подходящих для размещения объекта блоков
     protected List<KeyValuePair<float, Vector3i>> possibleBlocks = new List<KeyValuePair<float, Vector3i>>();
 
 
@@ -182,7 +183,7 @@ public class BuildStation : MonoBehaviour {
         var offset = CalculateOffset(obj);
 
         // Заполняем блоки кистью
-        block.fill(brush, false, offset, rotation * obj.transform.localRotation);
+        block.fill(brush, false, offset, rotation);
         brushBlock = block;
         brushShownFor = obj;
 
@@ -380,7 +381,7 @@ public class BuildStation : MonoBehaviour {
             }
         }
 
-        var rigidbody = obj.transform.parent.GetComponent<Rigidbody>();
+        var rigidbody = obj.transform.GetComponent<Rigidbody>();
         var objectIsMoving = !objIsActive && rigidbody && !rigidbody.velocity.Equals(Vector3.zero);
 
         // Размещаем объект сразу же, если игрок его отпустил, он движется и мы его раньше не обрабатывали
@@ -454,11 +455,9 @@ public class BuildStation : MonoBehaviour {
         }
     }
 
-    // Вовзращает координаты ближайшего валидного блока, а также блоки, на которые будет наложен GameObject и находится ли он в руке игрока
-    // Возращает -1 вектор, если такого блока нет
-    protected Vector3i GetClosestBlockCoord(GameObject obj, out Block[] closestAffectedBlocks) {
-        closestAffectedBlocks = null;
-
+    // Возвращает координаты ближайшего валидного блока, а также блоки, на которые будет наложен GameObject и находится ли он в руке игрока
+    // Возвращает -1 вектор, если такого блока нет
+    protected Vector3i GetClosestBlockCoord(GameObject obj, out Block[] affectedBlocks) {
 
         // Рассчитываем позицию объекта и диапазон блоков
         Vector3i rangeStart, rangeEnd;
@@ -466,9 +465,9 @@ public class BuildStation : MonoBehaviour {
 
         // Находим все пустые блоки в диапазоне, в которые уместится объект
         possibleBlocks.Clear();
-        for (int x = rangeStart.x; x < rangeEnd.x; x++) {
-            for (int y = rangeStart.y; y < rangeEnd.y; y++) {
-                for (int z = rangeStart.z; z < rangeEnd.z; z++) {
+        for (int x = rangeStart.x; x <= rangeEnd.x; x++) {
+            for (int y = rangeStart.y; y <= rangeEnd.y; y++) {
+                for (int z = rangeStart.z; z <= rangeEnd.z; z++) {
 
                     // Проверяем валидность блока, находим растояние до блока и задетые блоки
                     var blockCoord = new Vector3i(x, y, z);
@@ -484,8 +483,6 @@ public class BuildStation : MonoBehaviour {
             }
         }
 
-        Vector3i closestBlockCoord = -Vector3i.one;
-
         // Сортируем найденные блоки по дальности от объекта
         possibleBlocks.Sort((x1, x2) => {
             var dist1 = x1.Key;
@@ -496,15 +493,15 @@ public class BuildStation : MonoBehaviour {
         });
 
         // Ищем блок, в котором объект будет соединен с уже поставленным объектом и находим все задетые блоки
+        affectedBlocks = null;
         for (int i = 0; i < possibleBlocks.Count; i++) {
             var blockCoord = possibleBlocks[i].Value;
-            if (ObjectIsConnected(blockCoord, obj, out closestAffectedBlocks)) {
-                closestBlockCoord = blockCoord;
-                break;
+            if (ObjectIsConnected(blockCoord, obj, out affectedBlocks)) {
+                return blockCoord;
             }
         }
 
-        return closestBlockCoord;
+        return -Vector3i.one;
     }
 
     // Пуст ли блок
@@ -639,7 +636,7 @@ public class BuildStation : MonoBehaviour {
 
         // Начало и конец диапазона подходящих блоков
         rangeStart = VectorUtils.Max(VectorUtils.FloorToInt(localObjPositionInBlocks - addedRange), Vector3i.zero);
-        rangeEnd = VectorUtils.Min(VectorUtils.CeilToInt(localObjPositionInBlocks + addedRange), size);
+        rangeEnd = VectorUtils.Min(VectorUtils.CeilToInt(localObjPositionInBlocks + addedRange), size - Vector3i.one);
 
         // Debug.DrawRay(localObjPosition + transform.position - transform.localScale / 2, transform.localScale / 2);
         // Debug.LogFormat("{2} - {0} {1}", rangeStart, rangeEnd, localObjPosition);

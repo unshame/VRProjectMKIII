@@ -73,7 +73,7 @@ public class DisplayStation : BuildStation {
         }
 
         // Добавляем блок в сетку с поворотом редактора
-        base.AddObject(blockCoord, objCopy, affectedBlocksCopy, rotation * obj.transform.localRotation);
+        base.AddObject(blockCoord, objCopy, affectedBlocksCopy, rotation);
     }
 
     public override void ShowBrush(Vector3i blockCoord, GameObject obj, Quaternion rotation) {

@@ -19,7 +19,7 @@ public class Interactible : MonoBehaviour {
         }
     }
 
-    public virtual void StartInteract(Transform instigator) {
+    public virtual void StartInteract(Transform instigator = null) {
         if (isLocked) {
             throw new System.Exception("Attempting to interact with a locked object");
         }

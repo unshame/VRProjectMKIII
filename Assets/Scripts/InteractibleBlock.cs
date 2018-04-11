@@ -43,11 +43,11 @@ public class InteractibleBlock : Interactible {
         }
 
         if (shouldUpdateRotation || alwaysUpdateRotation) {
-            transform.parent.rotation = RotationManager.MainBuildStation.transform.rotation * identity.GetRotation();
+            transform.rotation = RotationManager.MainBuildStation.transform.rotation * identity.GetRotation();
         }
     }
 
-    public override void StartInteract(Transform instigator) {
+    public override void StartInteract(Transform instigator = null) {
         base.StartInteract(instigator);
         var identity = GetComponent<ObjectIdentity>();
 

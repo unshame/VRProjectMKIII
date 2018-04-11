@@ -195,7 +195,7 @@ public class Block {
     // Опустошает блок, выкидывая объект в случайную сторону
     public void eject(float force = 5) {
         if (!obj) return;
-        var rigidbody = getObjectTransform().GetComponent<Rigidbody>();
+        var rigidbody = obj.transform.GetComponent<Rigidbody>();
         empty();
 
         if (rigidbody) {
@@ -229,7 +229,7 @@ public class Block {
     public void setBlockStatus(bool kinematic, bool visible, bool collide) {
         if (!obj) return;
 
-        var rigidbody = getObjectTransform().GetComponent<Rigidbody>();
+        var rigidbody = obj.transform.GetComponent<Rigidbody>();
 
         if (rigidbody) {
             rigidbody.isKinematic = kinematic;
@@ -243,30 +243,25 @@ public class Block {
     // Добавляет блок в держатель, включает держатель, устанавливает его позицию и поворот
     private void addObjectToHolder(Vector3 offset, Quaternion rotation) {
 
-        var objTransform = getObjectTransform();
-        if (objTransform) {
-            objTransform.parent = holder;
+        obj.transform.parent = holder;
 
-            objTransform.localPosition = Vector3.zero;
-            objTransform.localRotation = Quaternion.identity;
+        obj.transform.localPosition = Vector3.zero;
+        obj.transform.localRotation = Quaternion.identity;
 
-            holder.localPosition = offset;
-            holder.localRotation = rotation;
+        holder.localPosition = offset;
+        holder.localRotation = rotation;
 
-            holder.GetComponent<BlockHolder>().enabled = true;
-        }
-
+        holder.GetComponent<BlockHolder>().enabled = true;
     }
 
     // Убирает блок из держателя, отключает блок
     private void removeObjectFromHolder() {
-        var objTransform = getObjectTransform();
-        if (objTransform && objTransform.parent == holder) {
+        if (obj && obj.transform.parent == holder) {
 
-            objTransform.localPosition = Vector3.zero;
-            objTransform.localRotation = Quaternion.identity;
+            obj.transform.localPosition = Vector3.zero;
+            obj.transform.localRotation = Quaternion.identity;
 
-            objTransform.parent = null;
+            obj.transform.parent = null;
 
             holder.GetComponent<BlockHolder>().enabled = false;
         }
@@ -286,16 +281,5 @@ public class Block {
             name += ")";
         }
         anchor.name = name;
-    }
-
-    // Возвращает transform объекта или его parent'a
-    private Transform getObjectTransform() {
-        if (!obj) return null;
-        var blockTransform = obj.transform.parent;
-
-        if (!blockTransform || !blockTransform.gameObject.GetComponent<Throwable>()) {
-            blockTransform = obj.transform;
-        }
-        return blockTransform;
     }
 }
