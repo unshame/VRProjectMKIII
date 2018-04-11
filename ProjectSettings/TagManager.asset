@@ -10,6 +10,7 @@ TagManager:
   - SpItem
   - TriggerArea
   - ChildSpItem
+  - key
   layers:
   - Default
   - TransparentFX
