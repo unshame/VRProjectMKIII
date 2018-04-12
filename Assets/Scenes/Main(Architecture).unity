@@ -12294,7 +12294,7 @@ Prefab:
     - target: {fileID: 114581013106838518, guid: ad233b753743c494e82333d1422f97c9,
         type: 2}
       propertyPath: debugGridEnabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 114581013106838518, guid: ad233b753743c494e82333d1422f97c9,
         type: 2}
