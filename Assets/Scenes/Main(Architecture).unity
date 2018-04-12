@@ -9947,17 +9947,17 @@ Prefab:
     - target: {fileID: 114236711568530810, guid: cc2777865be32aa41860da4dfad310fd,
         type: 2}
       propertyPath: size.x
-      value: 30
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114236711568530810, guid: cc2777865be32aa41860da4dfad310fd,
         type: 2}
       propertyPath: size.y
-      value: 30
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114236711568530810, guid: cc2777865be32aa41860da4dfad310fd,
         type: 2}
       propertyPath: size.z
-      value: 30
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114236711568530810, guid: cc2777865be32aa41860da4dfad310fd,
         type: 2}
@@ -12289,7 +12289,7 @@ Prefab:
     - target: {fileID: 114581013106838518, guid: ad233b753743c494e82333d1422f97c9,
         type: 2}
       propertyPath: maxBlockDistance
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 114196512414173248, guid: ad233b753743c494e82333d1422f97c9,
         type: 2}
@@ -12324,7 +12324,12 @@ Prefab:
     - target: {fileID: 114581013106838518, guid: ad233b753743c494e82333d1422f97c9,
         type: 2}
       propertyPath: chunkSize
-      value: 1250
+      value: 5000
+      objectReference: {fileID: 0}
+    - target: {fileID: 114581013106838518, guid: ad233b753743c494e82333d1422f97c9,
+        type: 2}
+      propertyPath: size.y
+      value: 17
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: ad233b753743c494e82333d1422f97c9, type: 2}
@@ -27153,7 +27158,7 @@ Transform:
   m_PrefabParentObject: {fileID: 400024, guid: fa6e3482182b1c4449c257fd56ec1928, type: 3}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2036597699}
-  m_LocalRotation: {x: -0.61457473, y: 0.3512531, z: 0.35081908, w: 0.6130621}
+  m_LocalRotation: {x: -0.6145748, y: 0.35125312, z: 0.3508191, w: 0.61306214}
   m_LocalPosition: {x: -0.00086120254, y: 0.0013251683, z: 0.00025678353}
   m_LocalScale: {x: 1.0000002, y: 1.0000001, z: 1.0000002}
   m_Children:

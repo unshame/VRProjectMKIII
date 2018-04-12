@@ -9,17 +9,20 @@ public class DisplayStation : BuildStation {
 
     private Vector3 scaleDif;       // Различие между масштабами редактора и дисплея
     private BuildStation parent;    // Редактор, главенствующий над этим редактором
+    private bool started = false;
 
     protected override void Awake() {
-
         editable = true;
-
-        base.Awake();
     }
 
     // Устанавливает главенствующий редактор, считает различие масштабов
     public void SetParentStation(BuildStation parentStation) {
         parent = parentStation;
+
+        // Синхронизируем размеры редакторов перед инициализацией
+        size = parent.size;
+
+        base.Awake();
 
         // Считаем различие между масштабами редактора и дисплея
         scaleDif = VectorUtils.Divide(blockSize, parent.blockSize);

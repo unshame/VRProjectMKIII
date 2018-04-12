@@ -9,24 +9,12 @@ public class DualBuildStation : BuildStation {
     public DisplayStation displayStation;
 
     protected override void Awake() {
-
-        // Синхронизируем размеры редакторов перед инициализацией
-        if (size != displayStation.size) {
-            Debug.LogWarning("DualBuildStation: Size will be set equal to match DisplayStation's size");
-            size = displayStation.size;
-        }
-
         base.Awake();
-    }
-
-
-    protected override void Start() {
-
-        base.Start();
 
         // Устанавливаем главенствующий редактор
         displayStation.SetParentStation(this);
     }
+
 
     public override void HideBrush() {
         base.HideBrush();

@@ -707,32 +707,11 @@ public class BuildStation : MonoBehaviour {
         return false;
     }
 
-    // Проверяет, находится ли блок рядом с хотя бы одним уже заполненным
-    protected bool BlockIsConnected(int x, int y, int z) {
-        if (y == 0) return true;
-
-        var coord = new Vector3i(x, y, z);
-
-        // Проверяем пустоту ближаших блоков по каждой оси
-        for (int i = 0; i < 3; i++) {
-            var increment = Vector3i.zero;
-            increment[i] = 1;
-
-            if (!BlockIsEmpty(GetBlock(coord + increment)) || !BlockIsEmpty(GetBlock(coord - increment))) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-
     /* Размеры и позиции объекта */
 
     // Считает поворот объекта
     // Учитывается только поворот в identity блока, реальный поворот применяется позже только визуально
     protected Quaternion CalculateRotation(GameObject obj) {
-        Quaternion appliedRotation = Quaternion.identity;
         var identity = obj.GetComponent<ObjectIdentity>();
         return identity ? identity.GetRotation() : Quaternion.identity;
     }
@@ -753,8 +732,7 @@ public class BuildStation : MonoBehaviour {
 
     // Возвращает размер объекта с округлением до ближайшего блока (минимум один блок)
     protected Vector3 CalculateMinFitSize(GameObject obj) {
-        var objSize = CalculateSize(obj);
-        return Vector3.Scale(VectorUtils.Max(VectorUtils.RoundAroundToInt(VectorUtils.Divide(objSize, blockSize), maxObjectProtrusion), Vector3i.one), blockSize);
+        return Vector3.Scale(CalculateBlockMagnitude(obj), blockSize);
     }
 
     // Считает необходимый сдвиг объекта, чтобы он визуально умещался в предоставленных ему блоках
@@ -800,8 +778,8 @@ public class BuildStation : MonoBehaviour {
 
     public bool debugGridEnabled = false;
 
-    public int debugTotalBlocks;
-    public int debugCheckedBlocks;
+    protected int debugTotalBlocks;
+    protected int debugCheckedBlocks;
 
     public GameObject DebugGridPrefab;
 
