@@ -166,8 +166,7 @@ public class Block {
 
     // Опустошает блок, выкидывая объект в случайную сторону
     public void eject(float force = 5) {
-        if (!obj) return;
-        var rigidbody = obj.transform.GetComponent<Rigidbody>();
+        var rigidbody = obj ? obj.transform.GetComponent<Rigidbody>() : null;
         empty();
 
         if (rigidbody) {

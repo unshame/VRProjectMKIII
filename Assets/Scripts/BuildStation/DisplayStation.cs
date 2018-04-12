@@ -46,7 +46,7 @@ public class DisplayStation : BuildStation {
         }
     }
 
-    public override void AddObject(Vector3i blockCoord, GameObject obj, Quaternion rotation) {
+    public override void AddObject(Vector3i blockCoord, GameObject obj, Quaternion rotation, Vector3i objBlockMagnitude) {
 
         // Копируем объект
         var objCopy = Instantiate(obj);
@@ -62,7 +62,7 @@ public class DisplayStation : BuildStation {
         }
 
         // Добавляем блок в сетку с поворотом редактора
-        base.AddObject(blockCoord, objCopy, rotation);
+        base.AddObject(blockCoord, objCopy, rotation, objBlockMagnitude);
     }
 
     public override void ShowBrush(Vector3i blockCoord, GameObject obj, Quaternion rotation) {
@@ -89,5 +89,8 @@ public class DisplayStation : BuildStation {
     }
 
     protected override void OnTriggerExit(Collider other) {
+    }
+
+    protected override void StartUpdateBlockInfo() {
     }
 }

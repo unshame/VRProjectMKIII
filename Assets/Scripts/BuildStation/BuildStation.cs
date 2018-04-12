@@ -41,6 +41,13 @@ public class BuildStation : MonoBehaviour {
     protected GameObject brushShownFor = null;
 
 
+    protected bool isReady = true;
+
+    public int chunkSize = 500;
+
+    protected Vector3i nextChunkStart;
+
+
     // Можно ли изменять контент редактора в игре
     public bool editable;
 
@@ -73,6 +80,7 @@ public class BuildStation : MonoBehaviour {
     protected virtual void Awake() {
         OpenDebugFile();
         blockSize = VectorUtils.Divide(transform.localScale, size);
+        debugTotalBlocks = size.x * size.y * size.z;
     }
 
     // Инициализирует кисть, создает блоки
@@ -125,6 +133,11 @@ public class BuildStation : MonoBehaviour {
 
         sinceLastUpdate += Time.deltaTime;
 
+        if (!isReady) {
+            ContinueUpdateBlockInfo();
+            return;
+        }
+
         if (!editable) {
             HideBrush();
             return;
@@ -142,7 +155,7 @@ public class BuildStation : MonoBehaviour {
     protected virtual void OnTriggerStay(Collider other) {
 
         // Не редактируем
-        if (!editable) {
+        if (!editable || !isReady) {
             return;
         }
 
@@ -153,6 +166,10 @@ public class BuildStation : MonoBehaviour {
     // Прячет кисть, удаляет объект из очереди на добавление
     protected virtual void OnTriggerExit(Collider other) {
         var obj = other.gameObject;
+
+        if (objList.Contains(obj)) {
+            RemoveObject(obj);
+        }
 
         DequeueObject(obj);
 
@@ -203,7 +220,7 @@ public class BuildStation : MonoBehaviour {
 
         objList.Remove(obj);
 
-        UpdateBlockSpaces();
+        StartUpdateBlockInfo();
     }
 
     private void RemoveObjectFromBlocks(GameObject obj) {
@@ -224,11 +241,11 @@ public class BuildStation : MonoBehaviour {
     }
 
     // Добавляет GameObject по указанным координатам
-    public virtual void AddObject(Vector3i blockCoord, GameObject obj, Quaternion rotation) {
+    public virtual void AddObject(Vector3i blockCoord, GameObject obj, Quaternion rotation, Vector3i objBlockMagnitude) {
 
         var block = GetBlock(blockCoord);
         var offset = CalculateOffset(obj);
-        var objBlockReach = CalculateBlockMagnitude(obj) - Vector3i.one;
+        var objBlockReach = objBlockMagnitude - Vector3i.one;
 
         // Заполняем массив объектов и блоки объектом
         objList.Add(obj);
@@ -241,7 +258,7 @@ public class BuildStation : MonoBehaviour {
             movingObjects.Remove(obj);
         }
 
-        UpdateBlockSpaces();
+        StartUpdateBlockInfo();
     }
 
     // Отключает редактирование
@@ -278,10 +295,9 @@ public class BuildStation : MonoBehaviour {
                 }
             }
         }
-
-        UpdateBlockSpaces();
-
         objList.Clear();
+
+        StartUpdateBlockInfo();
         StartCoroutine(LockFor(1));
     }
 
@@ -337,25 +353,45 @@ public class BuildStation : MonoBehaviour {
         return blockAnchor;
     }
 
+    protected virtual void StartUpdateBlockInfo() {
+        isReady = false;
+        nextChunkStart = size - Vector3i.one;
+        debugCheckedBlocks = 0;
+        ContinueUpdateBlockInfo();
+    }
+
+    protected virtual void ContinueUpdateBlockInfo() {
+        nextChunkStart = UpdateBlockInfoChunk(nextChunkStart);
+        if(nextChunkStart == -Vector3i.one) {
+            isReady = true;
+        }
+    }
+
     // Обновляет счетчики пустого места после блоков
-    protected void UpdateBlockSpaces() {
+    protected Vector3i UpdateBlockInfoChunk(Vector3i chunkStart) {
         WriteToFileDebug("================================");
 
-        for (int x = size.x - 1; x >= 0; x--) {
+        var blocksLeft = chunkSize;
+        var end = size - Vector3i.one;
+        for (int x = chunkStart.x; x >= 0; x--) {
 
-            WriteToFileDebug();
-            WriteToFileDebug();
+            WriteToFileDebug("\n\n");
             WriteToFileDebug(string.Format("({0})", x).PadRight(4));
-            for (int y = size.y - 1; y >= 0; y--) {
+            for (int y = x == chunkStart.x ? chunkStart.y : end.y; y >= 0; y--) {
                 WriteToFileDebug(y.ToString().PadLeft(15));
             }
 
-            for (int y = size.y - 1; y >= 0; y--) {
+            for (int y = x == chunkStart.x ? chunkStart.y : end.y; y >= 0; y--) {
 
                 WriteToFileDebug();
                 WriteToFileDebug(string.Format("{0}: ", y).PadLeft(5));
 
-                for (int z = size.z - 1; z >= 0; z--) {
+                for (int z = x == chunkStart.x && y == chunkStart.y ? chunkStart.z : end.z; z >= 0; z--) {
+                    if(blocksLeft == 0) {
+                        debugCheckedBlocks += chunkSize;
+                        return new Vector3i(x, y, z);
+                    }
+
                     var block = blocks[x][y][z];
 
                     // Блок не пуст, заполняем минус единицами
@@ -387,9 +423,9 @@ public class BuildStation : MonoBehaviour {
                         block.connectedAfter = Vector3i.zero;
                     }
 
-                    var xx = size.x - 1 - x;
-                    var yy = size.y - 1 - y;
-                    var zz = size.z - 1 - z;
+                    var xx = end.x - x;
+                    var yy = end.y - y;
+                    var zz = end.z - z;
                     var otherBlock = blocks[xx][yy][zz];
                     var blockxx = GetBlock(xx - 1, yy, zz);
                     var blockyy = GetBlock(xx, yy - 1, zz);
@@ -404,13 +440,18 @@ public class BuildStation : MonoBehaviour {
                         otherBlock.connectedBefore = Vector3i.zero;
                     }
 
+                    blocksLeft--;
+
                     //WriteToFileDebug(string.Format("{0} ", block.spaces).PadLeft(15));
                     //WriteToFileDebug(string.Format("{0} ", block.connectedAfter).PadLeft(15));
-                    WriteToFileDebug(string.Format("{1}{0} ", otherBlock.connectedBefore, BlockIsEmpty(otherBlock) ? "" : "*").PadLeft(15));
+                    //WriteToFileDebug(string.Format("{1}{0} ", otherBlock.connectedBefore, BlockIsEmpty(otherBlock) ? "" : "*").PadLeft(15));
                 }
             }
         }
         WriteToFileDebug();
+
+        debugCheckedBlocks = debugTotalBlocks;
+        return -Vector3i.one;
     }
 
     protected void SetBlocksFilled(Block sourceBlock, Vector3i objBlockReach, bool value) {
@@ -420,7 +461,7 @@ public class BuildStation : MonoBehaviour {
             for (int y = rangeStart.y; y <= rangeEnd.y; y++) {
                 for (int z = rangeStart.z; z <= rangeEnd.z; z++) {
                     var block = GetBlock(x, y, z);
-                    if (block == sourceBlock) continue;
+                    if (block == null || block == sourceBlock) continue;
                     if(value) {
                         block.fill(sourceBlock);
                     }
@@ -526,7 +567,7 @@ public class BuildStation : MonoBehaviour {
             }
             else {
                 // Иначе ставим объект
-                AddObject(closestBlockCoord, obj, appliedRotation);
+                AddObject(closestBlockCoord, obj, appliedRotation, CalculateBlockMagnitude(obj));
             }
         }
         else if (brushShownFor == obj) {
@@ -634,22 +675,26 @@ public class BuildStation : MonoBehaviour {
         var z2 = objBlockReach.z;
 
         for (int x = x1; x <= x2; x++) {
-            var conn1 = GetBlock(x, y1, z1).connectedAfter;
-            var conn2 = GetBlock(x, y2, z2).connectedBefore;
+            var block1 = GetBlock(x, y2, z1);
+            var block2 = GetBlock(x, y1, z2);
+            var conn1 = block1.connectedBefore;
+            var conn2 = block2.connectedAfter;
+            var conn3 = block2.connectedBefore;
+            var conn4 = block1.connectedAfter;
 
             if (
-                conn1.y != -1 && conn1.y < objBlockMagnitude.y || 
-                conn1.z != -1 && conn1.z < objBlockMagnitude.z || 
+                conn1.y != -1 && conn1.y < objBlockMagnitude.y ||
                 conn2.y != -1 && conn2.y < objBlockMagnitude.y ||
-                conn2.z != -1 && conn2.z < objBlockMagnitude.z
+                conn3.z != -1 && conn3.z < objBlockMagnitude.z ||
+                conn4.z != -1 && conn4.z < objBlockMagnitude.z
             ) {
                 return true;
             }
         }
 
-        for (int z = z1 + 1; z <= z2; z++) {
-            var conn1 = GetBlock(x1, y1, z).connectedAfter;
-            var conn2 = GetBlock(x2, y2, z).connectedBefore;
+        for (int z = z1; z <= z2; z++) {
+            var conn1 = GetBlock(x1, y2, z).connectedBefore;
+            var conn2 = GetBlock(x2, y1, z).connectedAfter;
 
             if (
                 conn1.y != -1 && conn1.y < objBlockMagnitude.y ||
@@ -754,6 +799,9 @@ public class BuildStation : MonoBehaviour {
     /* Дебаг */
 
     public bool debugGridEnabled = false;
+
+    public int debugTotalBlocks;
+    public int debugCheckedBlocks;
 
     public GameObject DebugGridPrefab;
 
