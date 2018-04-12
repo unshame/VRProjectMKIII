@@ -20,6 +20,8 @@ public class BuildStation : MonoBehaviour {
     [HideInInspector]
     public Block[][][] blocks;
 
+    protected GameObject blockHolder;
+
     // Массив всех GameObject'ов в редакторе
     [HideInInspector]
     public List<GameObject> objList = new List<GameObject>();
@@ -43,9 +45,13 @@ public class BuildStation : MonoBehaviour {
 
     protected bool isReady = true;
 
+    protected bool isCreated = false;
+
+    public int initChunkSize = 500;
+    
     public int chunkSize = 500;
 
-    protected Vector3i nextChunkStart;
+    protected Vector3i nextChunkStart = Vector3i.zero;
 
 
     // Можно ли изменять контент редактора в игре
@@ -62,7 +68,7 @@ public class BuildStation : MonoBehaviour {
 
 
     // Когда объект был обновлен в последний раз
-    protected float sinceLastUpdate = 0f;
+    protected float lastUpdateTime = 0f;
 
     // Очередь объектов на обработку
     protected List<GameObject> updateQueue = new List<GameObject>();
@@ -92,36 +98,13 @@ public class BuildStation : MonoBehaviour {
         brush.GetComponent<Collider>().enabled = false;
         brush.transform.localScale = blockSize;
 
-        var blockHolder = new GameObject {
+        blockHolder = new GameObject {
             name = "BlockHolder"
         };
         blockHolder.transform.parent = transform.parent;
 
-        var offset = transform.localScale / 2;
-        var position = transform.position - offset;
-
-        // Создаем блоки
         blocks = new Block[size.x][][];
-        for (int x = 0; x < size.x; x++) {
-            blocks[x] = new Block[size.y][];
-
-            for (int y = 0; y < size.y; y++) {
-                blocks[x][y] = new Block[size.z];
-
-                for (int z = 0; z < size.z; z++) {
-
-                    var blockCoord = new Vector3i(x, y, z);
-
-                    blocks[x][y][z] = new Block(
-                        position + Vector3.Scale(blockCoord, blockSize),
-                        blockCoord,
-                        blockHolder.transform,
-                        CreateBlockAnchor(),
-                        new Vector3i(size.x - x - 1, size.y - y - 1, size.z - z - 1)
-                    );
-                }
-            }
-        }
+        ContinueCreateBlockChunk();
     }
 
     protected virtual void OnDestroy() {
@@ -131,11 +114,14 @@ public class BuildStation : MonoBehaviour {
     // Обрабатывает объекты в очереди
     protected virtual void Update() {
 
-        sinceLastUpdate += Time.deltaTime;
+        if (!isCreated) {
+            ContinueCreateBlockChunk();
+            if(!isCreated) return;
+        }
 
         if (!isReady) {
             ContinueUpdateBlockInfo();
-            return;
+            if(!isReady) return;
         }
 
         if (!editable) {
@@ -143,8 +129,8 @@ public class BuildStation : MonoBehaviour {
             return;
         }
 
-        if (sinceLastUpdate >= objectUpdateInterval && updateQueue.Count > 0) {
-            sinceLastUpdate = 0;
+        if (Time.time - lastUpdateTime >= objectUpdateInterval && updateQueue.Count > 0) {
+            lastUpdateTime = Time.time;
 
             PlaceObject(DequeueObject());
         }
@@ -155,7 +141,7 @@ public class BuildStation : MonoBehaviour {
     protected virtual void OnTriggerStay(Collider other) {
 
         // Не редактируем
-        if (!editable || !isReady) {
+        if (!editable || !isReady || !isCreated) {
             return;
         }
 
@@ -165,6 +151,10 @@ public class BuildStation : MonoBehaviour {
     // Когда что-то покидает редактор
     // Прячет кисть, удаляет объект из очереди на добавление
     protected virtual void OnTriggerExit(Collider other) {
+        if (!isCreated) {
+            return;
+        }
+
         var obj = other.gameObject;
 
         if (objList.Contains(obj)) {
@@ -351,6 +341,53 @@ public class BuildStation : MonoBehaviour {
         childObject.name = "Holder";
 
         return blockAnchor;
+    }
+
+    protected virtual void ContinueCreateBlockChunk() {
+        nextChunkStart = CreateBlockChunk(nextChunkStart);
+        if(nextChunkStart == -Vector3i.one) {
+            isCreated = true;
+        }
+    }
+
+    protected Vector3i CreateBlockChunk(Vector3i chunkStart) {
+        var offset = transform.localScale / 2;
+        var position = transform.position - offset;
+
+        // Создаем блоки
+        var blocksLeft = initChunkSize;
+        for (int x = chunkStart.x; x < size.x; x++) {
+            if (blocks[x] == null) {
+                blocks[x] = new Block[size.y][];
+            }
+
+            for (int y = chunkStart.x == x ? chunkStart.y : 0; y < size.y; y++) {
+                if (blocks[x][y] == null) {
+                    blocks[x][y] = new Block[size.z];
+                }
+
+                for (int z = chunkStart.x == x && chunkStart.y == y ? chunkStart.z : 0; z < size.z; z++) {
+                    if(blocksLeft == 0) {
+                        debugCreatedBlocks += initChunkSize;
+                        return new Vector3i(x, y, z);
+                    }
+
+                    var blockCoord = new Vector3i(x, y, z);
+
+                    blocks[x][y][z] = new Block(
+                        position + Vector3.Scale(blockCoord, blockSize),
+                        blockCoord,
+                        blockHolder.transform,
+                        CreateBlockAnchor(),
+                        new Vector3i(size.x - x - 1, size.y - y - 1, size.z - z - 1)
+                    );
+                    
+                    blocksLeft--;
+                }
+            }
+        }
+        debugCreatedBlocks = debugTotalBlocks;
+        return -Vector3i.one;
     }
 
     protected virtual void StartUpdateBlockInfo() {
@@ -778,8 +815,9 @@ public class BuildStation : MonoBehaviour {
 
     public bool debugGridEnabled = false;
 
-    protected int debugTotalBlocks;
-    protected int debugCheckedBlocks;
+    protected int debugTotalBlocks = 0;
+    protected int debugCheckedBlocks = 0;
+    protected int debugCreatedBlocks = 0;
 
     public GameObject DebugGridPrefab;
 
