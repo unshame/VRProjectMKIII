@@ -199,29 +199,41 @@ public class BuildStation : MonoBehaviour {
 
         if ((obj != brush || brushBlock == null) && !objList.Contains(obj)) return;
 
-        for (int x = 0; x < size.x; x++) {
-            for (int y = 0; y < size.y; y++) {
-                for (int z = 0; z < size.z; z++) {
-                    var block = blocks[x][y][z];
-                    block.empty(obj);
-                }
-            }
-        }
+        RemoveObjectFromBlocks(obj);
 
         objList.Remove(obj);
 
         UpdateBlockSpaces();
     }
 
+    private void RemoveObjectFromBlocks(GameObject obj) {
+        for (int x = 0; x < size.x; x++) {
+            for (int y = 0; y < size.y; y++) {
+                for (int z = 0; z < size.z; z++) {
+                    var block = blocks[x][y][z];
+                    if (block.gameObject == obj) {
+                        if (block.objBlockReach != -Vector3i.one) {
+                            SetBlocksFilled(block, block.objBlockReach, false);
+                        }
+                        block.empty(obj);
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
     // Добавляет GameObject по указанным координатам
-    public virtual void AddObject(Vector3i blockCoord, GameObject obj, Block[] affectedBlocks, Quaternion rotation) {
+    public virtual void AddObject(Vector3i blockCoord, GameObject obj, Quaternion rotation) {
 
         var block = GetBlock(blockCoord);
         var offset = CalculateOffset(obj);
+        var objBlockReach = CalculateobjBlockMagnitude(obj) - Vector3i.one;
 
         // Заполняем массив объектов и блоки объектом
         objList.Add(obj);
-        block.fill(obj, true, offset, rotation, affectedBlocks);
+        block.fill(obj, true, offset, rotation, objBlockReach);
+        SetBlocksFilled(block, objBlockReach, true);
 
         WriteDebug(obj);
 
@@ -371,6 +383,24 @@ public class BuildStation : MonoBehaviour {
         WriteToFileDebug();
     }
 
+    protected void SetBlocksFilled(Block sourceBlock, Vector3i objBlockReach, bool value) {
+        var rangeStart = sourceBlock.coord;
+        var rangeEnd = sourceBlock.coord + objBlockReach;
+        for (int x = rangeStart.x; x <= rangeEnd.x; x++) {
+            for (int y = rangeStart.y; y <= rangeEnd.y; y++) {
+                for (int z = rangeStart.z; z <= rangeEnd.z; z++) {
+                    var block = GetBlock(x, y, z);
+                    if (block == sourceBlock) continue;
+                    if(value) {
+                        block.fill(sourceBlock);
+                    }
+                    else {
+                        block.empty();
+                    }
+                }
+            }
+        }
+    }
 
     /* Расставление объектов */
 
@@ -449,8 +479,7 @@ public class BuildStation : MonoBehaviour {
     // Размещает объект в редакторе или показывает браш, если есть место
     protected void PlaceObject(GameObject obj) {
         // Проверяем валидность объекта и находим ближайший блок, в который можно его поставить
-        Block[] closestAffectedBlocks;
-        var closestBlockCoord = GetClosestBlockCoord(obj, out closestAffectedBlocks);
+        var closestBlockCoord = GetClosestBlockCoord(obj);
 
         // Блок найден
         if (closestBlockCoord != -Vector3i.one) {
@@ -467,7 +496,7 @@ public class BuildStation : MonoBehaviour {
             }
             else {
                 // Иначе ставим объект
-                AddObject(closestBlockCoord, obj, closestAffectedBlocks, appliedRotation);
+                AddObject(closestBlockCoord, obj, appliedRotation);
             }
         }
         else if (brushShownFor == obj) {
@@ -478,7 +507,7 @@ public class BuildStation : MonoBehaviour {
 
     // Возвращает координаты ближайшего валидного блока, а также блоки, на которые будет наложен GameObject и находится ли он в руке игрока
     // Возвращает -1 вектор, если такого блока нет
-    protected Vector3i GetClosestBlockCoord(GameObject obj, out Block[] affectedBlocks) {
+    protected Vector3i GetClosestBlockCoord(GameObject obj) {
 
         // Рассчитываем позицию объекта и диапазон блоков
         Vector3i rangeStart, rangeEnd;
@@ -514,11 +543,10 @@ public class BuildStation : MonoBehaviour {
         });
 
         // Ищем блок, в котором объект будет соединен с уже поставленным объектом и находим все задетые блоки
-        affectedBlocks = null;
         for (int i = 0; i < possibleBlocks.Count; i++) {
             var blockCoord = possibleBlocks[i].Value;
-            if (ObjectIsConnected(blockCoord, obj, out affectedBlocks)) {
-                // Debug.LogFormat("{0} {1}", CalculateBlockMagnitude(obj), GetBlock(blockCoord).spaces);
+            if (ObjectIsConnected(blockCoord, obj)) {
+                // Debug.LogFormat("{0} {1}", CalculateobjBlockMagnitude(obj), GetBlock(blockCoord).spaces);
                 return blockCoord;
             }
         }
@@ -533,7 +561,7 @@ public class BuildStation : MonoBehaviour {
 
     // Проверяет, не пересечется ли объект с другими заполненными блоками
     protected bool ObjectFits(Vector3i blockCoord, GameObject obj) {
-        var blockNumAfter = CalculateBlockMagnitude(obj) - Vector3i.one;
+        var blockNumAfter = CalculateobjBlockMagnitude(obj) - Vector3i.one;
 
         var dec = new Vector3i(1, 0, 1);
         while (blockNumAfter.x != -1 && blockNumAfter.z != -1) {
@@ -558,19 +586,17 @@ public class BuildStation : MonoBehaviour {
     }
 
     // Проверяет соединен ли объект с другими блоками в данной позиции и находит задетые блоки
-    protected bool ObjectIsConnected(Vector3i blockCoord, GameObject obj, out Block[] affectedBlocks) {
-        var blockMagnitude = CalculateBlockMagnitude(obj);
+    protected bool ObjectIsConnected(Vector3i blockCoord, GameObject obj) {
+        var objBlockMagnitude = CalculateobjBlockMagnitude(obj);
 
         // Самый дальний блок, который будет занят объектом
-        var blockReach = blockCoord + blockMagnitude - Vector3i.one;
+        var objBlockReach = blockCoord + objBlockMagnitude - Vector3i.one;
 
-        affectedBlocks = new Block[blockMagnitude.x * blockMagnitude.y * blockMagnitude.z - 1];
-        var i = 0;
         var isConnected = false;
 
-        for (int x = blockReach.x; x >= blockCoord.x; x--) {
-            for (int y = blockReach.y; y >= blockCoord.y; y--) {
-                for (int z = blockReach.z; z >= blockCoord.z; z--) {
+        for (int x = objBlockReach.x; x >= blockCoord.x; x--) {
+            for (int y = objBlockReach.y; y >= blockCoord.y; y--) {
+                for (int z = objBlockReach.z; z >= blockCoord.z; z--) {
                     var affectedBlock = GetBlock(x, y, z);
 
                     if (!BlockIsEmpty(affectedBlock)) {
@@ -578,23 +604,14 @@ public class BuildStation : MonoBehaviour {
                     }
 
                     // Проверяем прилегающие блоки по краям
-                    if (x == blockCoord.x || y == blockCoord.y || z == blockCoord.z || x == blockReach.x || y == blockReach.y || z == blockReach.z) {
+                    if (x == blockCoord.x || y == blockCoord.y || z == blockCoord.z || x == objBlockReach.x || y == objBlockReach.y || z == objBlockReach.z) {
                         isConnected = isConnected || BlockIsConnected(x, y, z);
                     }
 
                     // Пропускаем текущий блок
                     if (blockCoord.x == x && blockCoord.y == y && blockCoord.z == z) continue;
-
-                    // Добавляем блок в массив блоков, занятых объектом
-                    affectedBlocks[i] = affectedBlock;
-
-                    i++;
                 }
             }
-        }
-
-        if (!isConnected) {
-            affectedBlocks = null;
         }
 
         return isConnected;
@@ -639,7 +656,7 @@ public class BuildStation : MonoBehaviour {
     }
 
     // Считает число блоков между двумя крайними блоками, которые будет занимать объект (минимум один блок)
-    protected Vector3i CalculateBlockMagnitude(GameObject obj) {
+    protected Vector3i CalculateobjBlockMagnitude(GameObject obj) {
         var objSize = CalculateSize(obj);
         return VectorUtils.Max(VectorUtils.RoundAroundToInt(VectorUtils.Divide(objSize, blockSize), maxObjectProtrusion), Vector3i.one);
     }
@@ -701,7 +718,7 @@ public class BuildStation : MonoBehaviour {
     [Conditional("GRID_DEBUG")]
     protected void WriteDebug(GameObject obj) {
         if (!debugGridEnabled) return;
-        var s1 = CalculateBlockMagnitude(obj);
+        var s1 = CalculateobjBlockMagnitude(obj);
         var s2 = CalculateSize(obj);
         var s3 = CalculateMinFitSize(obj);
         var s4 = CalculateRotation(obj);

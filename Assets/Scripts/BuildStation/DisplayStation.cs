@@ -46,24 +46,13 @@ public class DisplayStation : BuildStation {
         }
     }
 
-    public override void AddObject(Vector3i blockCoord, GameObject obj, Block[] affectedBlocks, Quaternion rotation) {
+    public override void AddObject(Vector3i blockCoord, GameObject obj, Quaternion rotation) {
 
         // Копируем объект
         var objCopy = Instantiate(obj);
 
         // Корректируем масштаб объекта
         objCopy.transform.localScale = Vector3.Scale(objCopy.transform.localScale, scaleDif);
-
-        // Копируем задетые блоки
-        Block[] affectedBlocksCopy = null;
-        if (affectedBlocks != null) {
-            affectedBlocksCopy = new Block[affectedBlocks.Length];
-            for (var i = 0; i < affectedBlocks.Length; i++) {
-                if (affectedBlocks[i] != null) {
-                    affectedBlocksCopy[i] = GetBlock(affectedBlocks[i].coord);
-                }
-            }
-        }
 
         // Копируем identity блока
         var identityCopy = objCopy.GetComponent<ObjectIdentity>();
@@ -73,7 +62,7 @@ public class DisplayStation : BuildStation {
         }
 
         // Добавляем блок в сетку с поворотом редактора
-        base.AddObject(blockCoord, objCopy, affectedBlocksCopy, rotation);
+        base.AddObject(blockCoord, objCopy, rotation);
     }
 
     public override void ShowBrush(Vector3i blockCoord, GameObject obj, Quaternion rotation) {

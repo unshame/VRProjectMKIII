@@ -7,12 +7,13 @@ using Valve.VR.InteractionSystem;
 public class Block {
 
     // Внутренние переменные
-    private GameObject obj = null;         // Объект добавленный в блок
-    private GameObject anchor;             // Объект, представляющий блок в игровом мире
-    private Transform holder;              // Объект внутри anchor, держащий добавленный блок
-    private bool isFilled = false;         // Заполнен ли блок
-    private MeshRenderer debugRenderer;    // Визуальное отображение блока    
-    public Vector3i spaces;                // Свободное место после блока
+    private GameObject obj = null;                   // Объект добавленный в блок
+    private GameObject anchor;                       // Объект, представляющий блок в игровом мире
+    private Transform holder;                        // Объект внутри anchor, держащий добавленный блок
+    private bool isFilled = false;                   // Заполнен ли блок
+    private MeshRenderer debugRenderer;              // Визуальное отображение блока    
+    public Vector3i spaces;                          // Свободное место после блока
+    public Vector3i objBlockReach = -Vector3i.one;
 
     // Конструктор
     public Block(Vector3 position, Vector3i coord, Transform parent, GameObject anchor, Vector3i spaces) {
@@ -45,12 +46,6 @@ public class Block {
 
     // Блок, хранящий в себе GameObject, который занимает и этот блок
     public Block affectingBlock {
-        get;
-        private set;
-    }
-
-    // Список блоков, занятых текущим GameObject'ом
-    public Block[] affectedBlocks {
         get;
         private set;
     }
@@ -113,13 +108,14 @@ public class Block {
     }
 
     // Заполняет блок переданным GameObject'ом
-    public void fill(GameObject obj, bool collide, Vector3 offset, Quaternion rotation, Block[] affectedBlocks = null) {
+    public void fill(GameObject obj, bool collide, Vector3 offset, Quaternion rotation, Vector3i objBlockReach) {
 
         if (this.obj) {
             empty();
         }
 
         this.obj = obj;
+        this.objBlockReach = objBlockReach;
 
         // Помещаем объект в держатель объекта и включаем его
         addObjectToHolder(offset, rotation);
@@ -129,18 +125,6 @@ public class Block {
 
         isFilled = true;
 
-        // Запоминаем и заполняем блоки, задетые объектом
-        if (affectedBlocks != null) {
-
-            this.affectedBlocks = affectedBlocks;
-
-            for (var i = 0; i < affectedBlocks.Length; i++) {
-                if (affectedBlocks[i] != null) {
-                    affectedBlocks[i].fill(this);
-                }
-            }
-        }
-
         updateAnchorName();
 
         if (debugRenderer) {
@@ -148,6 +132,9 @@ public class Block {
         }
     }
 
+    public void fill(GameObject obj, bool collide, Vector3 offset, Quaternion rotation) {
+        fill(obj, collide, offset, rotation, -Vector3i.one);
+    }
     // Убирает GameObject или ссылку на блок с ним из блока
     public void empty() {
 
@@ -155,10 +142,10 @@ public class Block {
         removeObjectFromHolder();
 
         obj = null;
+        objBlockReach = -Vector3i.one;
         isFilled = false;
         
         affectingBlock = null;
-        emptyAffected();
         
         updateAnchorName();
 
@@ -173,23 +160,6 @@ public class Block {
         if (this.obj == obj) {
             empty();
         }
-    }
-
-    // Опустошает блоки, задетые текущим GameObject'ом
-    private void emptyAffected() {
-        if (affectedBlocks == null) return;
-
-        for (var i = 0; i < affectedBlocks.Length; i++) { 
-            var affectedBlock = affectedBlocks[i];
-            if (affectedBlock == this) {
-                Debug.LogError("Block is overlapping itself");
-                continue;
-            }
-            if(affectedBlock == null) continue;
-            affectedBlock.empty();
-        }
-
-        affectedBlocks = null;
     }
 
     // Опустошает блок, выкидывая объект в случайную сторону

@@ -47,9 +47,9 @@ public class DualBuildStation : BuildStation {
         displayStation.RemoveObject(objCoord);
     }
 
-    public override void AddObject(Vector3i blockCoord, GameObject obj, Block[] affectedBlocks, Quaternion rotation) {
-        displayStation.AddObject(blockCoord, obj, affectedBlocks, rotation);
-        base.AddObject(blockCoord, obj, affectedBlocks, rotation);
+    public override void AddObject(Vector3i blockCoord, GameObject obj, Quaternion rotation) {
+        displayStation.AddObject(blockCoord, obj, rotation);
+        base.AddObject(blockCoord, obj, rotation);
     }
 
     public override void Clear() {
