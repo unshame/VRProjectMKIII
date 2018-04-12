@@ -1,4 +1,4 @@
-//#define GRID_DEBUG
+#define GRID_DEBUG
 
 using System.Collections;
 using System.Collections.Generic;
@@ -359,24 +359,54 @@ public class BuildStation : MonoBehaviour {
                     var block = blocks[x][y][z];
 
                     // Блок не пуст, заполняем минус единицами
-                    if (!block.isEmpty && !block.has(brush)) {
+                    if (BlockIsEmpty(block)) {
+                        // Блоки после этого
+                        var blockx = GetBlock(x + 1, y, z);
+                        var blocky = GetBlock(x, y + 1, z);
+                        var blockz = GetBlock(x, y, z + 1);
+
+                        // Если блоков не существует, то места нет
+                        var sx = blockx == null ? 0 : blockx.spaces.x + 1;
+                        var sy = blocky == null ? 0 : blocky.spaces.y + 1;
+                        var sz = blockz == null ? 0 : blockz.spaces.z + 1;
+                        block.spaces = new Vector3i(sx, sy, sz);
+
+                        if (BlockIsEmpty(blockx) && BlockIsEmpty(blocky) && BlockIsEmpty(blockz)) {
+                            var cx = blockx == null || blockx.connectedAfter.x == -1 ? -1 : blockx.connectedAfter.x + 1;
+                            var cy = blocky == null || blocky.connectedAfter.y == -1 ? -1 : blocky.connectedAfter.y + 1;
+                            var cz = blockz == null || blockz.connectedAfter.z == -1 ? -1 : blockz.connectedAfter.z + 1;
+                            block.connectedAfter = new Vector3i(cx, cy, cz);
+                        }
+                        else {
+                            block.connectedAfter = Vector3i.zero;
+                        }
+
+                    }
+                    else {
                         block.spaces = -Vector3i.one;
-                        WriteToFileDebug(string.Format("[{0}, {1}, {2}] ", -1, -1, -1).PadLeft(15));
-                        continue;
+                        block.connectedAfter = Vector3i.zero;
                     }
 
-                    // Блоки после этого
-                    var blockx = GetBlock(x + 1, y, z);
-                    var blocky = GetBlock(x, y + 1, z);
-                    var blockz = GetBlock(x, y, z + 1);
+                    var xx = size.x - 1 - x;
+                    var yy = size.y - 1 - y;
+                    var zz = size.z - 1 - z;
+                    var otherBlock = blocks[xx][yy][zz];
+                    var blockxx = GetBlock(xx - 1, yy, zz);
+                    var blockyy = GetBlock(xx, yy - 1, zz);
+                    var blockzz = GetBlock(xx, yy, zz - 1);
+                    if (BlockIsEmpty(otherBlock) && BlockIsEmpty(blockxx) && BlockIsEmpty(blockyy) && BlockIsEmpty(blockzz)) {
+                        var cxx = blockxx == null || blockxx.connectedBefore.x == -1 ? -1 : blockxx.connectedBefore.x + 1;
+                        var cyy = blockyy == null || blockyy.connectedBefore.y == -1 ? -1 : blockyy.connectedBefore.y + 1;
+                        var czz = blockzz == null || blockzz.connectedBefore.z == -1 ? -1 : blockzz.connectedBefore.z + 1;
+                        otherBlock.connectedBefore = new Vector3i(cxx, cyy, czz);
+                    }
+                    else {
+                        otherBlock.connectedBefore = Vector3i.zero;
+                    }
 
-                    // Если блоков не существует, то места нет
-                    var fx = blockx != null ? blockx.spaces.x + 1 : 0;
-                    var fy = blocky != null ? blocky.spaces.y + 1 : 0;
-                    var fz = blockz != null ? blockz.spaces.z + 1 : 0;
-                    block.spaces = new Vector3i(fx, fy, fz);
-
-                    WriteToFileDebug(string.Format("[{0}, {1}, {2}] ", fx, fy, fz).PadLeft(15));
+                    //WriteToFileDebug(string.Format("{0} ", block.spaces).PadLeft(15));
+                    //WriteToFileDebug(string.Format("{0} ", block.connectedAfter).PadLeft(15));
+                    WriteToFileDebug(string.Format("{1}{0} ", otherBlock.connectedBefore, BlockIsEmpty(otherBlock) ? "" : "*").PadLeft(15));
                 }
             }
         }
@@ -594,6 +624,10 @@ public class BuildStation : MonoBehaviour {
 
         var isConnected = false;
 
+        var y1 = 0;
+        var z1 = 0;
+        var y2 = objBlockReach.y;
+        var z2 = objBlockReach.z;
         for (int x = objBlockReach.x; x >= blockCoord.x; x--) {
             for (int y = objBlockReach.y; y >= blockCoord.y; y--) {
                 for (int z = objBlockReach.z; z >= blockCoord.z; z--) {
@@ -603,12 +637,12 @@ public class BuildStation : MonoBehaviour {
                         Debug.LogWarningFormat("Affected block isn't empty {0}", affectedBlock.coord);
                     }
 
-                    // Проверяем прилегающие блоки по краям
+                    // Проверяем прилегающие блоки по краям 
                     if (x == blockCoord.x || y == blockCoord.y || z == blockCoord.z || x == objBlockReach.x || y == objBlockReach.y || z == objBlockReach.z) {
                         isConnected = isConnected || BlockIsConnected(x, y, z);
                     }
 
-                    // Пропускаем текущий блок
+                    // Пропускаем текущий блок 
                     if (blockCoord.x == x && blockCoord.y == y && blockCoord.z == z) continue;
                 }
             }

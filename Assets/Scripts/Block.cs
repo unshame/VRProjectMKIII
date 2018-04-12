@@ -13,6 +13,8 @@ public class Block {
     private bool isFilled = false;                   // Заполнен ли блок
     private MeshRenderer debugRenderer;              // Визуальное отображение блока    
     public Vector3i spaces;                          // Свободное место после блока
+    public Vector3i connectedAfter = Vector3i.zero;
+    public Vector3i connectedBefore = Vector3i.zero;
     public Vector3i objBlockReach = -Vector3i.one;
 
     // Конструктор
