@@ -43,14 +43,19 @@ public class BuildStation : MonoBehaviour {
     protected GameObject brushShownFor = null;
 
 
-    protected bool isReady = true;
-
+    // Редактор создал все блоки
     protected bool isCreated = false;
 
+    // Редактор готов обрабатывать блоки
+    protected bool isReady = true;
+
+    // Количество блоков в чанке при создании
     public int initChunkSize = 500;
     
+    // Кол-во блоков в чанке при сборе информации
     public int chunkSize = 500;
 
+    // Блок, с которого начинается следующий чанк
     protected Vector3i nextChunkStart = Vector3i.zero;
 
 
@@ -204,24 +209,30 @@ public class BuildStation : MonoBehaviour {
     // Убирает указанный GameObject из редактора
     public virtual void RemoveObject(GameObject obj) {
 
-        if ((obj != brush || brushBlock == null) && !objList.Contains(obj)) return;
+        if (!objList.Contains(obj)) return;
 
         RemoveObjectFromBlocks(obj);
-
         objList.Remove(obj);
 
         StartUpdateBlockInfo();
     }
 
+    // Находит и удаляет объект из блока
     private void RemoveObjectFromBlocks(GameObject obj) {
         for (int x = 0; x < size.x; x++) {
             for (int y = 0; y < size.y; y++) {
                 for (int z = 0; z < size.z; z++) {
                     var block = blocks[x][y][z];
-                    if (block.gameObject == obj) {
+
+                    // Мы всегда первым наткнемся на основной блок объекта, а не на задетые,
+                    // но на всякий случай берем gameObjectOrigin
+                    if (block.gameObjectOrigin == obj) {
+
+                        // Очищаем задетые объектом блоки
                         if (block.objBlockReach != -Vector3i.one) {
                             SetBlocksFilled(block, block.objBlockReach, false);
                         }
+
                         block.empty(obj);
                         return;
                     }
@@ -233,6 +244,10 @@ public class BuildStation : MonoBehaviour {
     // Добавляет GameObject по указанным координатам
     public virtual void AddObject(Vector3i blockCoord, GameObject obj, Quaternion rotation, Vector3i objBlockMagnitude) {
 
+        if (movingObjects.Contains(obj)) {
+            movingObjects.Remove(obj);
+        }
+
         var block = GetBlock(blockCoord);
         var offset = CalculateOffset(obj);
         var objBlockReach = objBlockMagnitude - Vector3i.one;
@@ -243,10 +258,6 @@ public class BuildStation : MonoBehaviour {
         SetBlocksFilled(block, objBlockReach, true);
 
         WriteDebug(obj);
-
-        if (movingObjects.Contains(obj)) {
-            movingObjects.Remove(obj);
-        }
 
         StartUpdateBlockInfo();
     }
@@ -343,6 +354,7 @@ public class BuildStation : MonoBehaviour {
         return blockAnchor;
     }
 
+    // Запускает/завершает создание чанков блоков
     protected virtual void ContinueCreateBlockChunk() {
         nextChunkStart = CreateBlockChunk(nextChunkStart);
         if(nextChunkStart == -Vector3i.one) {
@@ -350,11 +362,11 @@ public class BuildStation : MonoBehaviour {
         }
     }
 
+    // Создает чанк блоков, возвращает позицию начала следующего чанка или -1
     protected Vector3i CreateBlockChunk(Vector3i chunkStart) {
         var offset = transform.localScale / 2;
         var position = transform.position - offset;
 
-        // Создаем блоки
         var blocksLeft = initChunkSize;
         for (int x = chunkStart.x; x < size.x; x++) {
             if (blocks[x] == null) {
@@ -367,6 +379,8 @@ public class BuildStation : MonoBehaviour {
                 }
 
                 for (int z = chunkStart.x == x && chunkStart.y == y ? chunkStart.z : 0; z < size.z; z++) {
+
+                    // Чанк закончился
                     if(blocksLeft == 0) {
                         debugCreatedBlocks += initChunkSize;
                         return new Vector3i(x, y, z);
@@ -390,6 +404,7 @@ public class BuildStation : MonoBehaviour {
         return -Vector3i.one;
     }
 
+    // Запускает сбор информации о блоках
     protected virtual void StartUpdateBlockInfo() {
         isReady = false;
         nextChunkStart = size - Vector3i.one;
@@ -397,6 +412,7 @@ public class BuildStation : MonoBehaviour {
         ContinueUpdateBlockInfo();
     }
 
+    // Продолжает/завершает сбор информации о блоках
     protected virtual void ContinueUpdateBlockInfo() {
         nextChunkStart = UpdateBlockInfoChunk(nextChunkStart);
         if(nextChunkStart == -Vector3i.one) {
@@ -404,26 +420,33 @@ public class BuildStation : MonoBehaviour {
         }
     }
 
-    // Обновляет счетчики пустого места после блоков
+    // Обновляет информацию о блоках - кол-во пустого места после блоков и ближайшие соединенные блоки
     protected Vector3i UpdateBlockInfoChunk(Vector3i chunkStart) {
+
         WriteToFileDebug("================================");
 
         var blocksLeft = chunkSize;
         var end = size - Vector3i.one;
         for (int x = chunkStart.x; x >= 0; x--) {
 
+            // DEBUG
             WriteToFileDebug("\n\n");
             WriteToFileDebug(string.Format("({0})", x).PadRight(4));
             for (int y = x == chunkStart.x ? chunkStart.y : end.y; y >= 0; y--) {
                 WriteToFileDebug(y.ToString().PadLeft(15));
             }
+            // /DEBUG
 
             for (int y = x == chunkStart.x ? chunkStart.y : end.y; y >= 0; y--) {
 
+                // DEBUG
                 WriteToFileDebug();
                 WriteToFileDebug(string.Format("{0}: ", y).PadLeft(5));
+                // /DEBUG
 
                 for (int z = x == chunkStart.x && y == chunkStart.y ? chunkStart.z : end.z; z >= 0; z--) {
+
+                    // Конец чанка
                     if(blocksLeft == 0) {
                         debugCheckedBlocks += chunkSize;
                         return new Vector3i(x, y, z);
@@ -431,7 +454,6 @@ public class BuildStation : MonoBehaviour {
 
                     var block = blocks[x][y][z];
 
-                    // Блок не пуст, заполняем минус единицами
                     if (BlockIsEmpty(block)) {
                         // Блоки после этого
                         var blockx = GetBlock(x + 1, y, z);
@@ -444,6 +466,8 @@ public class BuildStation : MonoBehaviour {
                         var sz = blockz == null ? 0 : blockz.spaces.z + 1;
                         block.spaces = new Vector3i(sx, sy, sz);
 
+                        // Ближайшие соединенные блоки
+                        // Последующие блоки пусты, значит берем информацию из них и прибавляем 1, либо -1 если вышли за пределы редактора
                         if (BlockIsEmpty(blockx) && BlockIsEmpty(blocky) && BlockIsEmpty(blockz)) {
                             var cx = blockx == null || blockx.connectedAfter.x == -1 ? -1 : blockx.connectedAfter.x + 1;
                             var cy = blocky == null || blocky.connectedAfter.y == -1 ? -1 : blocky.connectedAfter.y + 1;
@@ -451,6 +475,7 @@ public class BuildStation : MonoBehaviour {
                             block.connectedAfter = new Vector3i(cx, cy, cz);
                         }
                         else {
+                            // Один из блоков не пуст, значит ставим, что он в 0 расстоянии от соединенного блока
                             block.connectedAfter = Vector3i.zero;
                         }
 
@@ -460,13 +485,17 @@ public class BuildStation : MonoBehaviour {
                         block.connectedAfter = Vector3i.zero;
                     }
 
+                    // Сразу проходим с другого конца и узнаем ближайшие соединенные блоки перед блоками
                     var xx = end.x - x;
                     var yy = end.y - y;
                     var zz = end.z - z;
                     var otherBlock = blocks[xx][yy][zz];
+
+                    // Блоки перед этим
                     var blockxx = GetBlock(xx - 1, yy, zz);
                     var blockyy = GetBlock(xx, yy - 1, zz);
                     var blockzz = GetBlock(xx, yy, zz - 1);
+
                     if (BlockIsEmpty(otherBlock) && BlockIsEmpty(blockxx) && BlockIsEmpty(blockyy) && BlockIsEmpty(blockzz)) {
                         var cxx = blockxx == null || blockxx.connectedBefore.x == -1 ? -1 : blockxx.connectedBefore.x + 1;
                         var cyy = blockyy == null || blockyy.connectedBefore.y == -1 ? -1 : blockyy.connectedBefore.y + 1;
@@ -479,9 +508,11 @@ public class BuildStation : MonoBehaviour {
 
                     blocksLeft--;
 
+                    // DEBUG
                     //WriteToFileDebug(string.Format("{0} ", block.spaces).PadLeft(15));
                     //WriteToFileDebug(string.Format("{0} ", block.connectedAfter).PadLeft(15));
                     //WriteToFileDebug(string.Format("{1}{0} ", otherBlock.connectedBefore, BlockIsEmpty(otherBlock) ? "" : "*").PadLeft(15));
+                    // /DEBUG
                 }
             }
         }
@@ -491,6 +522,7 @@ public class BuildStation : MonoBehaviour {
         return -Vector3i.one;
     }
 
+    // Устанавливает заполненность блоков, которые были задеты объектом
     protected void SetBlocksFilled(Block sourceBlock, Vector3i objBlockReach, bool value) {
         var rangeStart = sourceBlock.coord;
         var rangeEnd = sourceBlock.coord + objBlockReach;
@@ -498,7 +530,10 @@ public class BuildStation : MonoBehaviour {
             for (int y = rangeStart.y; y <= rangeEnd.y; y++) {
                 for (int z = rangeStart.z; z <= rangeEnd.z; z++) {
                     var block = GetBlock(x, y, z);
+
+                    // Скипаем исходный блок
                     if (block == null || block == sourceBlock) continue;
+
                     if(value) {
                         block.fill(sourceBlock);
                     }
@@ -509,6 +544,7 @@ public class BuildStation : MonoBehaviour {
             }
         }
     }
+
 
     /* Расставление объектов */
 
@@ -613,7 +649,7 @@ public class BuildStation : MonoBehaviour {
         }
     }
 
-    // Возвращает координаты ближайшего валидного блока, а также блоки, на которые будет наложен GameObject и находится ли он в руке игрока
+    // Возвращает координаты ближайшего валидного блока
     // Возвращает -1 вектор, если такого блока нет
     protected Vector3i GetClosestBlockCoord(GameObject obj) {
 
@@ -627,7 +663,7 @@ public class BuildStation : MonoBehaviour {
             for (int y = rangeStart.y; y <= rangeEnd.y; y++) {
                 for (int z = rangeStart.z; z <= rangeEnd.z; z++) {
 
-                    // Проверяем валидность блока, находим растояние до блока и задетые блоки
+                    // Проверяем не заполнен ли блок уже, находим растояние до блока и проверяем, вмещается ли блок
                     var blockCoord = new Vector3i(x, y, z);
                     var block = GetBlock(blockCoord);
                     if (block == null) continue;
@@ -693,7 +729,7 @@ public class BuildStation : MonoBehaviour {
         return true;
     }
 
-    // Проверяет соединен ли объект с другими блоками в данной позиции и находит задетые блоки
+    // Возвращает соединен ли объект с другими блоками в данной позиции
     protected bool ObjectIsConnected(Vector3i blockCoord, GameObject obj) {
 
         if (blockCoord.y == 0) return true;
@@ -711,6 +747,9 @@ public class BuildStation : MonoBehaviour {
         var y2 = objBlockReach.y;
         var z2 = objBlockReach.z;
 
+        // Тут чтобы понять нужно визуализировать
+        // Короче проверяем близость соединенных блоков со всех сторон
+        // В зависимости от того, куда смотрит сторона берем либо инфу о блоках после, либо перед
         for (int x = x1; x <= x2; x++) {
             var block1 = GetBlock(x, y2, z1);
             var block2 = GetBlock(x, y1, z2);
@@ -743,6 +782,7 @@ public class BuildStation : MonoBehaviour {
 
         return false;
     }
+
 
     /* Размеры и позиции объекта */
 

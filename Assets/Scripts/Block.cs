@@ -7,19 +7,14 @@ using Valve.VR.InteractionSystem;
 public class Block {
 
     // Внутренние переменные
-    private GameObject obj = null;                   // Объект добавленный в блок
-    private GameObject anchor;                       // Объект, представляющий блок в игровом мире
-    private Transform holder;                        // Объект внутри anchor, держащий добавленный блок
-    private bool isFilled = false;                   // Заполнен ли блок
-    private MeshRenderer debugRenderer;              // Визуальное отображение блока    
-    public Vector3i spaces;                          // Свободное место после блока
-    public Vector3i connectedAfter = -Vector3i.one;
-    public Vector3i connectedBefore = -Vector3i.one;
-    public Vector3i objBlockReach = -Vector3i.one;
-
+    private GameObject obj = null;        // Объект добавленный в блок
+    private GameObject anchor;            // Объект, представляющий блок в игровом мире
+    private Transform holder;             // Объект внутри anchor, держащий добавленный блок
+    private bool isFilled = false;        // Заполнен ли блок
+    private MeshRenderer debugRenderer;   // Визуальное отображение блока   
+    
     // Конструктор
     public Block(Vector3 position, Vector3i coord, Transform parent, GameObject anchor, Vector3i spaces) {
-        affectingBlock = null;
 
         // Устанавливаем позицию объекта, представляющего блок в игровом мире
         this.anchor = anchor;
@@ -36,21 +31,24 @@ public class Block {
         holder = anchor.transform.GetChild(anchor.transform.childCount - 1);
         holder.GetComponent<BlockHolder>().enabled = false;
 
+        // Координаты
         this.coord = coord;
         this.spaces = spaces;
 
         updateAnchorName();
     }
 
+    // Информация о блоке
+    public Vector3i spaces;                          // Свободное место после блока
+    public Vector3i connectedAfter = -Vector3i.one;  // Расстояние до соединенных блоков после
+    public Vector3i connectedBefore = -Vector3i.one; // Расстояние до соединенных блоков пкркд
+    public Vector3i objBlockReach = -Vector3i.one;   // Кол-во блоков, занятое объектом внутри блока
 
     // Координаты блока
     public readonly Vector3i coord;
 
     // Блок, хранящий в себе GameObject, который занимает и этот блок
-    public Block affectingBlock {
-        get;
-        private set;
-    }
+    public Block affectingBlock;
 
     // Пуст ли блок
     public bool isEmpty {
@@ -246,8 +244,12 @@ public class Block {
             if (obj) {
                 name += "Base '" + obj.name + "'";
             }
-            else {
+            else if(affectingBlock != null) {
                 name += "'" + affectingBlock.obj.name + "'";
+            }
+            else {
+                name += "[MISSING]";
+                Debug.LogErrorFormat("Block {0} is filled but has no object or affecting block", coord);
             }
             name += ")";
         }
