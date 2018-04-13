@@ -56,6 +56,8 @@ public class DisplayStation : BuildStation {
         // Корректируем масштаб объекта
         objCopy.transform.localScale = Vector3.Scale(objCopy.transform.localScale, scaleDif);
 
+        objCopy.GetComponent<Interactible>().isLocked = true;
+
         // Копируем identity блока
         var identityCopy = objCopy.GetComponent<ObjectIdentity>();
 
