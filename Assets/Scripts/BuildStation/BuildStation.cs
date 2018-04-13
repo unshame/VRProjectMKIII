@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using Conditional = System.Diagnostics.ConditionalAttribute;
+using Valve.VR.InteractionSystem;
 
 // Редактор здания
 public class BuildStation : MonoBehaviour {
@@ -359,6 +360,14 @@ public class BuildStation : MonoBehaviour {
         nextChunkStart = CreateBlockChunk(nextChunkStart);
         if(nextChunkStart == -Vector3i.one) {
             isCreated = true;
+            var circularDrive = transform.parent ? transform.parent.GetComponent<CircularDriveCustom>() : null;
+            if (circularDrive) {
+                circularDrive.rotateGameObject = true;
+            }
+            var linearDrive = transform.parent ? transform.parent.GetComponent<LinearDrive>() : null;
+            if (linearDrive) {
+                linearDrive.repositionGameObject = true;
+            }
         }
     }
 
