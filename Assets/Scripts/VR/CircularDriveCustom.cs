@@ -152,7 +152,7 @@ namespace Valve.VR.InteractionSystem {
             }
             else {
                 start = Quaternion.AngleAxis(transform.localEulerAngles[(int)axisOfRotation], localPlaneNormal);
-                outAngle = 0.0f;
+                outAngle = forceStart ? startAngle : 0.0f;
             }
 
             if (debugText) {

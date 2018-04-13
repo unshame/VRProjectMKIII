@@ -13,6 +13,10 @@ public class BuildStation : MonoBehaviour {
     // Размер сетки
     public Vector3i size = new Vector3i(10, 10, 10);
 
+    public bool forceStartRotation = false;
+
+    public Vector3 startRotation = Vector3.zero;
+
     // Размер блока (рассчитывается из size)
     [HideInInspector]
     public Vector3 blockSize;
@@ -99,6 +103,7 @@ public class BuildStation : MonoBehaviour {
     protected virtual void Start() {
         // Инстанциируем кисть
         brush = Instantiate(brush, transform.parent);
+        brush.transform.position = transform.position;
         brush.GetComponent<Renderer>().material = brushMaterial;
         brush.GetComponent<Renderer>().enabled = false;
         brush.GetComponent<Collider>().enabled = false;
@@ -349,6 +354,7 @@ public class BuildStation : MonoBehaviour {
         // Добавляем объект, который будет держать добавляемые объекты на месте
         var childObject = new GameObject();
         childObject.transform.parent = blockAnchor.transform;
+        childObject.transform.position = transform.position;
         childObject.AddComponent<BlockHolder>();
         childObject.name = "Holder";
 
@@ -367,6 +373,9 @@ public class BuildStation : MonoBehaviour {
             var linearDrive = transform.parent ? transform.parent.GetComponent<LinearDrive>() : null;
             if (linearDrive) {
                 linearDrive.repositionGameObject = true;
+            }
+            if (forceStartRotation && transform.parent) {
+                transform.parent.localRotation = Quaternion.Euler(startRotation);
             }
         }
     }
