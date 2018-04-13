@@ -72,6 +72,8 @@ public class DisplayStation : BuildStation {
     }
 
     public override void Clear() {
+        if (!isCreated) return;
+
         for (int x = 0; x < size.x; x++) {
             for (int y = 0; y < size.y; y++) {
                 for (int z = 0; z < size.z; z++) {

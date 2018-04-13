@@ -288,7 +288,7 @@ public class BuildStation : MonoBehaviour {
 
     // Убирает все объекты
     public virtual void Clear() {
-        if (!editable) return;
+        if (!editable || !isCreated) return;
 
         for (int x = 0; x < size.x; x++) {
             for (int y = 0; y < size.y; y++) {
