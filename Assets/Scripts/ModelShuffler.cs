@@ -13,10 +13,10 @@ public class ModelShuffler : MonoBehaviour {
     }
 
     public ModelArray[] models;
-    public int specifiedInput = 0;
+    public List<int> specifiedInput = new List<int>(){ 0 };
 
     public void ShuffleOnSpecifiedInput(int i) {
-        if(i == specifiedInput) {
+        if(specifiedInput.Contains(i)) {
             ShuffleModel();
         }
     }
