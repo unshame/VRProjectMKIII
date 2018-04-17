@@ -450,9 +450,11 @@ public class BuildStation : MonoBehaviour {
             // DEBUG
             WriteToFileDebug("\n\n");
             WriteToFileDebug(string.Format("({0})", x).PadRight(4));
+            #if DEBUG_GRID
             for (int y = x == chunkStart.x ? chunkStart.y : end.y; y >= 0; y--) {
                 WriteToFileDebug(y.ToString().PadLeft(15));
             }
+            #endif
             // /DEBUG
 
             for (int y = x == chunkStart.x ? chunkStart.y : end.y; y >= 0; y--) {
