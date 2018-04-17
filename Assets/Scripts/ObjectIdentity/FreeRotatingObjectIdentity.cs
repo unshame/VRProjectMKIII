@@ -92,4 +92,7 @@ public class FreeRotatingObjectIdentity : ObjectIdentity {
         }
         return Quaternion.identity;
     }
+
+    public override void InitRotations() {
+    }
 }

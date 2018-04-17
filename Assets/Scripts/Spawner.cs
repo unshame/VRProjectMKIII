@@ -7,7 +7,7 @@ using UnityEngine;
 public class Spawner : MonoBehaviour {
 
     // Префаб, который будет инстанцироваться
-    public GameObject Prefab;
+    private GameObject Prefab;
 
     // Время до спавна нового объекта
     public float SpawnDelay;
@@ -32,6 +32,8 @@ public class Spawner : MonoBehaviour {
 
     // Устанавливает коллайдер в качестве триггера и спавнит первый объект
     public void Start() {
+        Prefab = transform.GetChild(0).gameObject;
+        Prefab.SetActive(false);
         GetComponent<BoxCollider>().isTrigger = true;
         SpawnObject(Prefab);
     }
@@ -61,12 +63,14 @@ public class Spawner : MonoBehaviour {
     // Спавнит объект
     public void SpawnObject(GameObject Item) {
         var item = Instantiate(Item, transform.position, transform.rotation);
+        item.SetActive(true);
         var interactible = item.GetComponentInChildren<InteractibleBlock>();
         if (interactible) {
             interactible.spawner = this;
         }
         var identity = item.GetComponentInChildren<ObjectIdentity>();
         if (identity) {
+            identity.InitRotations();
             item.transform.rotation = RotationManager.MainBuildStation.transform.rotation * identity.GetRotation();
         }
     }

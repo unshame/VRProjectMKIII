@@ -70,4 +70,8 @@ public class PredefinedRotatingObjectIdentity : ObjectIdentity {
         var rotation = predefinedRotations[predefinedRotationIndex];
         return Quaternion.Euler(rotation.x, rotation.y, rotation.z);
     }
+
+    public override void InitRotations() {
+    }
+
 }

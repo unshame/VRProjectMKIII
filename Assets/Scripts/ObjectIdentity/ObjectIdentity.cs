@@ -43,5 +43,7 @@ public abstract class ObjectIdentity : MonoBehaviour {
 
     public abstract bool CanRotate();
 
+    public abstract void InitRotations();
+
     public abstract Quaternion GetRotation();
 }

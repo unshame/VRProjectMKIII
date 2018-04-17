@@ -18,9 +18,8 @@ public class RotatingObjectIdentity : PredefinedRotatingObjectIdentity {
 
     private List<float>[] allowedRotations = new List<float>[NUM_AXIS];
 
-    protected override void Awake() {
-
-        for(int i = 0; i < NUM_AXIS; i++) {
+    public override void InitRotations() {
+        for (int i = 0; i < NUM_AXIS; i++) {
             var allowedRotation = allowedRotationMin[i];
             allowedRotations[i] = new List<float>() { 0f };
             while (allowedRotation <= allowedRotationMax[i]) {
@@ -37,11 +36,11 @@ public class RotatingObjectIdentity : PredefinedRotatingObjectIdentity {
         for (int x = 0; x < allowedRotations[0].Count; x++) {
             for (int y = 0; y < allowedRotations[1].Count; y++) {
                 for (int z = 0; z < allowedRotations[2].Count; z++) {
-                    if (!( 
-                        (xyPermutate || x == 0 || y == 0) && 
-                        (xzPermutate || x == 0 || z == 0) && 
-                        (yzPermutate || y == 0 || z == 0 ) && 
-                        (xyzPermutate || x == 0 || y == 0 || z == 0) 
+                    if (!(
+                        (xyPermutate || x == 0 || y == 0) &&
+                        (xzPermutate || x == 0 || z == 0) &&
+                        (yzPermutate || y == 0 || z == 0) &&
+                        (xyzPermutate || x == 0 || y == 0 || z == 0)
                     )) continue;
                     var xx = allowedRotations[0][x];
                     var yy = allowedRotations[1][y];
@@ -51,7 +50,7 @@ public class RotatingObjectIdentity : PredefinedRotatingObjectIdentity {
             }
         }
 
-        if(predefinedRotationIndex != 0) {
+        if (predefinedRotationIndex != 0) {
             predefinedRotationIndex += predefinedRotations.Count;
         }
 
