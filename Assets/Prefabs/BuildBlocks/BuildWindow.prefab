@@ -22,12 +22,12 @@ GameObject:
   - component: {fileID: 33686533990802282}
   - component: {fileID: 23755984691767912}
   - component: {fileID: 65725402490857546}
-  - component: {fileID: 114999182640145354}
   - component: {fileID: 114483970117106836}
   - component: {fileID: 114247187877972686}
   - component: {fileID: 54618730503185482}
   - component: {fileID: 114609953269204700}
   - component: {fileID: 114674883213019216}
+  - component: {fileID: 114999510417046118}
   m_Layer: 8
   m_Name: BuildWindow
   m_TagString: Untagged
@@ -223,7 +223,7 @@ MonoBehaviour:
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   snapAttachEaseInCompleted: 0
---- !u!114 &114999182640145354
+--- !u!114 &114999510417046118
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -231,17 +231,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 1647233962913558}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 26f1585e2a94e5b449ad1a4fb002d514, type: 3}
+  m_Script: {fileID: 11500000, guid: 9743bf7df90c27a4d91118019fdacf60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  typeName: Window
-  offset: {x: 0, y: 0, z: 0}
   rotationAngle: 90
   debugAngleDisplay: {x: 0, y: 0, z: 0}
   predefinedRotations: []
   predefinedRotationIndex: 0
   allowedRotationMin: {x: 0, y: 0, z: 0}
-  allowedRotationMax: {x: 0, y: 270, z: 0}
+  allowedRotationMax: {x: 0, y: 0, z: 0}
   xyPermutate: 0
   xzPermutate: 0
   yzPermutate: 0

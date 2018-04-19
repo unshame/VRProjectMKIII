@@ -70,8 +70,7 @@ public class Spawner : MonoBehaviour {
         }
         var rotatingComponent = item.GetComponentInChildren<Rotatable>();
         if (rotatingComponent) {
-            rotatingComponent.InitRotations();
-            item.transform.rotation = RotationManager.MainBuildStation.transform.rotation * rotatingComponent.GetRotation();
+            item.transform.rotation = PropertyManager.MainBuildStation.transform.rotation * rotatingComponent.GetRotation();
         }
     }
 

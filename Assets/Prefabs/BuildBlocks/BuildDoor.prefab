@@ -22,12 +22,12 @@ GameObject:
   - component: {fileID: 33908921257213180}
   - component: {fileID: 23907905952780406}
   - component: {fileID: 114510395538384450}
-  - component: {fileID: 114096806557349796}
   - component: {fileID: 65019706983357448}
   - component: {fileID: 114522765702007148}
   - component: {fileID: 54150167069213702}
   - component: {fileID: 114983704415623176}
   - component: {fileID: 114007683192129738}
+  - component: {fileID: 114185728603742742}
   m_Layer: 8
   m_Name: BuildDoor
   m_TagString: Untagged
@@ -183,7 +183,7 @@ MonoBehaviour:
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   snapAttachEaseInCompleted: 0
---- !u!114 &114096806557349796
+--- !u!114 &114185728603742742
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -191,17 +191,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 1984153316614954}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 26f1585e2a94e5b449ad1a4fb002d514, type: 3}
+  m_Script: {fileID: 11500000, guid: 9743bf7df90c27a4d91118019fdacf60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  typeName: Door
-  offset: {x: 0, y: 0, z: 0}
   rotationAngle: 90
   debugAngleDisplay: {x: 0, y: 0, z: 0}
   predefinedRotations: []
   predefinedRotationIndex: 0
   allowedRotationMin: {x: 0, y: 0, z: 0}
-  allowedRotationMax: {x: 0, y: 270, z: 0}
+  allowedRotationMax: {x: 0, y: 0, z: 0}
   xyPermutate: 0
   xzPermutate: 0
   yzPermutate: 0

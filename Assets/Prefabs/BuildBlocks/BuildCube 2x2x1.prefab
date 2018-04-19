@@ -23,11 +23,11 @@ GameObject:
   - component: {fileID: 23547463951750406}
   - component: {fileID: 114876014506722320}
   - component: {fileID: 65848095834523078}
-  - component: {fileID: 114480751331356968}
   - component: {fileID: 114530843002620854}
   - component: {fileID: 54793615758682856}
   - component: {fileID: 114637776845252100}
   - component: {fileID: 114607266759155930}
+  - component: {fileID: 114783289716789110}
   m_Layer: 8
   m_Name: BuildCube 2x2x1
   m_TagString: Untagged
@@ -114,29 +114,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &114480751331356968
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1674957772425898}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 26f1585e2a94e5b449ad1a4fb002d514, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  typeName: Cube2
-  offset: {x: 0, y: 0, z: 0}
-  rotationAngle: 90
-  debugAngleDisplay: {x: 0, y: 0, z: 0}
-  predefinedRotations: []
-  predefinedRotationIndex: 0
-  allowedRotationMin: {x: 0, y: 0, z: 0}
-  allowedRotationMax: {x: 90, y: 90, z: 0}
-  xyPermutate: 0
-  xzPermutate: 0
-  yzPermutate: 0
-  xyzPermutate: 0
 --- !u!114 &114530843002620854
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -231,6 +208,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b93b6a877adcbf94c89a9d6e0c0e844d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &114783289716789110
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1674957772425898}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9743bf7df90c27a4d91118019fdacf60, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rotationAngle: 90
+  debugAngleDisplay: {x: 0, y: 0, z: 0}
+  predefinedRotations: []
+  predefinedRotationIndex: 0
+  allowedRotationMin: {x: 0, y: 0, z: 0}
+  allowedRotationMax: {x: 0, y: 0, z: 0}
+  xyPermutate: 0
+  xzPermutate: 0
+  yzPermutate: 0
+  xyzPermutate: 0
 --- !u!114 &114876014506722320
 MonoBehaviour:
   m_ObjectHideFlags: 1

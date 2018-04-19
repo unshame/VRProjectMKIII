@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-// Блок с указанным списком возможных поворотов
+// Компонент поворота объектов
+// Хранит, изменяет, сохраняет и загружает индекс поворота и возможные повороты, но не устанавливает поворот объекту самостоятельно
 public abstract class Rotatable : MonoBehaviour {
 
     public float rotationAngle = 90f;
@@ -33,13 +34,11 @@ public abstract class Rotatable : MonoBehaviour {
 
     public abstract void SetRotationIndex(int index);
 
-    public abstract void UpdateRotationIndex();
+    public abstract void LoadRotationIndex();
 
     public abstract void SaveRotationIndex();
 
     public abstract bool CanRotate();
-
-    public abstract void InitRotations();
 
     public abstract Quaternion GetRotation();
 }

@@ -23,11 +23,11 @@ GameObject:
   - component: {fileID: 65650740956648146}
   - component: {fileID: 23521751301531762}
   - component: {fileID: 114907203859773928}
-  - component: {fileID: 114987812872577342}
   - component: {fileID: 114851240925188922}
   - component: {fileID: 54907959434242146}
   - component: {fileID: 114673637864570672}
   - component: {fileID: 114655458213508988}
+  - component: {fileID: 114144534753343152}
   m_Layer: 8
   m_Name: BuildCylinder
   m_TagString: Untagged
@@ -114,6 +114,27 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 2, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &114144534753343152
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1918083923250076}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9743bf7df90c27a4d91118019fdacf60, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rotationAngle: 90
+  debugAngleDisplay: {x: 0, y: 0, z: 0}
+  predefinedRotations: []
+  predefinedRotationIndex: 0
+  allowedRotationMin: {x: 0, y: 0, z: 0}
+  allowedRotationMax: {x: 0, y: 0, z: 0}
+  xyPermutate: 0
+  xzPermutate: 0
+  yzPermutate: 0
+  xyzPermutate: 0
 --- !u!114 &114655458213508988
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -223,26 +244,3 @@ MonoBehaviour:
   _isLocked: 0
   alwaysUpdateRotation: 1
   spawner: {fileID: 0}
---- !u!114 &114987812872577342
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1918083923250076}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 26f1585e2a94e5b449ad1a4fb002d514, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  typeName: Cylinder
-  offset: {x: 0, y: 0, z: 0}
-  rotationAngle: 90
-  debugAngleDisplay: {x: 0, y: 0, z: 0}
-  predefinedRotations: []
-  predefinedRotationIndex: 0
-  allowedRotationMin: {x: 0, y: 0, z: 0}
-  allowedRotationMax: {x: 90, y: 0, z: 90}
-  xyPermutate: 0
-  xzPermutate: 0
-  yzPermutate: 0
-  xyzPermutate: 0

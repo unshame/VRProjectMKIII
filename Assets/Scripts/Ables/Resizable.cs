@@ -1,34 +1,60 @@
-using UnityEngine;
+﻿using UnityEngine;
 
+// Компонент изменения размера объекта на указанные размеры
+// Хранит, изменяет, сохраняет и загружает индекс размера и устанавливает размер
 class Resizable : MonoBehaviour {
 
     public Vector3[] sizes = new Vector3[0];
-    public int currentSizeIndex = 0;
+    [SerializeField]
+    private int currentSizeIndex = 0;
 
-    private void Awake() {
-        WrapSizeIndex();
-        ApplySizeIndex();
+    void Awake() {
+        LoadSizeIndex();
+        ApplySizeIndex(false);
     }
 
     public void NextSize(int step = 1) {
-        currentSizeIndex += step;
-        WrapSizeIndex();
-        ApplySizeIndex();
-        transform.localPosition = Vector3.zero;
+        currentSizeIndex = Mathf.Clamp(currentSizeIndex + step, 0, sizes.Length - 1);
+        SaveSizeIndex();
+        ApplySizeIndex();        
     }
 
     public void PrevSize(int step = 1) {
-        currentSizeIndex -= step;
-        WrapSizeIndex();
+        currentSizeIndex = Mathf.Clamp(currentSizeIndex - step, 0, sizes.Length - 1);
+        SaveSizeIndex();
         ApplySizeIndex();
-        transform.localPosition = Vector3.zero;
     }
 
-    private void ApplySizeIndex() {
+    public int GetSizeIndex() {
+        return currentSizeIndex;
+    }
+
+    public void SetSizeIndex(int sizeIndex) {
+        currentSizeIndex = sizeIndex;
+        WrapSizeIndex();
+    }
+
+    public void ApplySizeIndex(bool resetLocalPosition = true) {
         transform.localScale = sizes[currentSizeIndex];
+        if (resetLocalPosition) {
+            transform.localPosition = Vector3.zero;
+        }
     }
 
-    private void WrapSizeIndex() {
+    public void LoadSizeIndex() {
+        var typeName = GetComponent<ObjectIdentity>().typeName;
+        var sizeIndex = PropertyManager.GetSize(typeName);
+        if (sizeIndex != -1) {
+            currentSizeIndex = sizeIndex;
+        }
+    }
+
+    public void SaveSizeIndex() {
+        var typeName = GetComponent<ObjectIdentity>().typeName;
+        PropertyManager.SetSize(typeName, currentSizeIndex);
+    }
+
+    void WrapSizeIndex() {
         if (currentSizeIndex >= sizes.Length) {
             currentSizeIndex = currentSizeIndex % sizes.Length;
         }

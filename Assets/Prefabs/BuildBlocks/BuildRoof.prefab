@@ -22,12 +22,12 @@ GameObject:
   - component: {fileID: 33331661220765764}
   - component: {fileID: 23771759572015354}
   - component: {fileID: 65516244836036296}
-  - component: {fileID: 114852641262474320}
   - component: {fileID: 114386259569028756}
   - component: {fileID: 114363111883292228}
   - component: {fileID: 54566805552805730}
   - component: {fileID: 114501004443100566}
   - component: {fileID: 114752747053555640}
+  - component: {fileID: 114429863549603458}
   m_Layer: 8
   m_Name: BuildRoof
   m_TagString: Untagged
@@ -143,6 +143,27 @@ MonoBehaviour:
   _isLocked: 0
   alwaysUpdateRotation: 1
   spawner: {fileID: 0}
+--- !u!114 &114429863549603458
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1911052377152692}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9743bf7df90c27a4d91118019fdacf60, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rotationAngle: 90
+  debugAngleDisplay: {x: 0, y: 0, z: 0}
+  predefinedRotations: []
+  predefinedRotationIndex: 0
+  allowedRotationMin: {x: 0, y: 0, z: 0}
+  allowedRotationMax: {x: 0, y: 0, z: 0}
+  xyPermutate: 0
+  xzPermutate: 0
+  yzPermutate: 0
+  xyzPermutate: 0
 --- !u!114 &114501004443100566
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -223,26 +244,3 @@ MonoBehaviour:
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   snapAttachEaseInCompleted: 0
---- !u!114 &114852641262474320
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1911052377152692}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 26f1585e2a94e5b449ad1a4fb002d514, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  typeName: Roof
-  offset: {x: 0, y: 0, z: 0}
-  rotationAngle: 90
-  debugAngleDisplay: {x: 0, y: 0, z: 0}
-  predefinedRotations: []
-  predefinedRotationIndex: 0
-  allowedRotationMin: {x: 0, y: 0, z: 0}
-  allowedRotationMax: {x: 0, y: 270, z: 90}
-  xyPermutate: 0
-  xzPermutate: 0
-  yzPermutate: 0
-  xyzPermutate: 0

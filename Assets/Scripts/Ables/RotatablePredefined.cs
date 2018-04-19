@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-// Блок с указанным списком возможных поворотов
+// Компонент поворота объекта с указанным списком возможных поворотов
 public class RotatablePredefined : Rotatable {
 
     public List<Vector3> predefinedRotations = new List<Vector3>();
@@ -11,7 +11,7 @@ public class RotatablePredefined : Rotatable {
 
     protected override void Awake() {
         if (!CanRotate()) return;
-        UpdateRotationIndex();
+        LoadRotationIndex();
     }
 
     protected override void WrapRotationIndex() {
@@ -33,7 +33,7 @@ public class RotatablePredefined : Rotatable {
         if (!CanRotate()) return;
         predefinedRotationIndex = index;
         var typeName = GetComponent<ObjectIdentity>().typeName;
-        RotationManager.SetRotation(typeName, index);
+        PropertyManager.SetRotation(typeName, index);
         if (index >= 0 && index < predefinedRotations.Count) {
             debugAngleDisplay = predefinedRotations[index];
         }
@@ -42,9 +42,9 @@ public class RotatablePredefined : Rotatable {
         }
     }
 
-    public override void UpdateRotationIndex() {
+    public override void LoadRotationIndex() {
         var typeName = GetComponent<ObjectIdentity>().typeName;
-        var rotationIndex = RotationManager.GetRotation(typeName);
+        var rotationIndex = PropertyManager.GetRotation(typeName);
         if (rotationIndex == -1) {
             rotationIndex = predefinedRotationIndex;
         }
@@ -53,7 +53,7 @@ public class RotatablePredefined : Rotatable {
 
     public override void SaveRotationIndex() {
         var typeName = GetComponent<ObjectIdentity>().typeName;
-        RotationManager.SetRotation(typeName, predefinedRotationIndex);
+        PropertyManager.SetRotation(typeName, predefinedRotationIndex);
     }
 
     public override bool CanRotate() {
@@ -65,9 +65,6 @@ public class RotatablePredefined : Rotatable {
 
         var rotation = predefinedRotations[predefinedRotationIndex];
         return Quaternion.Euler(rotation.x, rotation.y, rotation.z);
-    }
-
-    public override void InitRotations() {
     }
 
 }

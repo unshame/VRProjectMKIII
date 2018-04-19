@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-// Блок со свободным поворотом
+// Компонент свободного поворота объекта (deprecated)
 public class RotatableFree : Rotatable {
 
     private static int NUM_AXIS = 3;
@@ -42,7 +42,7 @@ public class RotatableFree : Rotatable {
         rotationIndexes[rotationAxis] = index;
     }
 
-    public override void UpdateRotationIndex() {
+    public override void LoadRotationIndex() {
     }
 
     public override void SaveRotationIndex() {
@@ -86,6 +86,4 @@ public class RotatableFree : Rotatable {
         return Quaternion.identity;
     }
 
-    public override void InitRotations() {
-    }
 }

@@ -1,7 +1,8 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// Компонент поворота объекта с возможностью задавать диапазон возможных поворотов
 public class RotatableConfigurable : RotatablePredefined {
 
     private static int NUM_AXIS = 3;
@@ -16,7 +17,9 @@ public class RotatableConfigurable : RotatablePredefined {
 
     private List<float>[] allowedRotations = new List<float>[NUM_AXIS];
 
-    public override void InitRotations() {
+    protected override void Awake() {
+        base.Awake();
+
         for (int i = 0; i < NUM_AXIS; i++) {
             var allowedRotation = allowedRotationMin[i];
             allowedRotations[i] = new List<float>() { 0f };
@@ -54,6 +57,6 @@ public class RotatableConfigurable : RotatablePredefined {
 
         predefinedRotations.AddRange(additionalRotations);
 
-        UpdateRotationIndex();
+        LoadRotationIndex();
     }
 }

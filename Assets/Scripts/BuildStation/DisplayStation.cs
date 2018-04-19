@@ -53,16 +53,10 @@ public class DisplayStation : BuildStation {
         // Копируем объект
         var objCopy = Instantiate(obj);
 
-        // Корректируем масштаб объекта
-        objCopy.transform.localScale = Vector3.Scale(objCopy.transform.localScale, scaleDif);
-
         objCopy.GetComponent<Interactable>().isLocked = true;
 
-        // Копируем identity блока
-        var rotatingObject = obj.GetComponent<Rotatable>();
-        if (rotatingObject) {
-            objCopy.GetComponent<Rotatable>().SetRotationIndex(rotatingObject.GetRotationIndex());
-        }
+        // Корректируем масштаб объекта
+        objCopy.transform.localScale = Vector3.Scale(objCopy.transform.localScale, scaleDif);
 
         // Добавляем блок в сетку с поворотом редактора
         base.AddObject(blockCoord, objCopy, rotation, objBlockMagnitude);

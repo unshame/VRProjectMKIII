@@ -23,11 +23,11 @@ GameObject:
   - component: {fileID: 23712378162688848}
   - component: {fileID: 114073152758130246}
   - component: {fileID: 65827886511957892}
-  - component: {fileID: 114779720943440834}
   - component: {fileID: 114242959246661640}
   - component: {fileID: 54966469683905192}
   - component: {fileID: 114028554179756620}
   - component: {fileID: 114601307261993822}
+  - component: {fileID: 114898213766560280}
   m_Layer: 8
   m_Name: BuildCube 1x1x1
   m_TagString: Untagged
@@ -223,7 +223,7 @@ MonoBehaviour:
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   snapAttachEaseInCompleted: 0
---- !u!114 &114779720943440834
+--- !u!114 &114898213766560280
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -231,17 +231,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 1701148955308812}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 26f1585e2a94e5b449ad1a4fb002d514, type: 3}
+  m_Script: {fileID: 11500000, guid: 9743bf7df90c27a4d91118019fdacf60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  typeName: Cube1
-  offset: {x: 0, y: 0, z: 0}
   rotationAngle: 90
   debugAngleDisplay: {x: 0, y: 0, z: 0}
   predefinedRotations: []
   predefinedRotationIndex: 0
   allowedRotationMin: {x: 0, y: 0, z: 0}
-  allowedRotationMax: {x: 90, y: 90, z: 0}
+  allowedRotationMax: {x: 0, y: 0, z: 0}
   xyPermutate: 0
   xzPermutate: 0
   yzPermutate: 0

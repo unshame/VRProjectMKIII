@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // Вращение объектов колесом мыши
+[RequireComponent(typeof(ObjectIdentity))]
 public class InteractableBlock : Interactable {
 
     private bool wasPickedUpBefore = false;
@@ -56,17 +57,24 @@ public class InteractableBlock : Interactable {
         }
 
         if (rotatingComponent && shouldUpdateRotation) {
-            transform.rotation = RotationManager.MainBuildStation.transform.rotation * rotatingComponent.GetRotation();
+            transform.rotation = PropertyManager.MainBuildStation.transform.rotation * rotatingComponent.GetRotation();
         }
     }
 
     public override void StartInteract(Transform instigator = null) {
         base.StartInteract(instigator);
         var rotatingComponent = GetComponent<Rotatable>();
+        var resizeableComponent = GetComponent<Resizable>();
+
+        if (resizeableComponent) {
+            resizeableComponent.SaveSizeIndex();
+        }
 
         // Загружаем поворот этого объекта из менеджера, если он не был поднят ранее
         if (!wasPickedUpBefore) {
-            rotatingComponent.UpdateRotationIndex();
+            if (rotatingComponent) {
+                rotatingComponent.LoadRotationIndex();
+            }
             wasPickedUpBefore = true;
             if (spawner) {
                 spawner.SpawningAllowed = false;
@@ -74,7 +82,9 @@ public class InteractableBlock : Interactable {
         }
         else {
             // либо сохраняем вращение в менеджер, если объект уже поднимался
-            rotatingComponent.SaveRotationIndex();
+            if (rotatingComponent) {
+                rotatingComponent.SaveRotationIndex();
+            }
         }
     }
 
