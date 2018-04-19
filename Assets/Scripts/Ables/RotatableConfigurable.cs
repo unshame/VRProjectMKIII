@@ -2,9 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
-// Блок с указанным списком возможных поворотов
-public class RotatingObjectIdentity : PredefinedRotatingObjectIdentity {
+public class RotatableConfigurable : RotatablePredefined {
 
     private static int NUM_AXIS = 3;
 
@@ -58,5 +56,4 @@ public class RotatingObjectIdentity : PredefinedRotatingObjectIdentity {
 
         UpdateRotationIndex();
     }
-
 }

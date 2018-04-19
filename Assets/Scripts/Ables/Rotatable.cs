@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-// Используется для различения блоков редактором, указания сдвига и поворота блока
-public abstract class ObjectIdentity : MonoBehaviour {
+// Блок с указанным списком возможных поворотов
+public abstract class Rotatable : MonoBehaviour {
 
-    public string typeName;
-    public Vector3 offset = Vector3.zero;
     public float rotationAngle = 90f;
     public Vector3 debugAngleDisplay = new Vector3();
 
@@ -38,8 +36,6 @@ public abstract class ObjectIdentity : MonoBehaviour {
     public abstract void UpdateRotationIndex();
 
     public abstract void SaveRotationIndex();
-
-    public abstract void CopyIdentity(GameObject obj);
 
     public abstract bool CanRotate();
 

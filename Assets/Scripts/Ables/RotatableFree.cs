@@ -4,7 +4,7 @@ using UnityEngine;
 
 
 // Блок со свободным поворотом
-public class FreeRotatingObjectIdentity : ObjectIdentity {
+public class RotatableFree : Rotatable {
 
     private static int NUM_AXIS = 3;
 
@@ -58,13 +58,6 @@ public class FreeRotatingObjectIdentity : ObjectIdentity {
         rotationAxis--;
         if (rotationAxis <= 0) rotationAxis = NUM_AXIS;
         if (!rotationAllowed[rotationAxis]) PrevRotationAxis();
-    }
-
-    public override void CopyIdentity(GameObject obj) {
-        var identity = obj.GetComponent<FreeRotatingObjectIdentity>();
-        if (!identity) return;
-        SetRotationIndex(identity.GetRotationIndex());
-        rotationAxis = identity.rotationAxis;
     }
 
     public override bool CanRotate() {

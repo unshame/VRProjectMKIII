@@ -4,7 +4,7 @@ using UnityEngine;
 
 
 // Блок с указанным списком возможных поворотов
-public class PredefinedRotatingObjectIdentity : ObjectIdentity {
+public class RotatablePredefined : Rotatable {
 
     public List<Vector3> predefinedRotations = new List<Vector3>();
     public int predefinedRotationIndex = 0;
@@ -32,6 +32,7 @@ public class PredefinedRotatingObjectIdentity : ObjectIdentity {
     public override void SetRotationIndex(int index) {
         if (!CanRotate()) return;
         predefinedRotationIndex = index;
+        var typeName = GetComponent<ObjectIdentity>().typeName;
         RotationManager.SetRotation(typeName, index);
         if (index >= 0 && index < predefinedRotations.Count) {
             debugAngleDisplay = predefinedRotations[index];
@@ -42,6 +43,7 @@ public class PredefinedRotatingObjectIdentity : ObjectIdentity {
     }
 
     public override void UpdateRotationIndex() {
+        var typeName = GetComponent<ObjectIdentity>().typeName;
         var rotationIndex = RotationManager.GetRotation(typeName);
         if (rotationIndex == -1) {
             rotationIndex = predefinedRotationIndex;
@@ -50,15 +52,9 @@ public class PredefinedRotatingObjectIdentity : ObjectIdentity {
     }
 
     public override void SaveRotationIndex() {
+        var typeName = GetComponent<ObjectIdentity>().typeName;
         RotationManager.SetRotation(typeName, predefinedRotationIndex);
     }
-
-    public override void CopyIdentity(GameObject obj) {
-        var identity = obj.GetComponent<ObjectIdentity>();
-        if (!identity) return;
-        SetRotationIndex(identity.GetRotationIndex());
-    }
-
 
     public override bool CanRotate() {
         return predefinedRotations.Count > 0;

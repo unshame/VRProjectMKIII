@@ -1,10 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Valve.VR.InteractionSystem;
 
 // Методы этого класса нужно подключить к контроллеру, чтобы легко узнавать, производится ли действие с объектом
-public class Interactible : MonoBehaviour {
+public class Interactable : MonoBehaviour {
 
     public bool isActive = false;
 

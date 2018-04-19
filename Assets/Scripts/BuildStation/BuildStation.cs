@@ -271,7 +271,7 @@ public class BuildStation : MonoBehaviour {
     // Отключает редактирование
     public virtual void Lock() {
         for (int i = 0; i < objList.Count; i++) {
-            objList[i].GetComponent<Interactible>().isLocked = true;
+            objList[i].GetComponent<Interactable>().isLocked = true;
         }
         editable = false;
     }
@@ -286,7 +286,7 @@ public class BuildStation : MonoBehaviour {
     // Включает редактирование
     public virtual void Unlock() {
         for (int i = 0; i < objList.Count; i++) {
-            objList[i].GetComponent<Interactible>().isLocked = false;
+            objList[i].GetComponent<Interactable>().isLocked = false;
         }
         editable = true;
     }
@@ -444,7 +444,6 @@ public class BuildStation : MonoBehaviour {
         WriteToFileDebug("================================");
 
         var blocksLeft = chunkSize;
-        var end = size - Vector3i.one;
         for (int x = chunkStart.x; x >= 0; x--) {
 
             // DEBUG
@@ -457,82 +456,26 @@ public class BuildStation : MonoBehaviour {
             #endif
             // /DEBUG
 
-            for (int y = x == chunkStart.x ? chunkStart.y : end.y; y >= 0; y--) {
+            for (int y = x == chunkStart.x ? chunkStart.y : size.y - 1; y >= 0; y--) {
 
                 // DEBUG
                 WriteToFileDebug();
                 WriteToFileDebug(string.Format("{0}: ", y).PadLeft(5));
                 // /DEBUG
 
-                for (int z = x == chunkStart.x && y == chunkStart.y ? chunkStart.z : end.z; z >= 0; z--) {
+                for (int z = x == chunkStart.x && y == chunkStart.y ? chunkStart.z : size.z - 1; z >= 0; z--) {
 
                     // Конец чанка
                     if(blocksLeft == 0) {
                         debugCheckedBlocks += chunkSize;
                         return new Vector3i(x, y, z);
                     }
-
-                    var block = blocks[x][y][z];
-
-                    if (BlockIsEmpty(block)) {
-                        // Блоки после этого
-                        var blockx = GetBlock(x + 1, y, z);
-                        var blocky = GetBlock(x, y + 1, z);
-                        var blockz = GetBlock(x, y, z + 1);
-
-                        // Если блоков не существует, то места нет
-                        var sx = blockx == null ? 0 : blockx.spaces.x + 1;
-                        var sy = blocky == null ? 0 : blocky.spaces.y + 1;
-                        var sz = blockz == null ? 0 : blockz.spaces.z + 1;
-                        block.spaces = new Vector3i(sx, sy, sz);
-
-                        // Ближайшие соединенные блоки
-                        // Последующие блоки пусты, значит берем информацию из них и прибавляем 1, либо -1 если вышли за пределы редактора
-                        if (BlockIsEmpty(blockx) && BlockIsEmpty(blocky) && BlockIsEmpty(blockz)) {
-                            var cx = blockx == null || blockx.connectedAfter.x == -1 ? -1 : blockx.connectedAfter.x + 1;
-                            var cy = blocky == null || blocky.connectedAfter.y == -1 ? -1 : blocky.connectedAfter.y + 1;
-                            var cz = blockz == null || blockz.connectedAfter.z == -1 ? -1 : blockz.connectedAfter.z + 1;
-                            block.connectedAfter = new Vector3i(cx, cy, cz);
-                        }
-                        else {
-                            // Один из блоков не пуст, значит ставим, что он в 0 расстоянии от соединенного блока
-                            block.connectedAfter = Vector3i.zero;
-                        }
-
-                    }
-                    else {
-                        block.spaces = -Vector3i.one;
-                        block.connectedAfter = Vector3i.zero;
-                    }
-
-                    // Сразу проходим с другого конца и узнаем ближайшие соединенные блоки перед блоками
-                    var xx = end.x - x;
-                    var yy = end.y - y;
-                    var zz = end.z - z;
-                    var otherBlock = blocks[xx][yy][zz];
-
-                    // Блоки перед этим
-                    var blockxx = GetBlock(xx - 1, yy, zz);
-                    var blockyy = GetBlock(xx, yy - 1, zz);
-                    var blockzz = GetBlock(xx, yy, zz - 1);
-
-                    if (BlockIsEmpty(otherBlock) && BlockIsEmpty(blockxx) && BlockIsEmpty(blockyy) && BlockIsEmpty(blockzz)) {
-                        var cxx = blockxx == null || blockxx.connectedBefore.x == -1 ? -1 : blockxx.connectedBefore.x + 1;
-                        var cyy = blockyy == null || blockyy.connectedBefore.y == -1 ? -1 : blockyy.connectedBefore.y + 1;
-                        var czz = blockzz == null || blockzz.connectedBefore.z == -1 ? -1 : blockzz.connectedBefore.z + 1;
-                        otherBlock.connectedBefore = new Vector3i(cxx, cyy, czz);
-                    }
-                    else {
-                        otherBlock.connectedBefore = Vector3i.zero;
-                    }
-
                     blocksLeft--;
 
-                    // DEBUG
-                    //WriteToFileDebug(string.Format("{0} ", block.spaces).PadLeft(15));
-                    //WriteToFileDebug(string.Format("{0} ", block.connectedAfter).PadLeft(15));
-                    //WriteToFileDebug(string.Format("{1}{0} ", otherBlock.connectedBefore, BlockIsEmpty(otherBlock) ? "" : "*").PadLeft(15));
-                    // /DEBUG
+                    // Находим информацию о блоке
+                    UpdateBlockInfo(x, y, z);
+
+
                 }
             }
         }
@@ -540,6 +483,71 @@ public class BuildStation : MonoBehaviour {
 
         debugCheckedBlocks = debugTotalBlocks;
         return -Vector3i.one;
+    }
+
+    // Обновляет информацию о двух блоках с разных сторон редактора на основе ближних блоков
+    protected void UpdateBlockInfo(int x, int y, int z) {
+        var block = blocks[x][y][z];
+
+        if (BlockIsEmpty(block)) {
+            // Блоки после этого
+            var blockx = GetBlock(x + 1, y, z);
+            var blocky = GetBlock(x, y + 1, z);
+            var blockz = GetBlock(x, y, z + 1);
+
+            // Если блоков не существует, то места нет
+            var sx = blockx == null ? 0 : blockx.spaces.x + 1;
+            var sy = blocky == null ? 0 : blocky.spaces.y + 1;
+            var sz = blockz == null ? 0 : blockz.spaces.z + 1;
+
+            // Место после блока
+            block.spaces = new Vector3i(sx, sy, sz);
+
+            // Ближайшие соединенные блоки
+            // Последующие блоки пусты, значит берем информацию из них и прибавляем 1, либо -1 если вышли за пределы редактора
+            if (BlockIsEmpty(blockx) && BlockIsEmpty(blocky) && BlockIsEmpty(blockz)) {
+                var cx = blockx == null || blockx.connectedAfter.x == -1 ? -1 : blockx.connectedAfter.x + 1;
+                var cy = blocky == null || blocky.connectedAfter.y == -1 ? -1 : blocky.connectedAfter.y + 1;
+                var cz = blockz == null || blockz.connectedAfter.z == -1 ? -1 : blockz.connectedAfter.z + 1;
+                block.connectedAfter = new Vector3i(cx, cy, cz);
+            }
+            else {
+                // Один из блоков не пуст, значит ставим, что он в 0 расстоянии от соединенного блока
+                block.connectedAfter = Vector3i.zero;
+            }
+
+        }
+        else {
+            block.spaces = -Vector3i.one;
+            block.connectedAfter = Vector3i.zero;
+        }
+
+        // Сразу проходим с другого конца и узнаем ближайшие соединенные блоки перед блоками
+        var xx = size.x - 1 - x;
+        var yy = size.y - 1 - y;
+        var zz = size.z - 1 - z;
+        var otherBlock = blocks[xx][yy][zz];
+
+        // Блоки перед этим
+        var blockxx = GetBlock(xx - 1, yy, zz);
+        var blockyy = GetBlock(xx, yy - 1, zz);
+        var blockzz = GetBlock(xx, yy, zz - 1);
+
+        if (BlockIsEmpty(otherBlock) && BlockIsEmpty(blockxx) && BlockIsEmpty(blockyy) && BlockIsEmpty(blockzz)) {
+            var cxx = blockxx == null || blockxx.connectedBefore.x == -1 ? -1 : blockxx.connectedBefore.x + 1;
+            var cyy = blockyy == null || blockyy.connectedBefore.y == -1 ? -1 : blockyy.connectedBefore.y + 1;
+            var czz = blockzz == null || blockzz.connectedBefore.z == -1 ? -1 : blockzz.connectedBefore.z + 1;
+            otherBlock.connectedBefore = new Vector3i(cxx, cyy, czz);
+        }
+        else {
+            otherBlock.connectedBefore = Vector3i.zero;
+        }
+
+        // DEBUG
+        //WriteToFileDebug(string.Format("{0} ", block.spaces).PadLeft(15));
+        //WriteToFileDebug(string.Format("{0} ", block.connectedAfter).PadLeft(15));
+        //WriteToFileDebug(string.Format("{1}{0} ", otherBlock.connectedBefore, BlockIsEmpty(otherBlock) ? "" : "*").PadLeft(15));
+        // /DEBUG
     }
 
     // Устанавливает заполненность блоков, которые были задеты объектом
@@ -571,7 +579,7 @@ public class BuildStation : MonoBehaviour {
     // Проверяет тип объекта и либо размещает его сразу, либо помещает его в очередь
     protected void ProcessObject(GameObject obj) {
 
-        var interactible = obj.GetComponent<Interactible>();
+        var interactible = obj.GetComponent<Interactable>();
 
         // Это не объект для редактора
         if (!interactible) {
@@ -652,7 +660,7 @@ public class BuildStation : MonoBehaviour {
 
             // Считаем поворот объекта
             var appliedRotation = CalculateRotation(obj);
-            var objIsActive = obj.GetComponent<Interactible>().isActive;
+            var objIsActive = obj.GetComponent<Interactable>().isActive;
 
             // Если он в руке игрока, показываем кисть
             if (objIsActive) {
@@ -809,8 +817,8 @@ public class BuildStation : MonoBehaviour {
     // Считает поворот объекта
     // Учитывается только поворот в identity блока, реальный поворот применяется позже только визуально
     protected Quaternion CalculateRotation(GameObject obj) {
-        var identity = obj.GetComponent<ObjectIdentity>();
-        return identity ? identity.GetRotation() : Quaternion.identity;
+        var rotatingComponent = obj.GetComponent<Rotatable>();
+        return rotatingComponent ? rotatingComponent.GetRotation() : Quaternion.identity;
     }
 
     // Считает размер объекта

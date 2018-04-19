@@ -64,14 +64,14 @@ public class Spawner : MonoBehaviour {
     public void SpawnObject(GameObject Item) {
         var item = Instantiate(Item, transform.position, transform.rotation);
         item.SetActive(true);
-        var interactible = item.GetComponentInChildren<InteractibleBlock>();
+        var interactible = item.GetComponentInChildren<InteractableBlock>();
         if (interactible) {
             interactible.spawner = this;
         }
-        var identity = item.GetComponentInChildren<ObjectIdentity>();
-        if (identity) {
-            identity.InitRotations();
-            item.transform.rotation = RotationManager.MainBuildStation.transform.rotation * identity.GetRotation();
+        var rotatingComponent = item.GetComponentInChildren<Rotatable>();
+        if (rotatingComponent) {
+            rotatingComponent.InitRotations();
+            item.transform.rotation = RotationManager.MainBuildStation.transform.rotation * rotatingComponent.GetRotation();
         }
     }
 

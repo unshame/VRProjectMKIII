@@ -1,0 +1,91 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+// Вращение объектов колесом мыши
+public class InteractableBlock : Interactable {
+
+    private bool wasPickedUpBefore = false;
+    private bool wasPutDownBefore = false;
+    public bool alwaysUpdateRotation = true;
+    public Spawner spawner;
+
+    void Update() {
+        if (!isActive) return;
+
+        var direction = Input.GetAxis("Mouse ScrollWheel");
+        var shouldUpdateRotation = alwaysUpdateRotation;
+
+        var rotatingComponent = GetComponent<Rotatable>();
+        var resizeableComponent = GetComponent<Resizable>();
+
+        var ctrlDown = Input.GetKeyDown(KeyCode.LeftControl);
+        var altPressed = Input.GetKey(KeyCode.LeftAlt);
+
+        if (direction != 0) {
+
+            var abs = (int)Mathf.Abs(Mathf.Round(direction * 10));
+
+            if (resizeableComponent && altPressed) {
+                if (direction > 0) {
+                    resizeableComponent.NextSize(abs);
+                }
+                else {
+                    resizeableComponent.PrevSize(abs);
+                }
+            }
+            else if (rotatingComponent) {
+                var freeRotatingComponent = GetComponent<RotatableFree>();
+
+                // Изменение оси вращения по нажатию ctrl
+                if (freeRotatingComponent && ctrlDown) {
+                    freeRotatingComponent.NextRotationAxis();
+                    shouldUpdateRotation = true;
+                }
+
+                // Изменение вращения по колесику мыши
+
+                if (direction > 0) {
+                    rotatingComponent.IncreaseRotationIndex(abs);
+                }
+                else {
+                    rotatingComponent.DecreaseRotationIndex(abs);
+                }
+                shouldUpdateRotation = true;
+            }
+        }
+
+        if (rotatingComponent && shouldUpdateRotation) {
+            transform.rotation = RotationManager.MainBuildStation.transform.rotation * rotatingComponent.GetRotation();
+        }
+    }
+
+    public override void StartInteract(Transform instigator = null) {
+        base.StartInteract(instigator);
+        var rotatingComponent = GetComponent<Rotatable>();
+
+        // Загружаем поворот этого объекта из менеджера, если он не был поднят ранее
+        if (!wasPickedUpBefore) {
+            rotatingComponent.UpdateRotationIndex();
+            wasPickedUpBefore = true;
+            if (spawner) {
+                spawner.SpawningAllowed = false;
+            }
+        }
+        else {
+            // либо сохраняем вращение в менеджер, если объект уже поднимался
+            rotatingComponent.SaveRotationIndex();
+        }
+    }
+
+    public override void StopInteract() {
+        base.StopInteract();
+
+        if (!wasPutDownBefore) {
+            if (spawner) {
+                spawner.SpawningAllowed = true;
+            }
+            wasPutDownBefore = true;
+        }
+    }
+}
