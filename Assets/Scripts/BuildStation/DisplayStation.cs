@@ -8,7 +8,7 @@ using UnityEngine;
 public class DisplayStation : BuildStation {
 
     private Vector3 scaleDif;       // Различие между масштабами редактора и дисплея
-    private BuildStation parent;    // Редактор, главенствующий над этим редактором
+    public BuildStation parent;    // Редактор, главенствующий над этим редактором
 
     protected override void Awake() {
         editable = true;

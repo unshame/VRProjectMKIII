@@ -7,12 +7,14 @@ public class DualBuildStation : BuildStation {
 
 
     public DisplayStation displayStation;
+	public BumScript BumMind;
 
     protected override void Awake() {
         base.Awake();
 
         // Устанавливаем главенствующий редактор
         displayStation.SetParentStation(this);
+		BumMind.setParentStation (this);
     }
 
 
