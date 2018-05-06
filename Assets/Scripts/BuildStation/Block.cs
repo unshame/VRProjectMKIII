@@ -10,7 +10,7 @@ public class Block {
     private GameObject obj = null;        // Объект добавленный в блок
     private GameObject anchor;            // Объект, представляющий блок в игровом мире
     private Transform holder;             // Объект внутри anchor, держащий добавленный блок
-    private bool isFilled = false;        // Заполнен ли блок
+    public bool isFilled = false;        // Заполнен ли блок
     private MeshRenderer debugRenderer;   // Визуальное отображение блока   
     
     // Конструктор

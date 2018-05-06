@@ -35,11 +35,13 @@ public class DualBuildStation : BuildStation {
 
         // Удаляем блок в дисплее по координатам
         displayStation.RemoveObject(objCoord);
+		BumMind.updateDecision ();
     }
 
     public override void AddObject(Vector3i blockCoord, GameObject obj, Quaternion rotation, Vector3i objBlockMagnitude) {
         displayStation.AddObject(blockCoord, obj, rotation, objBlockMagnitude);
         base.AddObject(blockCoord, obj, rotation, objBlockMagnitude);
+		BumMind.updateDecision ();
     }
 
     public override void Clear() {
@@ -47,5 +49,6 @@ public class DualBuildStation : BuildStation {
             displayStation.Clear();
         }
         base.Clear();
+		BumMind.updateDecision ();
     }
 }
