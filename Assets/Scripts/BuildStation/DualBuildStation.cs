@@ -41,7 +41,7 @@ public class DualBuildStation : BuildStation {
     public override void AddObject(Vector3i blockCoord, GameObject obj, Quaternion rotation, Vector3i objBlockMagnitude) {
         displayStation.AddObject(blockCoord, obj, rotation, objBlockMagnitude);
         base.AddObject(blockCoord, obj, rotation, objBlockMagnitude);
-		BumMind.updateDecision ();
+		BumMind.BlockAdded (obj);
     }
 
     public override void Clear() {

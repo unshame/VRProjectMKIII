@@ -8,5 +8,6 @@ public class ObjectIdentity : MonoBehaviour {
 
     public string typeName;
     public Vector3 offset = Vector3.zero;
+	public int blocksAffected;
 
 }

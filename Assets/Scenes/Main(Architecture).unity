@@ -78,15 +78,17 @@ LightmapSettings:
     m_PVRDirectSampleCount: 32
     m_PVRSampleCount: 500
     m_PVRBounces: 2
-    m_PVRFiltering: 0
+    m_PVRFilterTypeDirect: 0
+    m_PVRFilterTypeIndirect: 0
+    m_PVRFilterTypeAO: 0
     m_PVRFilteringMode: 1
     m_PVRCulling: 1
     m_PVRFilteringGaussRadiusDirect: 1
     m_PVRFilteringGaussRadiusIndirect: 5
     m_PVRFilteringGaussRadiusAO: 2
-    m_PVRFilteringAtrousColorSigma: 1
-    m_PVRFilteringAtrousNormalSigma: 1
-    m_PVRFilteringAtrousPositionSigma: 1
+    m_PVRFilteringAtrousPositionSigmaDirect: 0.5
+    m_PVRFilteringAtrousPositionSigmaIndirect: 2
+    m_PVRFilteringAtrousPositionSigmaAO: 1
   m_LightingDataAsset: {fileID: 0}
   m_ShadowMaskMode: 2
 --- !u!196 &4
@@ -2654,6 +2656,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   typeName: 
   offset: {x: 0, y: 0, z: 0}
+  blocksAffected: 0
 --- !u!1001 &145679274
 Prefab:
   m_ObjectHideFlags: 0
@@ -3844,6 +3847,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   typeName: die
   offset: {x: 0, y: 0, z: 0}
+  blocksAffected: 0
 --- !u!1001 &207285900
 Prefab:
   m_ObjectHideFlags: 0
@@ -4064,8 +4068,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fbdfacbd9a542a48b7e4b26260aad82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  typeName: cube1
+  typeName: wall
   offset: {x: 0, y: 0, z: 0}
+  blocksAffected: 1
 --- !u!1001 &222944209
 Prefab:
   m_ObjectHideFlags: 0
@@ -4694,8 +4699,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fbdfacbd9a542a48b7e4b26260aad82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  typeName: roof8
+  typeName: roof
   offset: {x: 0, y: 0, z: 0}
+  blocksAffected: 0
 --- !u!1001 &257452798
 Prefab:
   m_ObjectHideFlags: 0
@@ -5555,6 +5561,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   typeName: die
   offset: {x: 0, y: 0, z: 0}
+  blocksAffected: 0
 --- !u!1001 &325941352
 Prefab:
   m_ObjectHideFlags: 0
@@ -6006,6 +6013,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   typeName: door
   offset: {x: 0, y: 0, z: 0}
+  blocksAffected: 0
 --- !u!1001 &340189233
 Prefab:
   m_ObjectHideFlags: 0
@@ -6173,6 +6181,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   typeName: window
   offset: {x: 0, y: 0, z: 0}
+  blocksAffected: 0
 --- !u!1001 &343559121
 Prefab:
   m_ObjectHideFlags: 0
@@ -6694,8 +6703,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fbdfacbd9a542a48b7e4b26260aad82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  typeName: roof3
+  typeName: roof
   offset: {x: 0, y: 0, z: 0}
+  blocksAffected: 12
 --- !u!1001 &425062722
 Prefab:
   m_ObjectHideFlags: 0
@@ -8626,8 +8636,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fbdfacbd9a542a48b7e4b26260aad82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  typeName: roof5
+  typeName: roof
   offset: {x: 0, y: 0, z: 0}
+  blocksAffected: 24
 --- !u!114 &523243612
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10604,8 +10615,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fbdfacbd9a542a48b7e4b26260aad82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  typeName: roof2
+  typeName: roof
   offset: {x: 0, y: 0, z: 0}
+  blocksAffected: 0
 --- !u!1 &654778212 stripped
 GameObject:
   m_PrefabParentObject: {fileID: 1047736690351894, guid: 8c812ccc4fe030a42ac0067a72a43466,
@@ -12067,8 +12079,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fbdfacbd9a542a48b7e4b26260aad82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  typeName: roof7
+  typeName: roof
   offset: {x: 0, y: 0, z: 0}
+  blocksAffected: 8
 --- !u!1001 &762588726
 Prefab:
   m_ObjectHideFlags: 0
@@ -12619,6 +12632,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   typeName: die
   offset: {x: 0, y: 0, z: 0}
+  blocksAffected: 0
 --- !u!1001 &773415315
 Prefab:
   m_ObjectHideFlags: 0
@@ -13372,8 +13386,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fbdfacbd9a542a48b7e4b26260aad82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  typeName: cube3
+  typeName: wall
   offset: {x: 0, y: 0, z: 0}
+  blocksAffected: 4
 --- !u!1001 &826404032
 Prefab:
   m_ObjectHideFlags: 0
@@ -16067,8 +16082,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fbdfacbd9a542a48b7e4b26260aad82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  typeName: cube4
+  typeName: wall
   offset: {x: 0, y: 0, z: 0}
+  blocksAffected: 8
 --- !u!1 &1042527995 stripped
 GameObject:
   m_PrefabParentObject: {fileID: 100000, guid: d153a8045fa3a8143b860fc787040f99, type: 2}
@@ -16953,8 +16969,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fbdfacbd9a542a48b7e4b26260aad82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  typeName: roof6
+  typeName: roof
   offset: {x: 0, y: 0, z: 0}
+  blocksAffected: 16
 --- !u!1001 &1117346804
 Prefab:
   m_ObjectHideFlags: 0
@@ -17703,8 +17720,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fbdfacbd9a542a48b7e4b26260aad82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  typeName: roof4
+  typeName: roof
   offset: {x: 0, y: 0, z: 0}
+  blocksAffected: 24
 --- !u!1001 &1153012006
 Prefab:
   m_ObjectHideFlags: 0
@@ -18954,8 +18972,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fbdfacbd9a542a48b7e4b26260aad82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  typeName: roof1
+  typeName: roof
   offset: {x: 0, y: 0, z: 0}
+  blocksAffected: 48
 --- !u!1001 &1219089239
 Prefab:
   m_ObjectHideFlags: 0
@@ -19199,8 +19218,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fbdfacbd9a542a48b7e4b26260aad82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  typeName: cube2
+  typeName: wall
   offset: {x: 0, y: 0, z: 0}
+  blocksAffected: 8
 --- !u!1 &1227106078
 GameObject:
   m_ObjectHideFlags: 0
@@ -21170,8 +21190,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fbdfacbd9a542a48b7e4b26260aad82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  typeName: cube5
+  typeName: wall
   offset: {x: 0, y: 0, z: 0}
+  blocksAffected: 16
 --- !u!1001 &1347550679
 Prefab:
   m_ObjectHideFlags: 0
@@ -23785,8 +23806,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fbdfacbd9a542a48b7e4b26260aad82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  typeName: cube6
+  typeName: wall
   offset: {x: 0, y: 0, z: 0}
+  blocksAffected: 64
 --- !u!1 &1465325466
 GameObject:
   m_ObjectHideFlags: 0
