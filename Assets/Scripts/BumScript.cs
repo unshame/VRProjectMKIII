@@ -20,25 +20,19 @@ public class BumScript : MonoBehaviour {
 		windowBlocks= 0;
 	}
 	public void updateDecision(){
-        /*var size = buildStation.size;
-        for (int x = 0; x < size.x; x++) {
-            for (int y = 0; y < size.y; y++) {
-                for (int z = 0; z < size.z; z++) {
-                    var block = buildStation.blocks[x][y][z];
-                    if (block.isFilled) {
-                        var identity = block.gameObject.GetComponent<ObjectIdentity>();
-                        if(identity.typeName == "wall") {
-                            Debug.Log("+");
-                        }
-                    }
-				}
-			}
-		}*/
-		Debug.Log ("Walls: " + wallBlocks);
-		Debug.Log ("Roofs: " + roofBlocks);
-		Debug.Log ("Doors: " + doorBlocks);
-		Debug.Log ("Windows: " + windowBlocks);
-		if (wallBlocks >= 200 && roofBlocks >= 100 && doorBlocks != 0 && windowBlocks != 0)
+		//Debug.Log ("Walls: " + wallBlocks);
+		//Debug.Log ("Roofs: " + roofBlocks);
+		//Debug.Log ("Doors: " + doorBlocks);
+		//Debug.Log ("Windows: " + windowBlocks);
+		if (wallBlocks <= 200)
+			Debug.Log ("Not Enough walls");
+		else if (roofBlocks <= 100)
+			Debug.Log ("Not Enough roofs");
+		else if (doorBlocks == 0)
+			Debug.Log ("Put the door");
+		else if (windowBlocks == 0)
+			Debug.Log ("Need some windows");
+		else
 			Debug.Log ("Well played!");
 	}
 	public void BlockAdded(GameObject obj){
@@ -68,5 +62,12 @@ public class BumScript : MonoBehaviour {
 			windowBlocks--;
 		updateDecision ();	
 
+	}
+	public void Reset(){
+		summaryBlocksAffected = 0;
+		wallBlocks= 0;
+		roofBlocks= 0;
+		doorBlocks= 0;
+		windowBlocks= 0;
 	}
 }

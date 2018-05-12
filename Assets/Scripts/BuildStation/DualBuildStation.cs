@@ -49,6 +49,6 @@ public class DualBuildStation : BuildStation {
             displayStation.Clear();
         }
         base.Clear();
-		BumMind.updateDecision ();
+		BumMind.Reset ();
     }
 }
