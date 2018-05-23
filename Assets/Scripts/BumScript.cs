@@ -5,6 +5,17 @@ using UnityEngine;
 public class BumScript : MonoBehaviour {
 
 	private BuildStation buildStation;
+	public struct MindBlock
+	{
+		
+		public MindBlock(GameObject b,int a){
+			block = b;
+			blockSize =a;
+		}
+		public GameObject block;
+		public int blockSize;
+	}
+	public List<MindBlock> blocks = new List<MindBlock>();
 	private int summaryBlocksAffected;
 	private int wallBlocks;
 	private int roofBlocks;
@@ -35,27 +46,37 @@ public class BumScript : MonoBehaviour {
 		else
 			Debug.Log ("Well played!");
 	}
-	public void BlockAdded(GameObject obj){
+	public void BlockAdded(GameObject obj,Vector3i objBlockMagnitude){
 		ObjectIdentity identity = obj.GetComponent<ObjectIdentity> ();
-		summaryBlocksAffected += identity.blocksAffected;
+		int afflectedBlocks = objBlockMagnitude.x * objBlockMagnitude.y * objBlockMagnitude.z;
+		summaryBlocksAffected += afflectedBlocks;
 		if (identity.typeName == "wall")
-			wallBlocks += identity.blocksAffected;
+			wallBlocks += afflectedBlocks;
 		if (identity.typeName == "roof")
-			roofBlocks += identity.blocksAffected;
+			roofBlocks += afflectedBlocks;
 		if (identity.typeName == "door")
 			doorBlocks++;
 		if (identity.typeName == "window")
 			windowBlocks++;
+		MindBlock mb = new MindBlock (obj, afflectedBlocks);
+		blocks.Add(mb);
 		updateDecision ();	
 
 	}
 	public void BlockDeleted(GameObject obj){
 		ObjectIdentity identity = obj.GetComponent<ObjectIdentity> ();
-		summaryBlocksAffected -= identity.blocksAffected;
+		int deletedBlocks = 0;
+		foreach (MindBlock mb in blocks) 
+		{
+			if (mb.block == obj) {
+				summaryBlocksAffected -= mb.blockSize;
+				deletedBlocks = mb.blockSize;
+			}
+		}
 		if (identity.typeName == "wall")
-			wallBlocks -= identity.blocksAffected;
+			wallBlocks -= deletedBlocks;
 		if (identity.typeName == "roof")
-			roofBlocks -= identity.blocksAffected;
+			roofBlocks -= deletedBlocks;
 		if (identity.typeName == "door")
 			doorBlocks--;
 		if (identity.typeName == "window")
@@ -63,6 +84,7 @@ public class BumScript : MonoBehaviour {
 		updateDecision ();	
 
 	}
+
 	public void Reset(){
 		summaryBlocksAffected = 0;
 		wallBlocks= 0;
