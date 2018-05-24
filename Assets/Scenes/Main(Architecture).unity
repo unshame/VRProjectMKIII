@@ -2655,8 +2655,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   typeName: 
+  groupName: 
   offset: {x: 0, y: 0, z: 0}
-  blocksAffected: 0
 --- !u!1001 &145679274
 Prefab:
   m_ObjectHideFlags: 0
@@ -3846,8 +3846,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   typeName: die
+  groupName: 
   offset: {x: 0, y: 0, z: 0}
-  blocksAffected: 0
 --- !u!1001 &207285900
 Prefab:
   m_ObjectHideFlags: 0
@@ -4068,9 +4068,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fbdfacbd9a542a48b7e4b26260aad82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  typeName: wall
+  typeName: cube2
+  groupName: wall
   offset: {x: 0, y: 0, z: 0}
-  blocksAffected: 1
 --- !u!1001 &222944209
 Prefab:
   m_ObjectHideFlags: 0
@@ -4699,9 +4699,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fbdfacbd9a542a48b7e4b26260aad82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  typeName: roof
+  typeName: window_wide0
+  groupName: window
   offset: {x: 0, y: 0, z: 0}
-  blocksAffected: 0
 --- !u!1001 &257452798
 Prefab:
   m_ObjectHideFlags: 0
@@ -5560,8 +5560,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   typeName: die
+  groupName: 
   offset: {x: 0, y: 0, z: 0}
-  blocksAffected: 0
 --- !u!1001 &325941352
 Prefab:
   m_ObjectHideFlags: 0
@@ -6012,8 +6012,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   typeName: door
+  groupName: door
   offset: {x: 0, y: 0, z: 0}
-  blocksAffected: 0
 --- !u!1001 &340189233
 Prefab:
   m_ObjectHideFlags: 0
@@ -6180,8 +6180,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   typeName: window
+  groupName: window
   offset: {x: 0, y: 0, z: 0}
-  blocksAffected: 0
 --- !u!1001 &343559121
 Prefab:
   m_ObjectHideFlags: 0
@@ -6703,9 +6703,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fbdfacbd9a542a48b7e4b26260aad82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  typeName: roof
+  typeName: 2
+  groupName: roof
   offset: {x: 0, y: 0, z: 0}
-  blocksAffected: 12
 --- !u!1001 &425062722
 Prefab:
   m_ObjectHideFlags: 0
@@ -8636,9 +8636,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fbdfacbd9a542a48b7e4b26260aad82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  typeName: roof
+  typeName: 0
+  groupName: roof
   offset: {x: 0, y: 0, z: 0}
-  blocksAffected: 24
 --- !u!114 &523243612
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9333,46 +9333,6 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 8c812ccc4fe030a42ac0067a72a43466, type: 2}
   m_IsPrefabParent: 0
---- !u!1 &574421963
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 5
-  m_Component:
-  - component: {fileID: 574421964}
-  - component: {fileID: 574421965}
-  m_Layer: 0
-  m_Name: BumMind
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &574421964
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 574421963}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 1254650062}
-  m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &574421965
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 574421963}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e0898903f3c06e14494c214d37b967d4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &575473441
 Prefab:
   m_ObjectHideFlags: 0
@@ -10615,9 +10575,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fbdfacbd9a542a48b7e4b26260aad82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  typeName: roof
+  typeName: window_wide1
+  groupName: window
   offset: {x: 0, y: 0, z: 0}
-  blocksAffected: 0
 --- !u!1 &654778212 stripped
 GameObject:
   m_PrefabParentObject: {fileID: 1047736690351894, guid: 8c812ccc4fe030a42ac0067a72a43466,
@@ -12079,9 +12039,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fbdfacbd9a542a48b7e4b26260aad82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  typeName: roof
+  typeName: roof5
+  groupName: roof
   offset: {x: 0, y: 0, z: 0}
-  blocksAffected: 8
 --- !u!1001 &762588726
 Prefab:
   m_ObjectHideFlags: 0
@@ -12631,8 +12591,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   typeName: die
+  groupName: 
   offset: {x: 0, y: 0, z: 0}
-  blocksAffected: 0
 --- !u!1001 &773415315
 Prefab:
   m_ObjectHideFlags: 0
@@ -13386,9 +13346,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fbdfacbd9a542a48b7e4b26260aad82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  typeName: wall
+  typeName: 2
+  groupName: wall
   offset: {x: 0, y: 0, z: 0}
-  blocksAffected: 4
 --- !u!1001 &826404032
 Prefab:
   m_ObjectHideFlags: 0
@@ -15032,7 +14992,7 @@ Transform:
   m_PrefabParentObject: {fileID: 400032, guid: fa6e3482182b1c4449c257fd56ec1928, type: 3}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 929155717}
-  m_LocalRotation: {x: 0.0865599, y: -0.70179635, z: -0.08656177, w: 0.7017808}
+  m_LocalRotation: {x: 0.086559914, y: -0.70179635, z: -0.086561784, w: 0.7017808}
   m_LocalPosition: {x: 2.7755575e-19, y: 0.0017001948, z: 3.4924594e-11}
   m_LocalScale: {x: 1.0000001, y: 1.0000001, z: 1}
   m_Children:
@@ -16082,9 +16042,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fbdfacbd9a542a48b7e4b26260aad82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  typeName: wall
+  typeName: 1
+  groupName: wall
   offset: {x: 0, y: 0, z: 0}
-  blocksAffected: 8
 --- !u!1 &1042527995 stripped
 GameObject:
   m_PrefabParentObject: {fileID: 100000, guid: d153a8045fa3a8143b860fc787040f99, type: 2}
@@ -16969,9 +16929,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fbdfacbd9a542a48b7e4b26260aad82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  typeName: roof
+  typeName: roof4
+  groupName: roof
   offset: {x: 0, y: 0, z: 0}
-  blocksAffected: 16
 --- !u!1001 &1117346804
 Prefab:
   m_ObjectHideFlags: 0
@@ -17720,9 +17680,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fbdfacbd9a542a48b7e4b26260aad82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  typeName: roof
+  typeName: roof1
+  groupName: roof
   offset: {x: 0, y: 0, z: 0}
-  blocksAffected: 24
 --- !u!1001 &1153012006
 Prefab:
   m_ObjectHideFlags: 0
@@ -18783,6 +18743,90 @@ Light:
   m_UseColorTemperature: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
+--- !u!1 &1215690518
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 1215690522}
+  - component: {fileID: 1215690521}
+  - component: {fileID: 1215690520}
+  - component: {fileID: 1215690519}
+  m_Layer: 0
+  m_Name: speechbubble
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!23 &1215690519
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1215690518}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_MotionVectors: 0
+  m_LightProbeUsage: 0
+  m_ReflectionProbeUsage: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 59186a2b5b6ed6b43ab7b48e25159835, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_PreserveUVs: 1
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+--- !u!64 &1215690520
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1215690518}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 0
+  serializedVersion: 2
+  m_Convex: 0
+  m_InflateMesh: 0
+  m_SkinWidth: 0.01
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!33 &1215690521
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1215690518}
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!4 &1215690522
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1215690518}
+  m_LocalRotation: {x: -0.7068243, y: 0.019987315, z: -0.019987196, w: -0.7068243}
+  m_LocalPosition: {x: -0.059916236, y: 0.12595001, z: 0.0050376537}
+  m_LocalScale: {x: 0.009619972, y: 0.009619968, z: 0.0096199745}
+  m_Children: []
+  m_Father: {fileID: 1254650062}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 90.00001, y: 0, z: 67.066}
 --- !u!1001 &1216183000
 Prefab:
   m_ObjectHideFlags: 0
@@ -18972,9 +19016,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fbdfacbd9a542a48b7e4b26260aad82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  typeName: roof
+  typeName: roof3
+  groupName: roof
   offset: {x: 0, y: 0, z: 0}
-  blocksAffected: 48
 --- !u!1001 &1219089239
 Prefab:
   m_ObjectHideFlags: 0
@@ -19218,9 +19262,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fbdfacbd9a542a48b7e4b26260aad82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  typeName: wall
+  typeName: cube1
+  groupName: wall
   offset: {x: 0, y: 0, z: 0}
-  blocksAffected: 8
 --- !u!1 &1227106078
 GameObject:
   m_ObjectHideFlags: 0
@@ -19322,7 +19366,7 @@ Animator:
   m_GameObject: {fileID: 1227106078}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: d41ab39007312794396fbe71fa67faef, type: 2}
+  m_Controller: {fileID: 0}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -20011,6 +20055,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1254650062}
   - component: {fileID: 1254650061}
+  - component: {fileID: 1254650063}
   m_Layer: 0
   m_Name: Bum
   m_TagString: Untagged
@@ -20048,10 +20093,29 @@ Transform:
   m_Children:
   - {fileID: 1227106079}
   - {fileID: 82175269}
-  - {fileID: 574421964}
+  - {fileID: 1215690522}
   m_Father: {fileID: 1402177322}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 296.174, z: 0}
+--- !u!114 &1254650063
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1254650060}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0898903f3c06e14494c214d37b967d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bubble: {fileID: 1215690518}
+  wallMat: {fileID: 2100000, guid: 51d877fa407332844bb8df6a970e44b9, type: 2}
+  roofMat: {fileID: 2100000, guid: 59186a2b5b6ed6b43ab7b48e25159835, type: 2}
+  doorMat: {fileID: 2100000, guid: f742fcc7aa2e6b647b6ebb09e292231f, type: 2}
+  windowMat: {fileID: 2100000, guid: e6fd31bc5fe1f7b4581dfe166525bd13, type: 2}
+  goodAnim: {fileID: 9100000, guid: 9548fd8913d846b4494483fe5e50335f, type: 2}
+  badAnim: {fileID: 9100000, guid: a87e02667efce4541962e14c0d4329cb, type: 2}
+  defaultAnim: {fileID: 9100000, guid: a87e02667efce4541962e14c0d4329cb, type: 2}
 --- !u!1 &1264374009
 GameObject:
   m_ObjectHideFlags: 0
@@ -20821,7 +20885,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: Talk (not implemented)
+  m_Text: Talk
 --- !u!222 &1317786823
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -21190,9 +21254,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fbdfacbd9a542a48b7e4b26260aad82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  typeName: wall
+  typeName: 0
+  groupName: wall
   offset: {x: 0, y: 0, z: 0}
-  blocksAffected: 16
 --- !u!1001 &1347550679
 Prefab:
   m_ObjectHideFlags: 0
@@ -22860,15 +22924,15 @@ MonoBehaviour:
   onHandClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_MethodName: ShowTextHints
-        m_Mode: 0
+      - m_Target: {fileID: 327863618}
+        m_MethodName: LoadScene
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: Main(Architecture)
           m_BoolArgument: 0
         m_CallState: 2
     m_TypeName: Valve.VR.InteractionSystem.CustomEvents+UnityEventHand, Assembly-CSharp,
@@ -23205,7 +23269,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1434184161
 RectTransform:
   m_ObjectHideFlags: 0
@@ -23213,7 +23277,7 @@ RectTransform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1434184160}
   m_LocalRotation: {x: -0, y: -0.8488513, z: 0, w: -0.52863175}
-  m_LocalPosition: {x: 0, y: 0, z: -10.58}
+  m_LocalPosition: {x: 0, y: 0, z: -10.384}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1317786820}
@@ -23223,8 +23287,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 476.174, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 9.767, y: -0.090000026}
-  m_SizeDelta: {x: 0.7, y: 0.08}
+  m_AnchoredPosition: {x: 9.542, y: -0.090000026}
+  m_SizeDelta: {x: 0.4, y: 0.08}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1434184162
 MonoBehaviour:
@@ -23239,7 +23303,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   onHandClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_MethodName: updateDecision
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: Valve.VR.InteractionSystem.CustomEvents+UnityEventHand, Assembly-CSharp,
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
 --- !u!114 &1434184163
@@ -23806,9 +23881,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fbdfacbd9a542a48b7e4b26260aad82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  typeName: wall
+  typeName: cube0
+  groupName: wall
   offset: {x: 0, y: 0, z: 0}
-  blocksAffected: 64
 --- !u!1 &1465325466
 GameObject:
   m_ObjectHideFlags: 0
@@ -29172,11 +29247,11 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4095734170439258, guid: cc2777865be32aa41860da4dfad310fd, type: 2}
       propertyPath: m_LocalScale.y
-      value: 23.529411
+      value: 11.764706
       objectReference: {fileID: 0}
     - target: {fileID: 4095734170439258, guid: cc2777865be32aa41860da4dfad310fd, type: 2}
       propertyPath: m_LocalPosition.y
-      value: 7.76
+      value: 1.85
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: cc2777865be32aa41860da4dfad310fd, type: 2}
@@ -34249,16 +34324,16 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4231130782778906, guid: ad233b753743c494e82333d1422f97c9, type: 2}
       propertyPath: m_LocalScale.y
-      value: 3.125
+      value: 1.5625
       objectReference: {fileID: 0}
     - target: {fileID: 114942462511046552, guid: ad233b753743c494e82333d1422f97c9,
         type: 2}
       propertyPath: size.y
-      value: 50
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 4231130782778906, guid: ad233b753743c494e82333d1422f97c9, type: 2}
       propertyPath: m_LocalPosition.y
-      value: 1.659
+      value: 0.873
       objectReference: {fileID: 0}
     - target: {fileID: 4231130782778906, guid: ad233b753743c494e82333d1422f97c9, type: 2}
       propertyPath: m_LocalPosition.x
@@ -34268,7 +34343,7 @@ Prefab:
         type: 2}
       propertyPath: BumMind
       value: 
-      objectReference: {fileID: 574421965}
+      objectReference: {fileID: 1254650063}
     - target: {fileID: 23320341543590396, guid: ad233b753743c494e82333d1422f97c9,
         type: 2}
       propertyPath: m_Enabled
@@ -34545,7 +34620,7 @@ Transform:
   m_PrefabParentObject: {fileID: 400024, guid: fa6e3482182b1c4449c257fd56ec1928, type: 3}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2036597699}
-  m_LocalRotation: {x: -0.6145748, y: 0.35125312, z: 0.3508191, w: 0.61306214}
+  m_LocalRotation: {x: -0.61457473, y: 0.3512531, z: 0.35081908, w: 0.6130621}
   m_LocalPosition: {x: -0.00086120254, y: 0.0013251683, z: 0.00025678353}
   m_LocalScale: {x: 1.0000002, y: 1.0000001, z: 1.0000002}
   m_Children:

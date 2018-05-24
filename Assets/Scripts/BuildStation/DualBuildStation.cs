@@ -14,7 +14,6 @@ public class DualBuildStation : BuildStation {
 
         // Устанавливаем главенствующий редактор
         displayStation.SetParentStation(this);
-		BumMind.setParentStation (this);
     }
 
 
@@ -36,7 +35,6 @@ public class DualBuildStation : BuildStation {
         // Удаляем блок в дисплее по координатам
         displayStation.RemoveObject(objCoord);
 		BumMind.BlockDeleted (obj);
-		BumMind.updateDecision ();
     }
 
     public override void AddObject(Vector3i blockCoord, GameObject obj, Quaternion rotation, Vector3i objBlockMagnitude) {
@@ -51,6 +49,5 @@ public class DualBuildStation : BuildStation {
         }
         base.Clear();
 		BumMind.Reset ();
-		BumMind.updateDecision ();
     }
 }

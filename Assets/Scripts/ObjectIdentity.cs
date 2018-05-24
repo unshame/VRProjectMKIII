@@ -7,6 +7,7 @@ using UnityEngine;
 public class ObjectIdentity : MonoBehaviour {
 
     public string typeName;
+    public string groupName;
     public Vector3 offset = Vector3.zero;
 
 
