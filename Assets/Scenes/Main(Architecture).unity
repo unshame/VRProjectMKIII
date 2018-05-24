@@ -27011,7 +27011,7 @@ MonoBehaviour:
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   forceStart: 1
-  startAngle: 90
+  startAngle: -30
   rotateGameObject: 1
   debugPath: 0
   dbgPathLimit: 50
@@ -34824,7 +34824,7 @@ Transform:
   m_PrefabParentObject: {fileID: 400024, guid: fa6e3482182b1c4449c257fd56ec1928, type: 3}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2036597699}
-  m_LocalRotation: {x: -0.61457473, y: 0.3512531, z: 0.35081908, w: 0.6130621}
+  m_LocalRotation: {x: -0.6145748, y: 0.35125312, z: 0.3508191, w: 0.61306214}
   m_LocalPosition: {x: -0.00086120254, y: 0.0013251683, z: 0.00025678353}
   m_LocalScale: {x: 1.0000002, y: 1.0000001, z: 1.0000002}
   m_Children:
