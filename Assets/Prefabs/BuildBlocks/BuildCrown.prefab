@@ -27,7 +27,7 @@ GameObject:
   - component: {fileID: 54426451568084650}
   - component: {fileID: 114267341857182200}
   - component: {fileID: 114507467817480624}
-  - component: {fileID: 114336327253660532}
+  - component: {fileID: 114127778313831738}
   m_Layer: 8
   m_Name: BuildCrown
   m_TagString: Untagged
@@ -114,6 +114,20 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1.1457174, y: 0.9484177, z: 1.1364591}
   m_Center: {x: 0.015044779, y: 0.47420886, z: -0.05680713}
+--- !u!114 &114127778313831738
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1249576733337014}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fbdfacbd9a542a48b7e4b26260aad82, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  typeName: 
+  groupName: roof
+  offset: {x: 0, y: 0, z: 0}
 --- !u!114 &114267341857182200
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -125,27 +139,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b93b6a877adcbf94c89a9d6e0c0e844d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &114336327253660532
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1249576733337014}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9743bf7df90c27a4d91118019fdacf60, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rotationAngle: 90
-  debugAngleDisplay: {x: 0, y: 0, z: 0}
-  predefinedRotations: []
-  predefinedRotationIndex: 0
-  allowedRotationMin: {x: 0, y: 0, z: 0}
-  allowedRotationMax: {x: 0, y: 0, z: 0}
-  xyPermutate: 0
-  xzPermutate: 0
-  yzPermutate: 0
-  xyzPermutate: 0
 --- !u!114 &114507467817480624
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -58,7 +58,7 @@ public class BumScript : MonoBehaviour {
             return;
         }
 
-        if (windowBlocks == 0) {
+        if (windowBlocks < 4) {
             renderer.material = windowMat;
             return;
         }

@@ -23,6 +23,8 @@ public class Spawner : MonoBehaviour {
 
     List<GameObject> ObjectsInside = new List<GameObject>();
 
+
+
     // Объект имеет TypeName в ObjectIdentity, совпадающий с префабом
     bool IsCorrectType(GameObject other) {
         var identity = Prefab.gameObject.GetComponentInChildren<ObjectIdentity>();

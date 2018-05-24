@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -19,6 +19,10 @@ public class RotatableConfigurable : RotatablePredefined {
 
     protected override void Awake() {
         base.Awake();
+        LoadRotations();
+    }
+
+    public void LoadRotations() { 
 
         for (int i = 0; i < NUM_AXIS; i++) {
             var allowedRotation = allowedRotationMin[i];
