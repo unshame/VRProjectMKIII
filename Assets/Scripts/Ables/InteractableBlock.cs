@@ -23,6 +23,8 @@ public class InteractableBlock : Interactable {
         var ctrlDown = Input.GetKeyDown(KeyCode.LeftControl);
         var altPressed = Input.GetKey(KeyCode.LeftAlt);
 
+        var controller = SteamVR_Controller.Input(0);
+
         if (direction != 0) {
 
             var abs = (int)Mathf.Abs(Mathf.Round(direction * 10));
@@ -53,6 +55,11 @@ public class InteractableBlock : Interactable {
                     rotatingComponent.DecreaseRotationIndex(abs);
                 }
                 shouldUpdateRotation = true;
+            }
+        }
+        else if(controller != null) {
+            if(controller.GetPressDown(SteamVR_Controller.ButtonMask.Grip)) {
+                rotatingComponent.IncreaseRotationIndex(1);
             }
         }
 
